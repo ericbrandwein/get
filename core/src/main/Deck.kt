@@ -5,8 +5,7 @@ class Deck<T> {
     private var cards: MutableCollection<T>
     private val discardPile = mutableListOf<T>()
     private val shuffler: Random
-    val size: Int
-        get() = cards.size + discardPile.size
+    val size: Int get() = cards.size + discardPile.size
 
     constructor(cards: Collection<T>, shuffler: Random) {
         this.shuffler = shuffler
@@ -17,9 +16,7 @@ class Deck<T> {
     constructor() : this(emptyList())
 
     fun takeCard(): T {
-        if (cards.isEmpty()) {
-            shuffleDiscardPile()
-        }
+        if (cards.isEmpty()) { shuffleDiscardPile() }
         return popFirstCard()
     }
 
@@ -28,19 +25,16 @@ class Deck<T> {
         discardPile.clear()
     }
 
-    private fun popFirstCard(): T {
+    private fun pop(): T {
         val card = cards.first()
         cards.remove(card)
         return card
     }
 
-    private fun mutableShuffled(original: Collection<T>) = ArrayList(original.shuffled(shuffler))
+    private fun mutableShuffled(original: Collection<T>) = ArrayList(
+        original.shuffled(shuffler)
+    )
 
-    fun isEmpty(): Boolean {
-        return size == 0
-    }
-
-    fun add(card: T) {
-        discardPile.add(card)
-    }
+    fun isEmpty() = size == 0 
+    fun add(card: T) = discardPile.add(card)
 }
