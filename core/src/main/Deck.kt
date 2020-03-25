@@ -31,10 +31,10 @@ class Deck<T> {
         return card
     }
 
-    private fun mutableShuffled(original: Collection<T>) : ArrayList<T> {
+    private fun mutableShuffled(original: Collection<T>): MutableCollection<T> {
         return ArrayList(original.shuffled(shuffler))
     }
 
-    fun isEmpty() = size == 0 
+    fun isEmpty() = size == 0
     fun add(card: T) = discardPile.add(card)
 }
