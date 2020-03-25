@@ -17,7 +17,7 @@ class Deck<T> {
 
     fun takeCard(): T {
         if (cards.isEmpty()) { shuffleDiscardPile() }
-        return popFirstCard()
+        return pop()
     }
 
     private fun shuffleDiscardPile() {
