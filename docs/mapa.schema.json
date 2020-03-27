@@ -14,11 +14,11 @@
                 "type": "object",
                 "properties": {
                     "name": {"type": "string" },
+                    "description": "A continent",
                     "countries": {
                         "type": "array",
                         "items": {
                             "type": "object",
-                            "description": "A continent",
                             "properties": {
                                 "countries":{ 
                                     "type": "array",
