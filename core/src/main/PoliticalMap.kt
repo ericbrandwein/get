@@ -1,30 +1,28 @@
 class PoliticalMap private constructor(
-    private val countriesWithContinents: Map<String, String>,
+    private val continents: Map<String, Collection<String>>,
     private val borders: Map<String, Collection<String>>
 ) {
 
-    val countries get() = countriesWithContinents.keys
+    val countries get() = continents.flatMap { (_, countries) -> countries }.toSet()
 
     fun continentOf(country: String): String {
         assertCountryExists(country)
-        return countriesWithContinents.getValue(country)
+        return continents.keys.first { continents.getValue(it).contains(country) }
     }
 
     private fun assertCountryExists(country: String) {
-        if (!countriesWithContinents.containsKey(country)) {
+        if (!continents.values.any { it.contains(country) }) {
             throw NonExistentCountryException(country)
         }
     }
 
-    fun countriesOf(continent: String): Set<String> {
+    fun countriesOf(continent: String): Collection<String> {
         assertContinentExists(continent)
-        return countriesWithContinents.filter { (_, eachContinent) ->
-            eachContinent == continent
-        }.keys
+        return continents.getValue(continent)
     }
 
     private fun assertContinentExists(continent: String) {
-        if (!countriesWithContinents.containsValue(continent)) {
+        if (!continents.containsKey(continent)) {
             throw NonExistentContinentException(continent)
         }
     }
@@ -37,21 +35,24 @@ class PoliticalMap private constructor(
 
     class Builder {
 
-        private val countriesWithContinents = mutableMapOf<String, String>()
+        private val continents = mutableMapOf<String, MutableCollection<String>>()
         private val borders = mutableMapOf<String, MutableCollection<String>>()
 
         fun addCountry(country: String, continent: String): Builder {
             assertCountryDoesNotExist(country)
-            countriesWithContinents[country] = continent
+            continents.getOrPut(continent) { mutableSetOf() }.add(country)
             borders[country] = mutableSetOf()
             return this
         }
 
         private fun assertCountryDoesNotExist(country: String) {
-            if (countriesWithContinents.containsKey(country)) {
+            if (doesCountryExist(country)) {
                 throw CountryAlreadyExistsException(country)
             }
         }
+
+        private fun doesCountryExist(country: String) =
+            continents.values.any { it.contains(country) }
 
         fun addBorder(firstCountry: String, secondCountry: String): Builder {
             assertCountryExists(firstCountry)
@@ -62,11 +63,11 @@ class PoliticalMap private constructor(
         }
 
         private fun assertCountryExists(country: String) {
-            if (!countriesWithContinents.containsKey(country)) {
+            if (!doesCountryExist(country)) {
                 throw NonExistentCountryException(country)
             }
         }
 
-        fun build() = PoliticalMap(countriesWithContinents, borders)
+        fun build() = PoliticalMap(continents, borders)
     }
 }
