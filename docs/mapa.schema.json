@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/schema#" ,
+     "$schema": "http://json-schema.org/schema#" ,
     "title": "planisphere",
     "description": "A world's (or region's) flat representation",
     "type": "object",
@@ -14,24 +14,14 @@
                 "type": "object",
                 "properties": {
                     "name": {"type": "string" },
-                    "description": "A continent",
                     "countries": {
                         "type": "array",
                         "items": {
                             "type": "object",
+                            "description": "A Country",
                             "properties": {
-                                "countries":{ 
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "description": "country",
-                                        "properties": {
-                                            "name": { "type" : "string" },
-                                            "color": { "type": "integer"}
-                                        }
-                                    }
-                                }
-                                
+                                "name": { "type" : "string" },
+                                "color": { "type": "integer"}
                             }
                         }
                     }
