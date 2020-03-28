@@ -74,18 +74,16 @@ private class ContinentSet : HashSet<Continent>() {
     }
 
     fun assertCountryExists(country: Country) {
-        if (!anyHasCountry(country)) {
+        if (!countries.contains(country)) {
             throw NonExistentCountryException(country)
         }
     }
 
     fun assertCountryDoesNotExist(country: Country) {
-        if (anyHasCountry(country)) {
+        if (countries.contains(country)) {
             throw CountryAlreadyExistsException(country)
         }
     }
-
-    fun anyHasCountry(country: Country) = any { it.containsCountry(country) }
 
     fun doesContinentExist(name: String) = any { it.name == name }
 }
