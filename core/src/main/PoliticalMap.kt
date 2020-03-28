@@ -19,7 +19,7 @@ class PoliticalMap private constructor(
 
     class Builder {
 
-        private val continents = ContinentSet.new()
+        private val continents = ContinentSet()
         private val borders = mutableMapOf<Country, MutableCollection<Country>>()
 
         fun addCountry(country: Country, continent: String): Builder {
@@ -40,9 +40,7 @@ class PoliticalMap private constructor(
     }
 }
 
-private class ContinentSet private constructor(
-    val continents: MutableSet<Continent>
-) : MutableSet<Continent> by continents {
+private class ContinentSet : HashSet<Continent>() {
 
     val countries get() = flatMap { continent -> continent.countries }.toSet()
 
@@ -90,10 +88,6 @@ private class ContinentSet private constructor(
     fun anyHasCountry(country: Country) = any { it.containsCountry(country) }
 
     fun doesContinentExist(name: String) = any { it.name == name }
-
-    companion object {
-        fun new() = ContinentSet(mutableSetOf())
-    }
 }
 
 private class Continent(val name: String) {
