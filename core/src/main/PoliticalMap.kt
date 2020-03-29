@@ -19,8 +19,14 @@ class PoliticalMap private constructor(
 
         private val continents = ContinentSet.new()
         private val borders = mutableMapOf<Country, MutableCollection<Country>>()
+        private val countries = mutableSetOf<Country>()
 
         fun addContinent(continent: Continent): Builder {
+            val intersection = countries.intersect(continent.countries)
+            if (!intersection.isEmpty()) {
+                throw CountryAlreadyExistsException(intersection.elementAt(0))
+            }
+            countries.addAll(continent.countries)
             continents.add(continent)
             continent.countries.forEach {borders[it] = mutableSetOf()}
             return this
@@ -53,9 +59,7 @@ private class ContinentSet private constructor(
     }
 
     fun assertCountryExists(country: Country) {
-        if (!anyHasCountry(country)) {
-            throw NonExistentCountryException(country)
-        }
+        if (!anyHasCountry(country)) { throw NonExistentCountryException(country) }
     }
 
     fun anyHasCountry(country: Country) = any { it.containsCountry(country) }
@@ -71,9 +75,7 @@ data class Continent(val name: String) {
     val countries = mutableSetOf<String>()
 
     fun addCountry(country: Country) : Continent {
-        if (!countries.add(country)) {
-            throw CountryAlreadyExistsException(country)
-        }
+        if (!countries.add(country)) { throw CountryAlreadyExistsException(country) }
         return this
     }
 

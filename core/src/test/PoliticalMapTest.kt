@@ -219,4 +219,18 @@ class PoliticalMapTest {
         }
         assertEquals(nonExistentCountry, exception.country)
     }
+
+    @Test
+    fun `Can't add an already existing country i nother continent`() {
+        val country = "Argentina"
+        val continent = Continent("America").addCountry(country)
+        val otherContinent = Continent("SouthAmerica").addCountry(country)
+        val map = PoliticalMap.Builder().addContinent(continent)
+
+        val exception = assertFailsWith<CountryAlreadyExistsException> {
+            map.addContinent(otherContinent)
+        }
+        assertEquals(country, exception.country)
+
+    }
 }
