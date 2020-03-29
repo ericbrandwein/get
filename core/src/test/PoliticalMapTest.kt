@@ -233,4 +233,54 @@ class PoliticalMapTest {
         assertEquals(country, exception.country)
 
     }
+
+    @Test
+    fun `Map with no countries has no continents`() {
+        val map = PoliticalMap.Builder()
+            .build()
+
+        assertTrue(map.continents.isEmpty())
+    }
+
+    @Test
+    fun `Map with one countrie has its continent`() {
+        val country = "Guyana"
+        val continent = Continent("America").addCountry(country)
+        val map = PoliticalMap.Builder()
+            .addContinent(continent)
+            .build()
+
+        val continents = map.continents
+        assertEquals(1, continents.size)
+        assertEquals(continent, continents.single())
+    }
+
+    @Test
+    fun `Map with two countries with same continent has their continent once`() {
+        val continent = Continent("America")
+                .addCountry("Guyana")
+                .addCountry("Peru")
+        val map = PoliticalMap.Builder()
+            .addContinent(continent)
+            .build()
+
+        val continents = map.continents
+        assertEquals(1, continents.size)
+        assertEquals(continent, continents.single())
+    }
+
+    @Test
+    fun `Map with two countries with different continents has each continent`() {
+        val firstContinent = Continent("America")
+        val secondContinent = Continent("Asia")
+        val map = PoliticalMap.Builder()
+            .addContinent(firstContinent)
+            .addContinent(secondContinent)
+            .build()
+
+        val continents = map.continents
+        assertEquals(2, continents.size)
+        assertTrue(continents.contains(firstContinent))
+        assertTrue(continents.contains(secondContinent))
+    }
 }
