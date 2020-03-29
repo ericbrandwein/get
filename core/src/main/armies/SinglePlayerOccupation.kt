@@ -2,6 +2,11 @@ package armies
 
 import Country
 
+/**
+ * An Occupation with only one Player occupying the country.
+ *
+ * One can't take a share of a country if it is being occupied by just one Player.
+ */
 class SinglePlayerOccupation(
     override val country: Country,
     override val occupier: Player,

@@ -2,6 +2,11 @@ package armies
 
 import Country
 
+/**
+ * Defines an occupation of a country by zero or more players.
+ * Depending on the occupation situation, one can add or remove armies,
+ * take the entire country for another player, or take a share of the country.
+ */
 interface Occupation {
     val occupiers: Set<Player>
     val country: Country

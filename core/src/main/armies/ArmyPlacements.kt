@@ -4,6 +4,14 @@ import Country
 
 typealias Player = String
 
+/**
+ * Controls the army placements in countries.
+ *
+ * A player can takeCountry(), either from another player(s) or because
+ * no one is occupying it, they can addArmies() and removeArmies()
+ * to a Country occupied by them, and if the country is being shared, they can
+ * takeShare() of one of the occupiers.
+ */
 class ArmyPlacements {
 
     private val occupiedCountries =

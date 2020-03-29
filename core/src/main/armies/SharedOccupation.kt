@@ -2,6 +2,12 @@ package armies
 
 import Country
 
+/**
+ * An Occupation with two players sharing the country.
+ *
+ * Each of the players have their corresponding armies, and other player can take a
+ * share of the country from one of them or take the country completely.
+ */
 class SharedOccupation(
     override val country: Country,
     firstPlayer: Player,
