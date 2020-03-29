@@ -7,9 +7,9 @@ class PoliticalMap private constructor(
 
     val countries get() = continents.countries
 
-    fun continentOf(country: Country) = continents.forCountry(country).name
+    fun continentOf(country: Country) = continents.forCountry(country)
 
-    fun countriesOf(continent: String) =  continents.get(continent).countries
+    fun countriesOf(continent: Continent) =  continents.get(continent).countries
 
     fun areBordering(firstCountry: Country, secondCountry: Country): Boolean {
         continents.assertCountryExists(firstCountry)
@@ -22,9 +22,9 @@ class PoliticalMap private constructor(
         private val continents = ContinentSet.new()
         private val borders = mutableMapOf<Country, MutableCollection<Country>>()
 
-        fun addCountry(country: Country, continent: String): Builder {
-            continents.addCountry(country, continent)
-            borders[country] = mutableSetOf()
+        fun addContinent(continent: Continent): Builder {
+            continents.add(continent)
+            continent.countries.forEach {borders[it] = mutableSetOf()}
             return this
         }
 
@@ -46,33 +46,19 @@ private class ContinentSet private constructor(
 
     val countries get() = flatMap { continent -> continent.countries }.toSet()
 
-    fun get(name: String): Continent {
-        assertContinentExists(name)
-        return getOrNull(name)!!
-    }
-    fun getOrPut(name: String) = getOrNull(name) ?: create(name)
-    fun getOrNull(name: String) = firstOrNull { it.name == name }
-
-    fun create(name: String): Continent {
-        val continent = Continent(name)
-        add(continent)
-        return continent
-    }
-
-    fun addCountry(country: Country, continent: String) {
-        assertCountryDoesNotExist(country)
-        getOrPut(continent).addCountry(country)
+    fun get(continent: Continent): Continent {
+        try { return first { it == continent } }
+        catch (e:  NoSuchElementException) {
+            throw NonExistentContinentException(continent)
+        }
     }
 
     fun forCountry(country: Country): Continent {
-        assertCountryExists(country)
-        return first { it.containsCountry(country) }
-    }
-
-    fun assertContinentExists(continent: String) {
-        if (!doesContinentExist(continent)) {
-            throw NonExistentContinentException(continent)
+        try { return first { it.containsCountry(country) } }
+        catch (e:  NoSuchElementException) {
+            throw NonExistentCountryException(country)
         }
+
     }
 
     fun assertCountryExists(country: Country) {
@@ -81,24 +67,24 @@ private class ContinentSet private constructor(
         }
     }
 
-    fun assertCountryDoesNotExist(country: Country) {
-        if (anyHasCountry(country)) {
-            throw CountryAlreadyExistsException(country)
-        }
-    }
-
     fun anyHasCountry(country: Country) = any { it.containsCountry(country) }
 
-    fun doesContinentExist(name: String) = any { it.name == name }
+    fun doesContinentExist(continent: Continent) = any { it == continent }
 
     companion object {
         fun new() = ContinentSet(mutableSetOf())
     }
 }
 
-private class Continent(val name: String) {
+data class Continent(val name: String) {
     val countries = mutableSetOf<String>()
 
-    fun addCountry(country: Country) = countries.add(country)
+    fun addCountry(country: Country) : Continent {
+        if (!countries.add(country)) {
+            throw CountryAlreadyExistsException(country)
+        }
+        return this
+    }
+
     fun containsCountry(country: Country) = countries.contains(country)
 }
