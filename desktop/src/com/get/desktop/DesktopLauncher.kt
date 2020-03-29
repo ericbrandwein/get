@@ -8,6 +8,8 @@ object DesktopLauncher {
     @JvmStatic
     fun main(arg: Array<String>) {
         val config = Lwjgl3ApplicationConfiguration()
+        config.setTitle("Kamchatcka!");
+        config.setWindowedMode(529, 662);
         Lwjgl3Application(GetGame(), config)
     }
 }

@@ -1,0 +1,41 @@
+{                               
+    "name": "sudamerica",
+    "continents": [
+        {
+            "name":"Sudamerica",
+            "countries":[
+                { "name": "Arg", "color": 0x0094ff },
+                { "name": "Bra", "color": 0xffd800 },
+                { "name": "Uru", "color": 0x07077f },
+                { "name": "Chi", "color": 0xa8a8a8 },
+                { "name": "Par", "color": 0xff8706 },
+                { "name": "Bol", "color": 0x346733 },
+                { "name": "Per", "color": 0xff0725 },
+                { "name": "Ecu", "color": 0xfffc06 },
+                { "name": "Col", "color": 0x9f5b06 },
+                { "name": "Ven", "color": 0xb200ff }
+            ]
+        }
+      ],
+    "borders": [
+        {"first": 0x0094ff, "second": 0xffd800},
+        {"first": 0x0094ff, "second": 0x07077f},
+        {"first": 0x0094ff, "second": 0xa8a8a8},
+        {"first": 0x0094ff, "second": 0xff8706},
+        {"first": 0x0094ff, "second": 0x346733},
+        {"first": 0xffd800, "second": 0x07077f},
+        {"first": 0xffd800, "second": 0xff8706},
+        {"first": 0xffd800, "second": 0x346733},
+        {"first": 0xffd800, "second": 0xff0725},
+        {"first": 0xffd800, "second": 0x9f5b06},
+        {"first": 0xffd800, "second": 0xb200ff},
+        {"first": 0xa8a8a8, "second": 0x346733},
+        {"first": 0xa8a8a8, "second": 0xff0725},
+        {"first": 0xff8706, "second": 0x346733},
+        {"first": 0x346733, "second": 0xff0725},
+        {"first": 0xff0725, "second": 0xfffc06},
+        {"first": 0xff0725, "second": 0x9f5b06},
+        {"first": 0xfffc06, "second": 0x9f5b06},
+        {"first": 0x9f5b06, "second": 0xb200ff},
+    ]
+}
