@@ -662,7 +662,7 @@ class ArmyPlacementsTest {
 
     @Test
     fun `Can't take a share from a country occupied by a single player`() {
-        placements.takeCountry(someCountry, somePlayer,2)
+        placements.takeCountry(someCountry, somePlayer, 2)
 
         val exception = assertFailsWith<CountryNotSharedException> {
             placements.takeShare(someCountry, somePlayer, otherPlayer, 3)

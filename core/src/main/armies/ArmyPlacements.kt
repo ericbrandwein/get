@@ -87,4 +87,3 @@ class ArmyPlacements {
     private fun occupationForCountry(country: Country) =
         occupiedCountries.getValue(country)
 }
-
