@@ -9,7 +9,7 @@ class GetGame : ApplicationAdapter() {
     lateinit var img: Texture
     override fun create() {
         batch = SpriteBatch()
-        img = Texture("badlogic.jpg")
+        img = Texture("Sudamerica.png")
     }
 
     override fun render() {
