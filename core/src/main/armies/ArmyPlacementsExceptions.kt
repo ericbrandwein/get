@@ -1,7 +1,6 @@
 package armies
 
 import Country
-import java.lang.IllegalArgumentException
 
 class UnoccupiedCountryException(val country: Country) :
     Exception("The country $country has no occupants.")
@@ -29,3 +28,12 @@ class CantRemoveMoreArmiesThanAvailableException(
 class NonPositiveAmountRemovedException(val amountRemoved: Int) :
     IllegalArgumentException("Can't remove non-positive amount of armies " +
         "$amountRemoved from a country.")
+
+class NoSingleOccupierException(val country: Country) :
+    Exception("There is no single occupier in shared country $country.")
+
+class PlayerIsNotOccupyingCountryException(val country: Country, val player: Player) :
+    Exception("There is no occupier $player in country $country.")
+
+class CountryNotSharedException(val country: Country) :
+    Exception("Country $country is not being shared.")

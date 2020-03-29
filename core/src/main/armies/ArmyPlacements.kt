@@ -15,20 +15,55 @@ class ArmyPlacements {
         occupiedCountries[country] = occupationForCountry(country).take(player, armies)
     }
 
+    fun takeCountry(
+        country: Country, firstPlayer: Player, secondPlayer: Player,
+        firstArmies: Int, secondArmies: Int
+    ) {
+        assertTakingWithPositiveAmount(firstArmies)
+        assertTakingWithPositiveAmount(secondArmies)
+        occupiedCountries[country] =
+            occupationForCountry(country)
+                .take(firstPlayer, secondPlayer, firstArmies, secondArmies)
+    }
+
+    fun takeShare(
+        country: Country, currentPlayer: Player, newPlayer: Player, armies: Int) {
+        assertTakingWithPositiveAmount(armies)
+        occupiedCountries[country] =
+            occupationForCountry(country).takeShare(currentPlayer, newPlayer, armies)
+    }
+
     fun isOccupied(country: Country) = occupiedCountries.containsKey(country)
+
+    fun isShared(country: Country) = occupationForCountry(country).isShared()
 
     fun occupierFor(country: Country) = occupationForCountry(country).occupier
 
+    fun occupiersFor(country: Country) = occupationForCountry(country).occupiers
+
     fun armiesIn(country: Country) = occupationForCountry(country).armies
+
+    fun armiesIn(country: Country, player: Player) =
+        occupationForCountry(country).armiesFor(player)
 
     fun addArmies(country: Country, armies: Int) {
         assertPositiveAmountAdded(armies)
         occupationForCountry(country).addArmies(armies)
     }
 
+    fun addArmies(country: Country, armies: Int, player: Player) {
+        assertPositiveAmountAdded(armies)
+        occupationForCountry(country).addArmies(armies, player)
+    }
+
     fun removeArmies(country: Country, amount: Int) {
         assertPositiveAmountRemoved(amount)
         occupationForCountry(country).removeArmies(amount)
+    }
+
+    fun removeArmies(country: Country, amount: Int, player: Player) {
+        assertPositiveAmountRemoved(amount)
+        occupationForCountry(country).removeArmies(amount, player)
     }
 
     private fun assertTakingWithPositiveAmount(armies: Int) {
@@ -53,58 +88,3 @@ class ArmyPlacements {
         occupiedCountries.getValue(country)
 }
 
-interface Occupation {
-    val country: Country
-    val occupier: Player
-    val armies: Int
-
-    fun take(player: Player, armies: Int): Occupation =
-        SinglePlayerOccupation(country, player, armies)
-
-    fun addArmies(armies: Int)
-    fun removeArmies(armies: Int)
-}
-
-class NoOccupation(override val country: Country) : Occupation {
-    override val occupier get() = throw UnoccupiedCountryException(country)
-    override val armies = 0
-
-    override fun addArmies(armies: Int) = throw UnoccupiedCountryException(country)
-    override fun removeArmies(armies: Int) = throw UnoccupiedCountryException(country)
-}
-
-class SinglePlayerOccupation(
-    override val country: Country,
-    override val occupier: Player,
-    private var internalArmies: Int
-) : Occupation {
-
-    override val armies get() = internalArmies
-
-    override fun take(player: Player, armies: Int): Occupation {
-        assertCanTake(player)
-        return super.take(player, armies)
-    }
-
-    private fun assertCanTake(player: Player) {
-        if (player == occupier) {
-            throw CountryAlreadyOccupiedByPlayerException(country, player)
-        }
-    }
-
-    override fun addArmies(armies: Int) {
-        internalArmies += armies
-    }
-
-    override fun removeArmies(armies: Int) {
-        assertCanRemove(armies)
-        internalArmies -= armies
-    }
-
-    private fun assertCanRemove(armies: Int) {
-        if (armies >= this.armies) {
-            throw CantRemoveMoreArmiesThanAvailableException(country, this.armies, armies)
-        }
-    }
-
-}
