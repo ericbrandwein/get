@@ -9,8 +9,6 @@ class PoliticalMap private constructor(
 
     fun continentOf(country: Country) = continents.forCountry(country)
 
-    fun countriesOf(continent: Continent) =  continents.get(continent).countries
-
     fun areBordering(firstCountry: Country, secondCountry: Country): Boolean {
         continents.assertCountryExists(firstCountry)
         continents.assertCountryExists(secondCountry)
@@ -45,13 +43,6 @@ private class ContinentSet private constructor(
 ) : MutableSet<Continent> by continents {
 
     val countries get() = flatMap { continent -> continent.countries }.toSet()
-
-    fun get(continent: Continent): Continent {
-        try { return first { it == continent } }
-        catch (e:  NoSuchElementException) {
-            throw NonExistentContinentException(continent)
-        }
-    }
 
     fun forCountry(country: Country): Continent {
         try { return first { it.containsCountry(country) } }

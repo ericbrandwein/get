@@ -22,7 +22,7 @@ class PoliticalMapTest {
         assertEquals(1, countries.size)
         assertEquals(country, countries.single())
         assertEquals(continent, map.continentOf(country))
-        assertEquals(setOf(country), map.countriesOf(continent))
+        assertEquals(setOf(country), continent.countries)
     }
 
     @Test
@@ -35,18 +35,6 @@ class PoliticalMapTest {
             map.continentOf(country)
         }
         assertEquals(country, exception.country)
-    }
-
-    @Test
-    fun `Can't ask countries of a non existent continent`() {
-        val builder = PoliticalMap.Builder()
-        val map = builder.build()
-        val continent = Continent("America")
-
-        val exception = assertFailsWith<NonExistentContinentException> {
-            map.countriesOf(continent)
-        }
-        assertEquals(continent, exception.continent)
     }
 
     @Test
@@ -120,19 +108,6 @@ class PoliticalMapTest {
     }
 
     @Test
-    fun `Can't ask the countries of a continent that does not exist when there are other continents`() {
-        val map = PoliticalMap.Builder()
-            .addContinent(Continent("America").addCountry("Argentina"))
-            .build()
-
-        val nonExistentContinent = Continent("Europa")
-        val exception = assertFailsWith<NonExistentContinentException> {
-            map.countriesOf(nonExistentContinent)
-        }
-        assertEquals(nonExistentContinent, exception.continent)
-    }
-
-    @Test
     fun `Countries of a continent when there are many continents returns only the countries of that continent`() {
         val firstCountry = "Argentina"
         val firstContinent = Continent("America")
@@ -140,13 +115,9 @@ class PoliticalMapTest {
         val secondCountry = "South Africa"
         val secondContinent = Continent("Africa")
                 .addCountry(secondCountry)
-        val map = PoliticalMap.Builder()
-            .addContinent(firstContinent)
-            .addContinent(secondContinent)
-            .build()
 
-        assertEquals(setOf(firstCountry), map.countriesOf(firstContinent))
-        assertEquals(setOf(secondCountry), map.countriesOf(secondContinent))
+        assertEquals(setOf(firstCountry), firstContinent.countries)
+        assertEquals(setOf(secondCountry), secondContinent.countries)
     }
 
     @Test
