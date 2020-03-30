@@ -105,5 +105,37 @@ class SinglePlayerOccupationTest {
         assertEquals(somePlayer, exception.player)
     }
 
+    @Test
+    fun `Adding armies to a SinglePlayerOccupation adds to the amount of armies`() {
+        val occupation = SinglePlayerOccupation(somePlayer, 3)
+
+        occupation.addArmies(4)
+
+        assertEquals(7, occupation.armies)
+    }
+
+    @Test
+    fun `Can't add a negative amount to armies`() {
+        val occupation = SinglePlayerOccupation(somePlayer, 3)
+
+        val added = -2
+        val exception = assertFailsWith<NonPositiveArmiesAddedException> {
+            occupation.addArmies(added)
+        }
+
+        assertEquals(added, exception.armies)
+    }
+
+    @Test
+    fun `Can't add zero armies`() {
+        val occupation = SinglePlayerOccupation(somePlayer, 3)
+
+        val added = 0
+        val exception = assertFailsWith<NonPositiveArmiesAddedException> {
+            occupation.addArmies(added)
+        }
+
+        assertEquals(added, exception.armies)
+    }
 
 }

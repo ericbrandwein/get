@@ -2,7 +2,9 @@ package armies
 
 import Player
 
-class SinglePlayerOccupation(val occupier: Player, val armies: Int) : Occupation {
+class SinglePlayerOccupation(val occupier: Player, private var mutableArmies: Int) : Occupation {
+
+    val armies get() = mutableArmies
 
     init {
         assertPositiveArmies(armies)
@@ -30,6 +32,17 @@ class SinglePlayerOccupation(val occupier: Player, val armies: Int) : Occupation
     private fun assertNotOccupyingWithSamePlayer(occupier: Player) {
         if (occupier == this.occupier) {
             throw PlayerAlreadyOccupiesCountryException(occupier)
+        }
+    }
+
+    fun addArmies(added: Int) {
+        assertPositiveAmountAdded(added)
+        mutableArmies += added
+    }
+
+    private fun assertPositiveAmountAdded(added: Int) {
+        if (added <= 0) {
+            throw NonPositiveArmiesAddedException(added)
         }
     }
 }

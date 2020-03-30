@@ -13,3 +13,6 @@ class NonPositiveArmiesException(val armies: Int) :
 
 class PlayerAlreadyOccupiesCountryException(val player: Player) : Exception(
     "Can't occupy a country with the same player $player that is already occupying it.")
+
+class NonPositiveArmiesAddedException(val armies: Int) : Exception(
+    "Can't add the non-positive amount of armies $armies.")
