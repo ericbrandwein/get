@@ -92,16 +92,6 @@ class PoliticalMapTest {
         assertEquals(nonExistentCountry, exception.country)
     }
 
-    @Test
-    fun `Countries of a continent when there are many continents returns only the countries of that continent`() {
-        val firstCountry = "Argentina"
-        val firstContinent = Continent("America", setOf(firstCountry))
-        val secondCountry = "South Africa"
-        val secondContinent = Continent("Africa", setOf(secondCountry))
-
-        assertEquals(setOf(firstCountry), firstContinent.countries)
-        assertEquals(setOf(secondCountry), secondContinent.countries)
-    }
 
     @Test
     fun `Country with no borders added doesn't border any other country`() {
@@ -199,7 +189,7 @@ class PoliticalMapTest {
     }
 
     @Test
-    fun `Can't add an already existing country i nother continent`() {
+    fun `Can't add an already existing country in other continent`() {
         val country = "Argentina"
         val continent = Continent("America", setOf(country))
         val otherContinent = Continent("SouthAmerica", setOf(country))
@@ -221,7 +211,7 @@ class PoliticalMapTest {
     }
 
     @Test
-    fun `Map with one countrie has its continent`() {
+    fun `Map with one country has its continent`() {
         val country = "Guyana"
         val continent = Continent("America", setOf(country))
         val map = PoliticalMap.Builder()
@@ -259,4 +249,82 @@ class PoliticalMapTest {
         assertTrue(continents.contains(firstContinent))
         assertTrue(continents.contains(secondContinent))
     }
+
+
+
+}
+
+
+class ContinentTest {
+
+    @Test
+    fun `Continent with a country must contain it`() {
+        val country = "Argentina"
+        val continent = Continent("America", setOf(country))
+
+        assertTrue(continent.containsCountry(country))
+    }
+
+    @Test
+    fun `Continent without a country must not contain it`() {
+        val country = "Argentina"
+        val continent = Continent("America", setOf(country))
+        val otherCountry = "Brasil"
+        assertTrue(!continent.containsCountry(otherCountry))
+    }
+
+    @Test
+    fun `Countries of a continent when there are many continents returns only the countries of that continent`() {
+        val firstCountry = "Argentina"
+        val firstContinent = Continent("America", setOf(firstCountry))
+        val secondCountry = "South Africa"
+        val secondContinent = Continent("Africa", setOf(secondCountry))
+
+        assertEquals(setOf(firstCountry), firstContinent.countries)
+        assertEquals(setOf(secondCountry), secondContinent.countries)
+    }
+}
+
+
+class ContinentSetTest {
+
+    @Test
+    fun `ContinentSet must contain its coutries`() {
+        val country =  "Argentina"
+        val continent = Continent("America", setOf(country))
+        val continentSet = ContinentSet()
+        continentSet.add(continent)
+
+        assertTrue(continentSet.countries.contains(country))
+    }
+
+
+    @Test
+    fun `ContinentSet must contain the continent of a country included`() {
+        val country =  "Argentina"
+        val continent = Continent("America", setOf(country))
+        val continentSet = ContinentSet()
+        continentSet.add(continent)
+
+        assertTrue(continentSet.anyHasCountry(country))
+        assertEquals(continentSet.forCountry(country), continent)
+        assertTrue(continentSet.doesContinentExist(continent))
+    }
+
+
+    @Test
+    fun `ContinentSet must not contain a non included country`() {
+        val country =  "Argentina"
+        val continent = Continent("America", setOf(country))
+        val continentSet = ContinentSet()
+        continentSet.add(continent)
+        val otherCountry = "Brasil"
+
+        val exception = assertFailsWith<NonExistentCountryException> {
+            continentSet.forCountry(otherCountry)
+        }
+        assertEquals(otherCountry, exception.country)
+    }
+
+
 }
