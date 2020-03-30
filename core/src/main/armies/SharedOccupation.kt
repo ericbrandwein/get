@@ -12,7 +12,7 @@ class SharedOccupation(
             secondPlayer to SinglePlayerOccupation(secondPlayer, secondArmies)
         ).withDefault { player -> throw NotOccupyingPlayerException(player) }
 
-    val occupiers = occupations.keys
+    val occupiers get() = occupations.keys
 
     init {
         assertDifferentPlayersOccupying(firstPlayer, secondPlayer)
@@ -65,5 +65,16 @@ class SharedOccupation(
         if (player !in occupiers) {
             throw NotOccupyingPlayerException(player)
         }
+    }
+
+    fun replacePlayer(oldPlayer: Player, newPlayer: Player, armies: Int) {
+        assertPlayerIsOccupying(oldPlayer)
+        assertPlayerIsNotOccupying(newPlayer)
+        occupations.remove(oldPlayer)
+        addPlayer(newPlayer, armies)
+    }
+
+    private fun addPlayer(player: Player, armies: Int) {
+        occupations[player] = SinglePlayerOccupation(player, armies)
     }
 }

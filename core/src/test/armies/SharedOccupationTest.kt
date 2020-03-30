@@ -247,4 +247,42 @@ class SharedOccupationTest {
         }
         assertEquals(anotherPlayer, exception.player)
     }
+
+    @Test
+    fun `Occupying a player's share changes the removed player for the occupier`() {
+        val firstArmies = 2
+        val occupation =
+            SharedOccupation(somePlayer, 1, otherPlayer, firstArmies)
+
+        val secondArmies = 3
+        occupation.replacePlayer(somePlayer, anotherPlayer, secondArmies)
+
+        assertEquals(setOf(otherPlayer, anotherPlayer), occupation.occupiers)
+        assertEquals(firstArmies, occupation.armiesOf(otherPlayer))
+        assertEquals(secondArmies, occupation.armiesOf(anotherPlayer))
+    }
+
+    @Test
+    fun `Replaced player has to be an occupier`() {
+        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
+
+        val exception = assertFailsWith<NotOccupyingPlayerException> {
+            occupation.replacePlayer(anotherPlayer, evenOtherPlayer, 2)
+        }
+        assertEquals(anotherPlayer, exception.player)
+        assertEquals(setOf(somePlayer, otherPlayer), occupation.occupiers)
+    }
+
+    @Test
+    fun `New replacing player can't be already occupying`() {
+        val armies = 1
+        val occupation = SharedOccupation(somePlayer, armies, otherPlayer, 2)
+
+        val exception = assertFailsWith<PlayerAlreadyOccupiesCountryException> {
+            occupation.replacePlayer(somePlayer, otherPlayer, 3)
+        }
+        assertEquals(otherPlayer, exception.player)
+        assertEquals(setOf(somePlayer, otherPlayer), occupation.occupiers)
+        assertEquals(armies, occupation.armiesOf(somePlayer))
+    }
 }
