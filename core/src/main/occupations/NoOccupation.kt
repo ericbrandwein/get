@@ -1,4 +1,4 @@
-package armies
+package occupations
 
 /**
  * An Occupation where there is no player occupying the country.

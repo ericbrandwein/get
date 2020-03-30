@@ -1,4 +1,4 @@
-package armies
+package occupations
 
 import kotlin.test.BeforeTest
 import kotlin.test.Test
