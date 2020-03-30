@@ -1,18 +1,17 @@
 typealias Country = String
 
 class PoliticalMap private constructor(
-    private val continentSet: ContinentSet,
+    public val continents: ContinentSet,
     private val borders: Map<Country, Collection<Country>>
 ) {
 
-    val countries = continentSet.countries
-    val continents = continentSet
+    val countries = continents.countries
 
-    fun continentOf(country: Country) = continentSet.forCountry(country)
+    fun continentOf(country: Country) = continents.forCountry(country)
 
     fun areBordering(firstCountry: Country, secondCountry: Country): Boolean {
-        continentSet.assertCountryExists(firstCountry)
-        continentSet.assertCountryExists(secondCountry)
+        continents.assertCountryExists(firstCountry)
+        continents.assertCountryExists(secondCountry)
         return borders.getValue(firstCountry).contains(secondCountry)
     }
 
@@ -66,13 +65,7 @@ class ContinentSet : HashSet<Continent>() {
     fun doesContinentExist(continent: Continent) = any { it == continent }
 }
 
-data class Continent(val name: String) {
-    val countries = mutableSetOf<String>()
 
-    fun addCountry(country: Country) : Continent {
-        if (!countries.add(country)) { throw CountryAlreadyExistsException(country) }
-        return this
-    }
-
+data class Continent(val name: String, val countries: Set<Country>) {
     fun containsCountry(country: Country) = countries.contains(country)
 }
