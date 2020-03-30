@@ -51,4 +51,7 @@ class SharedOccupation(
 
     fun addArmies(added: Int, player: Player) =
         occupations.getValue(player).addArmies(added)
+
+    fun removeArmies(removed: Int, player: Player) =
+        occupations.getValue(player).removeArmies(removed)
 }

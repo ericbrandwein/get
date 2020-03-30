@@ -197,4 +197,30 @@ class SharedOccupationTest {
 
         assertEquals(added, exception.armies)
     }
+
+    @Test
+    fun `Removing armies from a player subtracts from the amount of armies`() {
+        val original = 4
+        val occupation =
+            SharedOccupation(somePlayer, original, otherPlayer, 1)
+
+        val removed = 3
+        occupation.removeArmies(removed, somePlayer)
+
+        assertEquals(original - removed, occupation.armiesOf(somePlayer))
+    }
+
+    @Test
+    fun `Can't remove a non-positive amount of armies from a player`() {
+        val original = 4
+        val occupation =
+            SharedOccupation(somePlayer, original, otherPlayer, 1)
+
+        val removed = -2
+        val exception = assertFailsWith<NonPositiveArmiesRemovedException> {
+            occupation.removeArmies(removed, somePlayer)
+        }
+        assertEquals(removed, exception.armies)
+        assertEquals(original, occupation.armiesOf(somePlayer))
+    }
 }
