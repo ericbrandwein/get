@@ -6,17 +6,24 @@ class SharedOccupation(
     firstPlayer: Player, firstArmies: Int, secondPlayer: Player, secondArmies: Int
 ) : Occupation {
 
+    private val occupations =
+        mutableMapOf(
+            firstPlayer to SinglePlayerOccupation(firstPlayer, firstArmies),
+            secondPlayer to SinglePlayerOccupation(secondPlayer, secondArmies)
+        ).withDefault { player -> throw NotOccupyingPlayerException(player) }
+
+    val occupiers = occupations.keys
+
     init {
         assertDifferentPlayersOccupying(firstPlayer, secondPlayer)
-        assertPositiveArmies(firstArmies)
-        assertPositiveArmies(secondArmies)
     }
 
-    private val armiesForOccupiers =
-        mutableMapOf(firstPlayer to firstArmies, secondPlayer to secondArmies)
-            .withDefault { player -> throw NotOccupyingPlayerException(player) }
-
-    val occupiers = armiesForOccupiers.keys
+    private fun assertDifferentPlayersOccupying(
+        firstPlayer: Player, secondPlayer: Player) {
+        if (firstPlayer == secondPlayer) {
+            throw CantShareCountryWithYourselfException(firstPlayer)
+        }
+    }
 
     override fun isShared() = true
 
@@ -40,29 +47,8 @@ class SharedOccupation(
         }
     }
 
-    fun armiesOf(player: Player) = armiesForOccupiers.getValue(player)
+    fun armiesOf(player: Player) = occupations.getValue(player).armies
 
-    private fun assertDifferentPlayersOccupying(
-        firstPlayer: Player, secondPlayer: Player) {
-        if (firstPlayer == secondPlayer) {
-            throw CantShareCountryWithYourselfException(firstPlayer)
-        }
-    }
-
-    private fun assertPositiveArmies(armies: Int) {
-        if (armies <= 0) {
-            throw NonPositiveArmiesException(armies)
-        }
-    }
-
-    fun addArmies(added: Int, player: Player) {
-        assertPositiveAmountAdded(added)
-        armiesForOccupiers[player] = armiesForOccupiers.getValue(player) + added
-    }
-
-    private fun assertPositiveAmountAdded(added: Int) {
-        if (added <= 0) {
-            throw NonPositiveArmiesAddedException(added)
-        }
-    }
+    fun addArmies(added: Int, player: Player) =
+        occupations.getValue(player).addArmies(added)
 }
