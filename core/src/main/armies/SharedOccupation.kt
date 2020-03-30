@@ -13,7 +13,7 @@ class SharedOccupation(
     }
 
     private val armiesForOccupiers =
-        mapOf(firstPlayer to firstArmies, secondPlayer to secondArmies)
+        mutableMapOf(firstPlayer to firstArmies, secondPlayer to secondArmies)
             .withDefault { player -> throw NotOccupyingPlayerException(player) }
 
     val occupiers = armiesForOccupiers.keys
@@ -51,6 +51,17 @@ class SharedOccupation(
     private fun assertPositiveArmies(armies: Int) {
         if (armies <= 0) {
             throw NonPositiveArmiesException(armies)
+        }
+    }
+
+    fun addArmies(added: Int, player: Player) {
+        assertPositiveAmountAdded(added)
+        armiesForOccupiers[player] = armiesForOccupiers.getValue(player) + added
+    }
+
+    private fun assertPositiveAmountAdded(added: Int) {
+        if (added <= 0) {
+            throw NonPositiveArmiesAddedException(added)
         }
     }
 }

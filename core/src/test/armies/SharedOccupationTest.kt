@@ -154,4 +154,44 @@ class SharedOccupationTest {
         assertEquals(somePlayer, exception.player)
     }
 
+    @Test
+    fun `Adding armies to a player changes the amount of armies of that player only`() {
+        val firstArmies = 2
+        val secondArmies = 1
+        val occupation = SharedOccupation(somePlayer, otherPlayer, firstArmies, secondArmies)
+
+        val added = 5
+        occupation.addArmies(added, somePlayer)
+
+        assertEquals(firstArmies + added, occupation.armiesOf(somePlayer))
+        assertEquals(secondArmies, occupation.armiesOf(otherPlayer))
+    }
+
+    @Test
+    fun `Can't add a negative amount of armies to a player`() {
+        val firstArmies = 4
+        val secondArmies = 1
+        val occupation = SharedOccupation(somePlayer, otherPlayer, firstArmies, secondArmies)
+
+        val added = -2
+        val exception = assertFailsWith<NonPositiveArmiesAddedException> {
+            occupation.addArmies(added, somePlayer)
+        }
+
+        assertEquals(added, exception.armies)
+    }
+
+    @Test
+    fun `Can't add zero armies to a player`() {
+        val firstArmies = 4
+        val secondArmies = 1
+        val occupation = SharedOccupation(somePlayer, otherPlayer, firstArmies, secondArmies)
+
+        val added = 0
+        val exception = assertFailsWith<NonPositiveArmiesAddedException> {
+            occupation.addArmies(added, somePlayer)
+        }
+
+        assertEquals(added, exception.armies)
+    }
 }
