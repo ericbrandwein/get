@@ -262,7 +262,7 @@ class ContinentTest {
         val country = "Argentina"
         val continent = Continent("America", setOf(country))
 
-        assertTrue(continent.containsCountry(country))
+        assertTrue(continent.countries.contains(country))
     }
 
     @Test
@@ -270,7 +270,7 @@ class ContinentTest {
         val country = "Argentina"
         val continent = Continent("America", setOf(country))
         val otherCountry = "Brasil"
-        assertTrue(!continent.containsCountry(otherCountry))
+        assertFalse(continent.countries.contains(otherCountry))
     }
 
     @Test
@@ -289,7 +289,7 @@ class ContinentTest {
 class ContinentSetTest {
 
     @Test
-    fun `ContinentSet must contain its coutries`() {
+    fun `ContinentSet must contain its countries`() {
         val country =  "Argentina"
         val continent = Continent("America", setOf(country))
         val continentSet = ContinentSet()

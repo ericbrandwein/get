@@ -49,7 +49,7 @@ class ContinentSet : HashSet<Continent>() {
     val countries get() = flatMap { continent -> continent.countries }.toSet()
 
     fun forCountry(country: Country): Continent {
-        try { return first { it.containsCountry(country) } }
+        try { return first { it.countries.contains(country) } }
         catch (e:  NoSuchElementException) {
             throw NonExistentCountryException(country)
         }
@@ -60,12 +60,10 @@ class ContinentSet : HashSet<Continent>() {
         if (!anyHasCountry(country)) { throw NonExistentCountryException(country) }
     }
 
-    fun anyHasCountry(country: Country) = any { it.containsCountry(country) }
+    fun anyHasCountry(country: Country) = any { it.countries.contains(country) }
 
     fun doesContinentExist(continent: Continent) = any { it == continent }
 }
 
 
-data class Continent(val name: String, val countries: Set<Country>) {
-    fun containsCountry(country: Country) = countries.contains(country)
-}
+data class Continent(val name: String, val countries: Set<Country>)
