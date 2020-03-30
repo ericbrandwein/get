@@ -2,6 +2,9 @@ package armies
 
 import Player
 
+/**
+ * An Occupation where there are two players occupying the same country.
+ */
 class SharedOccupation(
     firstPlayer: Player, firstArmies: Int, secondPlayer: Player, secondArmies: Int
 ) : Occupation {

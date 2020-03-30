@@ -2,6 +2,9 @@ package armies
 
 import Player
 
+/**
+ * An Occupation with only one player occupying the country,
+ */
 class SinglePlayerOccupation(val occupier: Player, private var mutableArmies: Int) : Occupation {
 
     val armies get() = mutableArmies
