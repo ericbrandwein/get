@@ -45,4 +45,22 @@ class SinglePlayerOccupation(val occupier: Player, private var mutableArmies: In
             throw NonPositiveArmiesAddedException(added)
         }
     }
+
+    fun removeArmies(removed: Int) {
+        assertPositiveAmountRemoved(removed)
+        assertSufficientArmiesAvailableForRemoval(removed)
+        mutableArmies -= removed
+    }
+
+    private fun assertSufficientArmiesAvailableForRemoval(removed: Int) {
+        if (removed >= armies) {
+            throw TooManyArmiesRemovedException(armies, removed)
+        }
+    }
+
+    private fun assertPositiveAmountRemoved(removed: Int) {
+        if (removed <= 0) {
+            throw NonPositiveArmiesRemovedException(removed)
+        }
+    }
 }

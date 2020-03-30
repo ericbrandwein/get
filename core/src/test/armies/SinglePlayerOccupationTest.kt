@@ -116,7 +116,8 @@ class SinglePlayerOccupationTest {
 
     @Test
     fun `Can't add a negative amount to armies`() {
-        val occupation = SinglePlayerOccupation(somePlayer, 3)
+        val originalArmies = 3
+        val occupation = SinglePlayerOccupation(somePlayer, originalArmies)
 
         val added = -2
         val exception = assertFailsWith<NonPositiveArmiesAddedException> {
@@ -124,6 +125,7 @@ class SinglePlayerOccupationTest {
         }
 
         assertEquals(added, exception.armies)
+        assertEquals(originalArmies, occupation.armies)
     }
 
     @Test
@@ -138,4 +140,71 @@ class SinglePlayerOccupationTest {
         assertEquals(added, exception.armies)
     }
 
+    @Test
+    fun `Removing armies subtracts from the amount of armies`() {
+        val originalArmies = 3
+        val occupation = SinglePlayerOccupation(somePlayer, originalArmies)
+
+        val removed = 1
+        occupation.removeArmies(removed)
+
+        assertEquals(originalArmies - removed, occupation.armies)
+    }
+
+    @Test
+    fun `Can't remove a negative amount of armies`() {
+        val originalArmies = 2
+        val occupation = SinglePlayerOccupation(somePlayer, originalArmies)
+
+        val removed = -3
+        val exception = assertFailsWith<NonPositiveArmiesRemovedException> {
+            occupation.removeArmies(removed)
+        }
+
+        assertEquals(removed, exception.armies)
+        assertEquals(originalArmies, occupation.armies)
+    }
+
+    @Test
+    fun `Can't remove zero armies`() {
+        val originalArmies = 2
+        val occupation = SinglePlayerOccupation(somePlayer, originalArmies)
+
+        val removed = 0
+        val exception = assertFailsWith<NonPositiveArmiesRemovedException> {
+            occupation.removeArmies(removed)
+        }
+
+        assertEquals(removed, exception.armies)
+        assertEquals(originalArmies, occupation.armies)
+    }
+
+    @Test
+    fun `Can't remove more armies than there are currently in the occupation`() {
+        val originalArmies = 2
+        val occupation = SinglePlayerOccupation(somePlayer, originalArmies)
+
+        val removed = 3
+        val exception = assertFailsWith<TooManyArmiesRemovedException> {
+            occupation.removeArmies(removed)
+        }
+
+        assertEquals(originalArmies, exception.currentArmies)
+        assertEquals(removed, exception.removed)
+        assertEquals(originalArmies, occupation.armies)
+    }
+
+    @Test
+    fun `Can't remove armies and leave the occupation with zero armies`() {
+        val originalArmies = 2
+        val occupation = SinglePlayerOccupation(somePlayer, originalArmies)
+
+        val exception = assertFailsWith<TooManyArmiesRemovedException> {
+            occupation.removeArmies(originalArmies)
+        }
+
+        assertEquals(originalArmies, exception.currentArmies)
+        assertEquals(originalArmies, exception.removed)
+        assertEquals(originalArmies, occupation.armies)
+    }
 }
