@@ -27,22 +27,4 @@ class NoOccupationTest {
     fun `NoOccupation is not shared`() {
         assertFalse(occupation.isShared())
     }
-
-    @Test
-    fun `Occupying a NoOccupation with only one player returns an occupation with that player and armies`() {
-        val newOccupation = occupation.occupy(somePlayer, someArmies)
-
-        assertEquals(somePlayer, newOccupation.occupier)
-        assertEquals(someArmies, newOccupation.armies)
-    }
-
-    @Test
-    fun `Occupying a NoOccupation with two players returns an occupation with that players and armies`() {
-        val newOccupation =
-            occupation.occupy(somePlayer, someArmies, otherPlayer, otherArmies)
-
-        assertEquals(setOf(somePlayer, otherPlayer), newOccupation.occupiers)
-        assertEquals(someArmies, newOccupation.armiesOf(somePlayer))
-        assertEquals(otherArmies, newOccupation.armiesOf(otherPlayer))
-    }
 }

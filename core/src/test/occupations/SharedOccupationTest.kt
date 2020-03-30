@@ -99,62 +99,6 @@ class SharedOccupationTest {
     }
 
     @Test
-    fun `Occupying with one player returns an occupation with only that player`() {
-        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
-
-        val armies = 3
-        val newOccupation = occupation.occupy(anotherPlayer, armies)
-
-        assertEquals(anotherPlayer, newOccupation.occupier)
-        assertEquals(armies, newOccupation.armies)
-    }
-
-    @Test
-    fun `Can't occupy with player already occupying country`() {
-        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
-
-        val exception = assertFailsWith<PlayerAlreadyOccupiesCountryException> {
-            occupation.occupy(somePlayer, 3)
-        }
-
-        assertEquals(somePlayer, exception.player)
-    }
-
-    @Test
-    fun `Occupying with two new players a country should return an occupation with both players`() {
-        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
-
-        val firstArmies = 4
-        val secondArmies = 7
-        val newOccupation =
-            occupation.occupy(anotherPlayer, firstArmies, evenOtherPlayer, secondArmies)
-
-        assertEquals(setOf(anotherPlayer, evenOtherPlayer), newOccupation.occupiers)
-        assertEquals(firstArmies, newOccupation.armiesOf(anotherPlayer))
-        assertEquals(secondArmies, newOccupation.armiesOf(evenOtherPlayer))
-    }
-
-    @Test
-    fun `Can't occupy a SharedOccupation when the first player is already occupying the country`() {
-        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
-
-        val exception = assertFailsWith<PlayerAlreadyOccupiesCountryException> {
-            occupation.occupy(somePlayer, 3, anotherPlayer, 5)
-        }
-        assertEquals(somePlayer, exception.player)
-    }
-
-    @Test
-    fun `Can't occupy a SharedOccupation when the second player is already occupying the country`() {
-        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
-
-        val exception = assertFailsWith<PlayerAlreadyOccupiesCountryException> {
-            occupation.occupy(anotherPlayer, 3, somePlayer, 5)
-        }
-        assertEquals(somePlayer, exception.player)
-    }
-
-    @Test
     fun `Adding armies to a player changes the amount of armies of that player only`() {
         val firstArmies = 2
         val secondArmies = 1

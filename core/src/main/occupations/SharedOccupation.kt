@@ -30,26 +30,6 @@ class SharedOccupation(
 
     override fun isShared() = true
 
-    override fun occupy(occupier: Player, armies: Int): SinglePlayerOccupation {
-        assertPlayerIsNotOccupying(occupier)
-        return super.occupy(occupier, armies)
-    }
-
-    override fun occupy(
-        firstPlayer: Player, firstArmies: Int, secondPlayer: Player,
-        secondArmies: Int
-    ): SharedOccupation {
-        assertPlayerIsNotOccupying(firstPlayer)
-        assertPlayerIsNotOccupying(secondPlayer)
-        return super.occupy(firstPlayer, firstArmies, secondPlayer, secondArmies)
-    }
-
-    private fun assertPlayerIsNotOccupying(player: Player) {
-        if (player in occupiers) {
-            throw PlayerAlreadyOccupiesCountryException(player)
-        }
-    }
-
     fun armiesOf(player: Player) = occupations.getValue(player).armies
 
     fun addArmies(added: Int, player: Player) =
@@ -75,6 +55,12 @@ class SharedOccupation(
         assertPlayerIsNotOccupying(newPlayer)
         occupations.remove(oldPlayer)
         addPlayer(newPlayer, armies)
+    }
+
+    private fun assertPlayerIsNotOccupying(player: Player) {
+        if (player in occupiers) {
+            throw PlayerAlreadyOccupiesCountryException(player)
+        }
     }
 
     private fun addPlayer(player: Player, armies: Int) {
