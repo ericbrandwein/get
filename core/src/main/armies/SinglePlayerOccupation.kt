@@ -22,11 +22,12 @@ class SinglePlayerOccupation(val occupier: Player, private var mutableArmies: In
     }
 
     override fun occupy(
-        firstPlayer: Player, secondPlayer: Player, firstArmies: Int, secondArmies: Int
+        firstPlayer: Player, firstArmies: Int, secondPlayer: Player,
+        secondArmies: Int
     ): SharedOccupation {
         assertNotOccupyingWithSamePlayer(firstPlayer)
         assertNotOccupyingWithSamePlayer(secondPlayer)
-        return super.occupy(firstPlayer, secondPlayer, firstArmies, secondArmies)
+        return super.occupy(firstPlayer, firstArmies, secondPlayer, secondArmies)
     }
 
     private fun assertNotOccupyingWithSamePlayer(occupier: Player) {

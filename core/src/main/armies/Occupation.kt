@@ -10,6 +10,7 @@ interface Occupation {
         SinglePlayerOccupation(occupier, armies)
 
     fun occupy(
-        firstPlayer: Player, secondPlayer: Player, firstArmies: Int, secondArmies: Int) =
-        SharedOccupation(firstPlayer, secondPlayer, firstArmies, secondArmies)
+        firstPlayer: Player, firstArmies: Int, secondPlayer: Player,
+        secondArmies: Int) =
+        SharedOccupation(firstPlayer, firstArmies, secondPlayer, secondArmies)
 }

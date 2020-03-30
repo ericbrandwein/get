@@ -3,7 +3,7 @@ package armies
 import Player
 
 class SharedOccupation(
-    firstPlayer: Player, secondPlayer: Player, firstArmies: Int, secondArmies: Int
+    firstPlayer: Player, firstArmies: Int, secondPlayer: Player, secondArmies: Int
 ) : Occupation {
 
     init {
@@ -26,11 +26,12 @@ class SharedOccupation(
     }
 
     override fun occupy(
-        firstPlayer: Player, secondPlayer: Player, firstArmies: Int,
-        secondArmies: Int): SharedOccupation {
+        firstPlayer: Player, firstArmies: Int, secondPlayer: Player,
+        secondArmies: Int
+    ): SharedOccupation {
         assertPlayerIsNotOccupying(firstPlayer)
         assertPlayerIsNotOccupying(secondPlayer)
-        return super.occupy(firstPlayer, secondPlayer, firstArmies, secondArmies)
+        return super.occupy(firstPlayer, firstArmies, secondPlayer, secondArmies)
     }
 
     private fun assertPlayerIsNotOccupying(player: Player) {

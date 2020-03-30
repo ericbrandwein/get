@@ -14,19 +14,19 @@ class SharedOccupationTest {
 
     @Test
     fun `SharedOccupation means it's occupied`() {
-        val occupation = SharedOccupation(somePlayer, otherPlayer, 1, 2)
+        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
         assertTrue(occupation.isOccupied())
     }
 
     @Test
     fun `SharedOccupation is shared`() {
-        val occupation = SharedOccupation(somePlayer, otherPlayer, 1, 2)
+        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
         assertTrue(occupation.isShared())
     }
 
     @Test
     fun `Occupiers of a SharedOccupation are the ones passed as a constructor parameter`() {
-        val occupation = SharedOccupation(somePlayer, otherPlayer, 1, 2)
+        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
 
         val occupiers = occupation.occupiers
         assertEquals(2, occupiers.size)
@@ -37,7 +37,7 @@ class SharedOccupationTest {
     @Test
     fun `Both occupiers can't be the same player`() {
         val exception = assertFailsWith<CantShareCountryWithYourselfException> {
-            SharedOccupation(somePlayer, somePlayer, 1, 2)
+            SharedOccupation(somePlayer, 1, somePlayer, 2)
         }
         assertEquals(somePlayer, exception.player)
     }
@@ -47,7 +47,7 @@ class SharedOccupationTest {
         val armies = -3
 
         val exception = assertFailsWith<NonPositiveArmiesException> {
-            SharedOccupation(somePlayer, otherPlayer, armies, 3)
+            SharedOccupation(somePlayer, armies, otherPlayer, 3)
         }
         assertEquals(armies, exception.armies)
     }
@@ -57,7 +57,7 @@ class SharedOccupationTest {
         val armies = 0
 
         val exception = assertFailsWith<NonPositiveArmiesException> {
-            SharedOccupation(somePlayer, otherPlayer, armies, 3)
+            SharedOccupation(somePlayer, armies, otherPlayer, 3)
         }
         assertEquals(armies, exception.armies)
     }
@@ -67,7 +67,7 @@ class SharedOccupationTest {
         val armies = -2
 
         val exception = assertFailsWith<NonPositiveArmiesException> {
-            SharedOccupation(somePlayer, otherPlayer, 2, armies)
+            SharedOccupation(somePlayer, 2, otherPlayer, armies)
         }
         assertEquals(armies, exception.armies)
     }
@@ -75,7 +75,7 @@ class SharedOccupationTest {
     @Test
     fun `Armies of the first occupier are the armies passed first as a constructor parameter`() {
         val firstArmies = 1
-        val occupation = SharedOccupation(somePlayer, otherPlayer, firstArmies, 2)
+        val occupation = SharedOccupation(somePlayer, firstArmies, otherPlayer, 2)
 
         assertEquals(firstArmies, occupation.armiesOf(somePlayer))
     }
@@ -83,14 +83,14 @@ class SharedOccupationTest {
     @Test
     fun `Armies of the second occupier are the armies passed second as a constructor parameter`() {
         val secondArmies = 2
-        val occupation = SharedOccupation(somePlayer, otherPlayer, 1, secondArmies)
+        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, secondArmies)
 
         assertEquals(secondArmies, occupation.armiesOf(otherPlayer))
     }
 
     @Test
     fun `Can't ask armies of a non-occupying player`() {
-        val occupation = SharedOccupation(somePlayer, otherPlayer, 1, 2)
+        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
 
         val exception = assertFailsWith<NotOccupyingPlayerException> {
             occupation.armiesOf(anotherPlayer)
@@ -100,7 +100,7 @@ class SharedOccupationTest {
 
     @Test
     fun `Occupying with one player returns an occupation with only that player`() {
-        val occupation = SharedOccupation(somePlayer, otherPlayer, 1, 2)
+        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
 
         val armies = 3
         val newOccupation = occupation.occupy(anotherPlayer, armies)
@@ -111,7 +111,7 @@ class SharedOccupationTest {
 
     @Test
     fun `Can't occupy with player already occupying country`() {
-        val occupation = SharedOccupation(somePlayer, otherPlayer, 1, 2)
+        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
 
         val exception = assertFailsWith<PlayerAlreadyOccupiesCountryException> {
             occupation.occupy(somePlayer, 3)
@@ -122,12 +122,12 @@ class SharedOccupationTest {
 
     @Test
     fun `Occupying with two new players a country should return an occupation with both players`() {
-        val occupation = SharedOccupation(somePlayer, otherPlayer, 1, 2)
+        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
 
         val firstArmies = 4
         val secondArmies = 7
         val newOccupation =
-            occupation.occupy(anotherPlayer, evenOtherPlayer, firstArmies, secondArmies)
+            occupation.occupy(anotherPlayer, firstArmies, evenOtherPlayer, secondArmies)
 
         assertEquals(setOf(anotherPlayer, evenOtherPlayer), newOccupation.occupiers)
         assertEquals(firstArmies, newOccupation.armiesOf(anotherPlayer))
@@ -136,20 +136,20 @@ class SharedOccupationTest {
 
     @Test
     fun `Can't occupy a SharedOccupation when the first player is already occupying the country`() {
-        val occupation = SharedOccupation(somePlayer, otherPlayer, 1, 2)
+        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
 
         val exception = assertFailsWith<PlayerAlreadyOccupiesCountryException> {
-            occupation.occupy(somePlayer, anotherPlayer, 3, 5)
+            occupation.occupy(somePlayer, 3, anotherPlayer, 5)
         }
         assertEquals(somePlayer, exception.player)
     }
 
     @Test
     fun `Can't occupy a SharedOccupation when the second player is already occupying the country`() {
-        val occupation = SharedOccupation(somePlayer, otherPlayer, 1, 2)
+        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
 
         val exception = assertFailsWith<PlayerAlreadyOccupiesCountryException> {
-            occupation.occupy(anotherPlayer, somePlayer, 3, 5)
+            occupation.occupy(anotherPlayer, 3, somePlayer, 5)
         }
         assertEquals(somePlayer, exception.player)
     }
@@ -158,7 +158,8 @@ class SharedOccupationTest {
     fun `Adding armies to a player changes the amount of armies of that player only`() {
         val firstArmies = 2
         val secondArmies = 1
-        val occupation = SharedOccupation(somePlayer, otherPlayer, firstArmies, secondArmies)
+        val occupation = SharedOccupation(
+            somePlayer, firstArmies, otherPlayer, secondArmies)
 
         val added = 5
         occupation.addArmies(added, somePlayer)
@@ -171,7 +172,8 @@ class SharedOccupationTest {
     fun `Can't add a negative amount of armies to a player`() {
         val firstArmies = 4
         val secondArmies = 1
-        val occupation = SharedOccupation(somePlayer, otherPlayer, firstArmies, secondArmies)
+        val occupation = SharedOccupation(
+            somePlayer, firstArmies, otherPlayer, secondArmies)
 
         val added = -2
         val exception = assertFailsWith<NonPositiveArmiesAddedException> {
@@ -185,7 +187,8 @@ class SharedOccupationTest {
     fun `Can't add zero armies to a player`() {
         val firstArmies = 4
         val secondArmies = 1
-        val occupation = SharedOccupation(somePlayer, otherPlayer, firstArmies, secondArmies)
+        val occupation = SharedOccupation(
+            somePlayer, firstArmies, otherPlayer, secondArmies)
 
         val added = 0
         val exception = assertFailsWith<NonPositiveArmiesAddedException> {

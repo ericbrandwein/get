@@ -78,7 +78,7 @@ class SinglePlayerOccupationTest {
         val occupation = SinglePlayerOccupation(somePlayer, 3)
 
         val newOccupation =
-            occupation.occupy(otherPlayer, anotherPlayer, firstArmies, secondArmies)
+            occupation.occupy(otherPlayer, firstArmies, anotherPlayer, secondArmies)
 
         assertEquals(setOf(otherPlayer, anotherPlayer), newOccupation.occupiers)
         assertEquals(firstArmies, newOccupation.armiesOf(otherPlayer))
@@ -90,7 +90,7 @@ class SinglePlayerOccupationTest {
         val occupation = SinglePlayerOccupation(somePlayer, 3)
 
         val exception = assertFailsWith<PlayerAlreadyOccupiesCountryException> {
-            occupation.occupy(somePlayer, otherPlayer, 1, 2)
+            occupation.occupy(somePlayer, 1, otherPlayer, 2)
         }
         assertEquals(somePlayer, exception.player)
     }
@@ -100,7 +100,7 @@ class SinglePlayerOccupationTest {
         val occupation = SinglePlayerOccupation(somePlayer, 3)
 
         val exception = assertFailsWith<PlayerAlreadyOccupiesCountryException> {
-            occupation.occupy(otherPlayer, somePlayer, 1, 2)
+            occupation.occupy(otherPlayer, 1, somePlayer, 2)
         }
         assertEquals(somePlayer, exception.player)
     }

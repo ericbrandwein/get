@@ -39,7 +39,7 @@ class NoOccupationTest {
     @Test
     fun `Occupying a NoOccupation with two players returns an occupation with that players and armies`() {
         val newOccupation =
-            occupation.occupy(somePlayer, otherPlayer, someArmies, otherArmies)
+            occupation.occupy(somePlayer, someArmies, otherPlayer, otherArmies)
 
         assertEquals(setOf(somePlayer, otherPlayer), newOccupation.occupiers)
         assertEquals(someArmies, newOccupation.armiesOf(somePlayer))
