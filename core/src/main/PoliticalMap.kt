@@ -1,7 +1,9 @@
 typealias Country = String
 
+data class Continent(val name: String, val countries: Set<Country>)
+
 class PoliticalMap private constructor(
-    public val continents: ContinentSet,
+    public val continents: Set<Continent>,
     private val borders: Map<Country, Collection<Country>>
 ) {
 
@@ -17,9 +19,9 @@ class PoliticalMap private constructor(
 
     class Builder {
 
-        private val continents = ContinentSet()
+        private val continents = HashSet<Continent>()
         private val borders = mutableMapOf<Country, MutableCollection<Country>>()
-        private val countries = mutableSetOf<Country>()
+        private val countries = HashSet<Country>()
 
         fun addContinent(continent: Continent): Builder {
             val intersection = countries.intersect(continent.countries)
@@ -44,26 +46,17 @@ class PoliticalMap private constructor(
     }
 }
 
-class ContinentSet : HashSet<Continent>() {
+val Set<Continent>.countries : Set<Country>
+        get() = flatMap { continent -> continent.countries }.toSet()
 
-    val countries get() = flatMap { continent -> continent.countries }.toSet()
-
-    fun forCountry(country: Country): Continent {
-        try { return first { it.countries.contains(country) } }
-        catch (e:  NoSuchElementException) {
-            throw NonExistentCountryException(country)
-        }
-
+fun Set<Continent>.forCountry(country: Country): Continent {
+    try { return first { it.countries.contains(country) } }
+    catch (e:  NoSuchElementException) {
+        throw NonExistentCountryException(country)
     }
 
-    fun assertCountryExists(country: Country) {
-        if (!anyHasCountry(country)) { throw NonExistentCountryException(country) }
-    }
-
-    fun anyHasCountry(country: Country) = any { it.countries.contains(country) }
-
-    fun doesContinentExist(continent: Continent) = any { it == continent }
 }
 
-
-data class Continent(val name: String, val countries: Set<Country>)
+fun Set<Continent>.assertCountryExists(country: Country) {
+    if (!any { it.countries.contains(country) } ) { throw NonExistentCountryException(country) }
+}
