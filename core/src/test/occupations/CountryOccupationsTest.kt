@@ -187,4 +187,20 @@ class CountryOccupationsTest {
         assertEquals(somePlayer, exception.player)
         assertFalse(occupations.of(someCountry).isOccupied())
     }
+
+    @Test
+    fun `Can't remove a player that is not sharing country`() {
+        val occupations = CountryOccupations(someContinentSet)
+
+        occupations.occupy(someCountry, somePlayer, someArmies, otherPlayer, otherArmies)
+        val exception = assertFailsWith<NotOccupyingPlayerException> {
+            occupations.remove(someCountry, anotherPlayer)
+        }
+
+        assertEquals(anotherPlayer, exception.player)
+        val occupation = occupations.of(someCountry) as SharedOccupation
+        assertEquals(setOf(somePlayer, otherPlayer), occupation.occupiers)
+        assertEquals(someArmies, occupation.armiesOf(somePlayer))
+        assertEquals(otherArmies, occupation.armiesOf(otherPlayer))
+    }
 }

@@ -61,7 +61,16 @@ class CountryOccupations(private val continents: Set<Continent>) {
         }
 
         override fun visit(occupation: SharedOccupation) {
-            occupations[country] = occupation.removePlayer(player)
+            assertPlayerOccupies(occupation)
+            val otherPlayer = occupation.occupiers.first { it != player }
+            occupations[country] =
+                SinglePlayerOccupation(otherPlayer, occupation.armiesOf(otherPlayer))
+        }
+
+        private fun assertPlayerOccupies(occupation: SharedOccupation) {
+            if (player !in occupation.occupiers) {
+                throw NotOccupyingPlayerException(player)
+            }
         }
     }
 }

@@ -166,30 +166,6 @@ class SharedOccupationTest {
     }
 
     @Test
-    fun `Removing a player from a SharedOccupation returns an occupation with just the remaining player`() {
-        val armies = 2
-        val occupation =
-            SharedOccupation(somePlayer, 1, otherPlayer, armies)
-
-        val newOccupation = occupation.removePlayer(somePlayer)
-
-        assertEquals(otherPlayer, newOccupation.occupier)
-        assertEquals(armies, newOccupation.armies)
-    }
-
-    @Test
-    fun `Can't remove a player not part of the occupiers`() {
-        val armies = 2
-        val occupation =
-            SharedOccupation(somePlayer, 1, otherPlayer, armies)
-
-        val exception = assertFailsWith<NotOccupyingPlayerException> {
-            occupation.removePlayer(anotherPlayer)
-        }
-        assertEquals(anotherPlayer, exception.player)
-    }
-
-    @Test
     fun `Occupying a player's share changes the removed player for the occupier`() {
         val firstArmies = 2
         val occupation =

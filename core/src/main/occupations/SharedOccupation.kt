@@ -38,12 +38,6 @@ class SharedOccupation(
     fun removeArmies(removed: Int, player: Player) =
         occupations.getValue(player).removeArmies(removed)
 
-    fun removePlayer(player: Player): SinglePlayerOccupation {
-        assertPlayerIsOccupying(player)
-        val otherPlayer = occupiers.first { it != player }
-        return occupations.getValue(otherPlayer)
-    }
-
     private fun assertPlayerIsOccupying(player: Player) {
         if (player !in occupiers) {
             throw NotOccupyingPlayerException(player)
