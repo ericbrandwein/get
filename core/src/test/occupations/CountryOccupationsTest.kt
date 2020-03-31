@@ -145,4 +145,46 @@ class CountryOccupationsTest {
         assertEquals(somePlayer, occupation.occupier)
         assertEquals(someArmies, occupation.armies)
     }
+
+    @Test
+    fun `Removing a player from a shared occupation makes the other player the only occupier`() {
+        val occupations = CountryOccupations(someContinentSet)
+
+        occupations.occupy(someCountry, somePlayer, someArmies, otherPlayer, otherArmies)
+        occupations.remove(someCountry, somePlayer)
+
+        val occupation = occupations.of(someCountry) as SinglePlayerOccupation
+        assertEquals(otherPlayer, occupation.occupier)
+        assertEquals(otherArmies, occupation.armies)
+    }
+
+    @Test
+    fun `Can't remove a player from a country occupied by only one player`() {
+        val occupations = CountryOccupations(someContinentSet)
+
+        occupations.occupy(someCountry, somePlayer, someArmies)
+
+        val exception = assertFailsWith<CantRemoveOnlyOccupierException> {
+            occupations.remove(someCountry, somePlayer)
+        }
+
+        assertEquals(somePlayer, exception.player)
+        assertEquals(someCountry, exception.country)
+
+        val occupation = occupations.of(someCountry) as SinglePlayerOccupation
+        assertEquals(somePlayer, occupation.occupier)
+        assertEquals(someArmies, occupation.armies)
+    }
+
+    @Test
+    fun `Can't remove a player from a country not occupied by anyone`() {
+        val occupations = CountryOccupations(someContinentSet)
+
+        val exception = assertFailsWith<NotOccupyingPlayerException> {
+            occupations.remove(someCountry, somePlayer)
+        }
+
+        assertEquals(somePlayer, exception.player)
+        assertFalse(occupations.of(someCountry).isOccupied())
+    }
 }

@@ -37,28 +37,31 @@ class CountryOccupations(private val continents: Set<Continent>) {
         occupations[country] =
             SharedOccupation(firstPlayer, firstArmies, secondPlayer, secondArmies)
     }
-}
 
-/**
- * Checks if the player occupies an Occupation.
- */
-private class PlayerOccupationChecker(private val player: Player) : OccupationVisitor {
-    private var playerOccupationFlag = false
-
-    fun doesPlayerOccupy(occupation: Occupation): Boolean {
-        occupation.accept(this)
-        return playerOccupationFlag
+    fun remove(country: Country, player: Player) {
+        PlayerRemover(country, player).remove()
     }
 
-    override fun visit(occupation: NoOccupation) {
-        playerOccupationFlag = false
-    }
+    /**
+     * Removes the player from a country if possible.
+     */
+    private inner class PlayerRemover(
+        private val country: Country, private val player: Player) : OccupationVisitor {
 
-    override fun visit(occupation: SinglePlayerOccupation) {
-        playerOccupationFlag = player == occupation.occupier
-    }
+        fun remove() {
+            occupations.getValue(country).accept(this)
+        }
 
-    override fun visit(occupation: SharedOccupation) {
-        playerOccupationFlag = player in occupation.occupiers
+        override fun visit(occupation: NoOccupation) {
+            throw NotOccupyingPlayerException(player)
+        }
+
+        override fun visit(occupation: SinglePlayerOccupation) {
+            throw CantRemoveOnlyOccupierException(country, player)
+        }
+
+        override fun visit(occupation: SharedOccupation) {
+            occupations[country] = occupation.removePlayer(player)
+        }
     }
 }
