@@ -22,9 +22,6 @@ class GetGame : ApplicationAdapter() {
         val winWidth = Gdx.graphics.getWidth().toFloat()
         val winHeight = Gdx.graphics.getHeight().toFloat()
 
-        val iW = img.getWidth()
-        val iH = img.getHeight()
-
         val w = winWidth / img.getWidth()
         val h = winHeight / img.getHeight()
 
