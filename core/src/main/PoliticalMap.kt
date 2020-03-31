@@ -19,9 +19,9 @@ class PoliticalMap private constructor(
 
     class Builder {
 
-        private val continents = HashSet<Continent>()
+        private val continents = mutableSetOf<Continent>()
         private val borders = mutableMapOf<Country, MutableCollection<Country>>()
-        private val countries = HashSet<Country>()
+        private val countries = mutableSetOf<Country>()
 
         fun addContinent(continent: Continent): Builder {
             val intersection = countries.intersect(continent.countries)
