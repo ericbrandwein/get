@@ -66,4 +66,6 @@ class SharedOccupation(
     private fun addPlayer(player: Player, armies: Int) {
         occupations[player] = SinglePlayerOccupation(player, armies)
     }
+
+    override fun accept(visitor: OccupationVisitor) = visitor.visit(this)
 }

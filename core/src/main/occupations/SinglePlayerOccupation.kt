@@ -48,4 +48,6 @@ class SinglePlayerOccupation(
             throw TooManyArmiesRemovedException(armies, removed)
         }
     }
+
+    override fun accept(visitor: OccupationVisitor) = visitor.visit(this)
 }

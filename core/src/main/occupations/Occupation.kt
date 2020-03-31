@@ -9,4 +9,5 @@ package occupations
 interface Occupation {
     fun isOccupied() = true
     fun isShared() = false
+    fun accept(visitor: OccupationVisitor)
 }

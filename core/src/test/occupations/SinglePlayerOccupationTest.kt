@@ -151,4 +151,28 @@ class SinglePlayerOccupationTest {
         assertEquals(originalArmies, exception.removed)
         assertEquals(originalArmies, occupation.armies)
     }
+
+    @Test
+    fun `Correct visit gets called when visiting a SinglePlayerOccupation`() {
+        var timesCalled = 0
+        val visitor = object : OccupationVisitor {
+            override fun visit(occupation: NoOccupation) {
+                fail("Should not visit a NoOccupation")
+            }
+
+            override fun visit(occupation: SinglePlayerOccupation) {
+                timesCalled++
+            }
+
+            override fun visit(occupation: SharedOccupation) {
+                fail("Should not visit a SharedOccupation")
+            }
+        }
+
+        val occupation = SinglePlayerOccupation(somePlayer, 1)
+        occupation.accept(visitor)
+
+        assertEquals(
+            1, timesCalled, "visit(SinglePlayerOccupation) should be called one time.")
+    }
 }

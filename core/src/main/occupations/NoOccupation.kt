@@ -7,4 +7,6 @@ package occupations
  */
 class NoOccupation : Occupation {
     override fun isOccupied() = false
+
+    override fun accept(visitor: OccupationVisitor) = visitor.visit(this)
 }

@@ -1,9 +1,6 @@
 package occupations
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class SharedOccupationTest {
 
@@ -228,5 +225,28 @@ class SharedOccupationTest {
         assertEquals(otherPlayer, exception.player)
         assertEquals(setOf(somePlayer, otherPlayer), occupation.occupiers)
         assertEquals(armies, occupation.armiesOf(somePlayer))
+    }
+
+    @Test
+    fun `Correct visit gets called when visiting a SharedOccupation`() {
+        var timesCalled = 0
+        val visitor = object : OccupationVisitor {
+            override fun visit(occupation: NoOccupation) {
+                fail("Should not visit a NoOccupation.")
+            }
+
+            override fun visit(occupation: SinglePlayerOccupation) {
+                fail("Should not visit a SinglePlayerOccupation.")
+            }
+
+            override fun visit(occupation: SharedOccupation) {
+                timesCalled++
+            }
+        }
+
+        val occupation = SharedOccupation(somePlayer, 1, otherPlayer, 2)
+        occupation.accept(visitor)
+
+        assertEquals(1, timesCalled, "visit(SharedOccupation) should be called one time")
     }
 }
