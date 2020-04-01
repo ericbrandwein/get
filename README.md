@@ -3,3 +3,10 @@
 TEG La Revancha Online.
 
 Inspired by [TEGNET](http://www.tegnet.com.ar/es/principal.htm).
+
+
+## Running
+
+```
+./gradlew desktop:run
+```
