@@ -87,6 +87,17 @@ class CountryOccupationsTest {
     }
 
     @Test
+    fun `Can't occupy a non-existent country with a single player`() {
+        val occupations = CountryOccupations(someContinentSet)
+
+        val exception = assertFailsWith<NonExistentCountryException> {
+            occupations.occupy(nonExistentCountry, somePlayer, someArmies)
+        }
+
+        assertEquals(nonExistentCountry, exception.country)
+    }
+
+    @Test
     fun `Occupying a country with two players makes it shared`() {
         val occupations = CountryOccupations(someContinentSet)
 
@@ -144,6 +155,17 @@ class CountryOccupationsTest {
         val occupation = occupations.of(someCountry) as SinglePlayerOccupation
         assertEquals(somePlayer, occupation.occupier)
         assertEquals(someArmies, occupation.armies)
+    }
+
+    @Test
+    fun `Can't occupy a non-existent country with two players`() {
+        val occupations = CountryOccupations(someContinentSet)
+
+        val exception = assertFailsWith<NonExistentCountryException> {
+            occupations.occupy(nonExistentCountry, somePlayer, someArmies, anotherPlayer, otherArmies)
+        }
+
+        assertEquals(nonExistentCountry, exception.country)
     }
 
     @Test
