@@ -5,13 +5,11 @@ import Player
 
 private const val STARTING_OCCUPATION_ARMIES = 1
 
-class CountryDealer(private val countries: Collection<Country>) {
+class DeterministicCountryDealer(private val countries: List<Country>) {
 
     fun dealTo(players: Collection<Player>): Collection<Occupation> {
         assertPlayersIsNotEmpty(players)
-        val shuffledCountries = countries.shuffled()
-        return dealEqually(shuffledCountries, players)
-            .union(dealRemainingCountries(shuffledCountries, players))
+        return dealEqually(players).union(dealRemaining(players))
     }
 
     private fun assertPlayersIsNotEmpty(players: Collection<Player>) {
@@ -20,20 +18,15 @@ class CountryDealer(private val countries: Collection<Country>) {
         }
     }
 
-    private fun dealEqually(
-        countries: Collection<Country>, players: Collection<Player>
-    ): Collection<Occupation> {
+    private fun dealEqually(players: Collection<Player>): Collection<Occupation> {
         val countriesPerPlayer = countries.size / players.size
         return deal(countries, players, countriesPerPlayer)
     }
 
-    private fun dealRemainingCountries(
-        countries: List<Country>, players: Collection<Player>
-    ): Collection<Occupation> {
+    private fun dealRemaining(players: Collection<Player>): Collection<Occupation> {
         val amountOfCountriesRemaining = countries.size % players.size
         val remainingCountries = countries.takeLast(amountOfCountriesRemaining)
-        val shuffledPlayers = players.shuffled()
-        return deal(remainingCountries, shuffledPlayers, 1)
+        return deal(remainingCountries, players, 1)
     }
 
     private fun deal(
