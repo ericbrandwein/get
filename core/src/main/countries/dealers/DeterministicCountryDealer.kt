@@ -1,11 +1,12 @@
-package countries
+package countries.dealers
 
 import Country
 import Player
+import countries.Occupation
 
 private const val STARTING_OCCUPATION_ARMIES = 1
 
-class DeterministicCountryDealer(private val countries: List<Country>): CountryDealer {
+class DeterministicCountryDealer(private val countries: List<Country>) : CountryDealer {
 
     override fun dealTo(players: Collection<Player>): Collection<Occupation> {
         assertPlayersIsNotEmpty(players)
