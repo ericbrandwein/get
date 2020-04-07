@@ -3,6 +3,7 @@ package countries
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotEquals
 
 class OccupationTest {
 
@@ -104,5 +105,45 @@ class OccupationTest {
         }
 
         assertEquals(removed, exception.armies)
+    }
+
+    @Test
+    fun `Occupation equals another Occupation with same members`() {
+        val firstOccupation = occupationWithArmies(1)
+        val secondOccupation = occupationWithArmies(1)
+
+        assertEquals(firstOccupation, secondOccupation)
+    }
+
+    @Test
+    fun `Occupation does not equal an object that is not an Occupation`() {
+        val otherObject = Object()
+        val occupation = occupationWithArmies(1)
+
+        assertNotEquals<Any>(occupation, otherObject)
+    }
+
+    @Test
+    fun `Occupation does not equal another Occupation with different country`() {
+        val firstOccupation = Occupation("Argentina", "Eric", 1)
+        val secondOccupation = Occupation("Uruguay", "Eric", 1)
+
+        assertNotEquals(firstOccupation, secondOccupation)
+    }
+
+    @Test
+    fun `Occupation does not equal another Occupation with different occupier`() {
+        val firstOccupation = Occupation("Argentina", "Eric", 1)
+        val secondOccupation = Occupation("Argentina", "Nico", 1)
+
+        assertNotEquals(firstOccupation, secondOccupation)
+    }
+
+    @Test
+    fun `Occupation does not equal another Occupation with different armies`() {
+        val firstOccupation = Occupation("Argentina", "Eric", 1)
+        val secondOccupation = Occupation("Argentina", "Eric", 2)
+
+        assertNotEquals(firstOccupation, secondOccupation)
     }
 }
