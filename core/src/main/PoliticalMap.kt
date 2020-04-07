@@ -1,7 +1,5 @@
 typealias Country = String
 
-data class Continent(val name: String, val countries: Set<Country>)
-
 class PoliticalMap private constructor(
     public val continents: Set<Continent>,
     private val borders: Map<Country, Collection<Country>>
