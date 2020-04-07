@@ -1,3 +1,5 @@
+package countries
+
 typealias Country = String
 
 class PoliticalMap private constructor(

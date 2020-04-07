@@ -1,6 +1,6 @@
-package occupations
+package countries.occupations
 
-import Country
+import countries.Country
 import Player
 
 class Occupation(val country: Country, val occupier: Player, armies: Int) {

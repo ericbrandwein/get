@@ -1,4 +1,4 @@
-package occupations
+package countries.occupations
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

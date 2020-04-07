@@ -1,3 +1,5 @@
+package countries
+
 import kotlin.test.*
 
 class PoliticalMapTest {
@@ -40,7 +42,8 @@ class PoliticalMapTest {
     fun `Builder with two countries adds both to the countries list`() {
         val firstCountry = "Argentina"
         val secondCountry = "Uruguay"
-        val continent = Continent("America", setOf(firstCountry, secondCountry))
+        val continent = Continent(
+            "America", setOf(firstCountry, secondCountry))
 
         val map = PoliticalMap.Builder()
                 .addContinent(continent)
@@ -53,7 +56,8 @@ class PoliticalMapTest {
     fun `Map with two countries with same continent returns same continent for both`() {
         val firstCountry = "Argentina"
         val secondCountry = "Uruguay"
-        val continent = Continent("America", setOf(firstCountry, secondCountry))
+        val continent = Continent(
+            "America", setOf(firstCountry, secondCountry))
         val builder = PoliticalMap.Builder()
         builder.addContinent(continent)
         val map = builder.build()
@@ -65,9 +69,11 @@ class PoliticalMapTest {
     @Test
     fun `Map with two countries with different continents returns the corresponding continent for both of them`() {
         val firstCountry = "Argentina"
-        val firstContinent = Continent("America", setOf(firstCountry))
+        val firstContinent =
+            Continent("America", setOf(firstCountry))
         val secondCountry = "China"
-        val secondContinent = Continent("Asia", setOf(secondCountry))
+        val secondContinent =
+            Continent("Asia", setOf(secondCountry))
 
         val map = PoliticalMap.Builder()
                 .addContinent(firstContinent)
@@ -80,7 +86,8 @@ class PoliticalMapTest {
 
     @Test
     fun `Can't ask the continent of a non existent country when there are other countries`() {
-        val continent = Continent("America", setOf("Argentina"))
+        val continent =
+            Continent("America", setOf("Argentina"))
         val map = PoliticalMap.Builder()
                 .addContinent(continent)
                 .build()
@@ -97,7 +104,8 @@ class PoliticalMapTest {
     fun `Country with no borders added doesn't border any other country`() {
         val country = "Argentina"
         val otherCountry = "Uruguay"
-        val continent = Continent("America", setOf(country, otherCountry))
+        val continent = Continent(
+            "America", setOf(country, otherCountry))
         val map = PoliticalMap.Builder()
                 .addContinent(continent)
                 .build()
@@ -109,7 +117,8 @@ class PoliticalMapTest {
     fun `Two countries added as bordering in Builder are bordering in Map`() {
         val country = "Argentina"
         val otherCountry = "Uruguay"
-        val continent = Continent("America", setOf(country, otherCountry))
+        val continent = Continent(
+            "America", setOf(country, otherCountry))
 
         val map = PoliticalMap.Builder()
                 .addContinent(continent)
@@ -123,7 +132,8 @@ class PoliticalMapTest {
     fun `Country added as border of other country borders other country`() {
         val country = "Argentina"
         val otherCountry = "Uruguay"
-        val continent = Continent("America", setOf(country,otherCountry))
+        val continent = Continent(
+            "America", setOf(country, otherCountry))
         val map = PoliticalMap.Builder()
                 .addContinent(continent)
                 .addBorder(country, otherCountry)
@@ -192,7 +202,8 @@ class PoliticalMapTest {
     fun `Can't add an already existing country in other continent`() {
         val country = "Argentina"
         val continent = Continent("America", setOf(country))
-        val otherContinent = Continent("SouthAmerica", setOf(country))
+        val otherContinent =
+            Continent("SouthAmerica", setOf(country))
         val map = PoliticalMap.Builder().addContinent(continent)
 
         val exception = assertFailsWith<CountryAlreadyExistsException> {
@@ -225,7 +236,8 @@ class PoliticalMapTest {
 
     @Test
     fun `Map with two countries with same continent has their continent once`() {
-        val continent = Continent("America", setOf("Guyana", "Peru"))
+        val continent =
+            Continent("America", setOf("Guyana", "Peru"))
         val map = PoliticalMap.Builder()
                 .addContinent(continent)
                 .build()
@@ -237,8 +249,10 @@ class PoliticalMapTest {
 
     @Test
     fun `Map with two countries with different continents has each continent`() {
-        val firstContinent = Continent("America", setOf<Country>())
-        val secondContinent = Continent("Asia", setOf<Country>())
+        val firstContinent =
+            Continent("America", setOf<Country>())
+        val secondContinent =
+            Continent("Asia", setOf<Country>())
         val map = PoliticalMap.Builder()
                 .addContinent(firstContinent)
                 .addContinent(secondContinent)
@@ -276,9 +290,11 @@ class ContinentTest {
     @Test
     fun `Countries of a continent when there are many continents returns only the countries of that continent`() {
         val firstCountry = "Argentina"
-        val firstContinent = Continent("America", setOf(firstCountry))
+        val firstContinent =
+            Continent("America", setOf(firstCountry))
         val secondCountry = "South Africa"
-        val secondContinent = Continent("Africa", setOf(secondCountry))
+        val secondContinent =
+            Continent("Africa", setOf(secondCountry))
 
         assertEquals(setOf(firstCountry), firstContinent.countries)
         assertEquals(setOf(secondCountry), secondContinent.countries)

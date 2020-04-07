@@ -1,8 +1,8 @@
-package occupations.dealers
+package countries.occupations.dealers
 
-import Country
+import countries.Country
 import Player
-import occupations.Occupation
+import countries.occupations.Occupation
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
