@@ -6,7 +6,7 @@ import countries.Occupation
 
 private const val STARTING_OCCUPATION_ARMIES = 1
 
-class DeterministicCountryDealer(private val countries: List<Country>) : CountryDealer {
+class DeterministicCountryDealer(countries: List<Country>) : CountryDealer(countries) {
 
     override fun dealTo(players: Collection<Player>): Collection<Occupation> {
         assertPlayersIsNotEmpty(players)
