@@ -1,6 +1,6 @@
 package countries.occupations.dealers
 
-import countries.Country
+import Country
 import Player
 import countries.occupations.Occupation
 import kotlin.test.Test

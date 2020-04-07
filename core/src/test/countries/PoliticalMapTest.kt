@@ -1,5 +1,6 @@
 package countries
 
+import Country
 import kotlin.test.*
 
 class PoliticalMapTest {

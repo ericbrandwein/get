@@ -1,6 +1,6 @@
 package countries.occupations.dealers
 
-import countries.Country
+import Country
 import Player
 
 class RandomOccupationsDealer(countries: List<Country>) : OccupationsDealer(countries) {

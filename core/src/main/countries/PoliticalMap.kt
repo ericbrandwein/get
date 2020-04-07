@@ -1,6 +1,6 @@
 package countries
 
-typealias Country = String
+import Country
 
 class PoliticalMap private constructor(
     val continents: Set<Continent>,
