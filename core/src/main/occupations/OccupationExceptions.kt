@@ -1,4 +1,4 @@
-package countries
+package occupations
 
 class NonPositiveArmiesException(val armies: Int) : IllegalArgumentException(
     "The amount of armies should be positive, it was $armies instead.")

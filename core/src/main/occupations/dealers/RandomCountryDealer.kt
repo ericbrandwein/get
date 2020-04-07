@@ -1,4 +1,4 @@
-package countries.dealers
+package occupations.dealers
 
 import Country
 import Player
