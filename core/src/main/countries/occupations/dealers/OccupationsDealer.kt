@@ -4,7 +4,7 @@ import countries.Country
 import Player
 import countries.occupations.Occupation
 
-abstract class CountryDealer(protected val countries: List<Country>) {
+abstract class OccupationsDealer(protected val countries: List<Country>) {
 
     abstract fun dealTo(players: Collection<Player>): Collection<Occupation>
 

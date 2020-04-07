@@ -4,7 +4,7 @@ import countries.Country
 import Player
 import countries.occupations.Occupation
 
-class DeterministicCountryDealer(countries: List<Country>) : CountryDealer(countries) {
+class DeterministicOccupationsDealer(countries: List<Country>) : OccupationsDealer(countries) {
 
     override fun dealTo(players: Collection<Player>): Collection<Occupation> {
         assertPlayersIsNotEmpty(players)
