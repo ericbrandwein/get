@@ -4,8 +4,6 @@ import Country
 import Player
 import countries.Occupation
 
-private const val STARTING_OCCUPATION_ARMIES = 1
-
 class DeterministicCountryDealer(countries: List<Country>) : CountryDealer(countries) {
 
     override fun dealTo(players: Collection<Player>): Collection<Occupation> {
