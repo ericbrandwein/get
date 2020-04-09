@@ -1,9 +1,33 @@
 package situations
 
+import NonPositiveArmiesException
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class ClassicCombatDiceAmountCalculatorTest {
+
+    @Test
+    fun `Can't create with a non-positive amount of attacking armies`() {
+        val armies = -5
+
+        val exception = assertFailsWith<NonPositiveArmiesException> {
+            ClassicCombatDiceAmountCalculator(armies, 1)
+        }
+
+        assertEquals(armies, exception.armies)
+    }
+
+    @Test
+    fun `Can't create with a non-positive amount of defending armies`() {
+        val armies = -5
+
+        val exception = assertFailsWith<NonPositiveArmiesException> {
+            ClassicCombatDiceAmountCalculator(1, armies)
+        }
+
+        assertEquals(armies, exception.armies)
+    }
 
     class ForAttacker {
         @Test
