@@ -1,5 +1,14 @@
-class PositiveInt private constructor(
-    private val value: Int) : Number(), Comparable<PositiveInt> {
+class PositiveInt(private val value: Int) : Number(), Comparable<PositiveInt> {
+
+    init {
+        assertPositive(value)
+    }
+
+    private fun assertPositive(number: Int) {
+        if (number <= 0) {
+            throw NonPositiveNumberException(number)
+        }
+    }
 
     override fun toByte() = value.toByte()
     override fun toChar() = value.toChar()
@@ -11,27 +20,27 @@ class PositiveInt private constructor(
 
     override operator fun compareTo(other: PositiveInt) = value.compareTo(other.value)
 
-    operator fun plus(other: PositiveInt) = fromInt(toInt() + other.toInt())
+    operator fun plus(other: PositiveInt) = PositiveInt(toInt() + other.toInt())
 
     operator fun minus(other: PositiveInt): PositiveInt {
         try {
-            return fromInt(toInt() - other.toInt())
+            return PositiveInt(toInt() - other.toInt())
         } catch (e: NonPositiveNumberException) {
             throw TooBigToSubtractException(this, other)
         }
     }
 
-    operator fun times(other: PositiveInt) = fromInt(toInt() * other.toInt())
+    operator fun times(other: PositiveInt) = PositiveInt(toInt() * other.toInt())
 
-    operator fun div(other: PositiveInt) = fromInt(toInt() / other.toInt())
+    operator fun div(other: PositiveInt) = PositiveInt(toInt() / other.toInt())
 
-    operator fun rem(other: PositiveInt) = fromInt(toInt() % other.toInt())
+    operator fun rem(other: PositiveInt) = PositiveInt(toInt() % other.toInt())
 
-    operator fun inc() = fromInt(value.inc())
+    operator fun inc() = PositiveInt(value.inc())
 
     operator fun dec(): PositiveInt {
         try {
-            return fromInt(value.dec())
+            return PositiveInt(value.dec())
         } catch (e: NonPositiveNumberException) {
             throw CantDecrementException()
         }
@@ -43,18 +52,4 @@ class PositiveInt private constructor(
     override fun hashCode(): Int = toInt()
 
     override fun toString() = "PositiveInt($value)"
-
-    companion object {
-
-        fun fromInt(number: Int): PositiveInt {
-            assertPositive(number)
-            return PositiveInt(number)
-        }
-
-        private fun assertPositive(number: Int) {
-            if (number <= 0) {
-                throw NonPositiveNumberException(number)
-            }
-        }
-    }
 }
