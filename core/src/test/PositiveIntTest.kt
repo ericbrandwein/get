@@ -218,4 +218,35 @@ class PositiveIntTest {
         assertTrue(second in range)
         assertTrue(PositiveInt(3) in range)
     }
+    
+    @Test
+    fun `Can't increment past the maximum value`() {
+        var number = PositiveInt.MAX_VALUE
+
+        assertFailsWith<PositiveIntOverflowException> {
+            number++
+        }
+
+        assertEquals(number, PositiveInt.MAX_VALUE)
+    }
+
+    @Test
+    fun `Can't sum past the maximum value`() {
+        val first = PositiveInt.MAX_VALUE
+        val second = PositiveInt(1)
+
+        assertFailsWith<PositiveIntOverflowException> {
+            first + second
+        }
+    }
+
+    @Test
+    fun `Can't multiply past the maximum value`() {
+        val first = PositiveInt.MAX_VALUE
+        val second = PositiveInt.MAX_VALUE
+
+        assertFailsWith<PositiveIntOverflowException> {
+            first * second
+        }
+    }
 }

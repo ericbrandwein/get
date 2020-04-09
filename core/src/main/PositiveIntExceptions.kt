@@ -7,3 +7,6 @@ class TooBigToSubtractException(
     "Can't do $minuend - $subtrahend, it would result in a non-positive number.")
 
 class CantDecrementException : Exception("Can't decrement a PositiveInt past 1.")
+
+class PositiveIntOverflowException : ArithmeticException(
+    "This operation would result in a value greater than the maximum for PositiveInt.")

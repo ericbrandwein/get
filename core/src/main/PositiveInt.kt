@@ -20,7 +20,19 @@ class PositiveInt(private val value: Int) : Number(), Comparable<PositiveInt> {
 
     override operator fun compareTo(other: PositiveInt) = value.compareTo(other.value)
 
-    operator fun plus(other: PositiveInt) = PositiveInt(toInt() + other.toInt())
+    operator fun plus(other: PositiveInt): PositiveInt {
+        return buildCheckingForOverflow {
+            PositiveInt(Math.addExact(toInt(), other.toInt()))
+        }
+    }
+
+    private fun buildCheckingForOverflow(builder: () -> PositiveInt): PositiveInt {
+        try {
+            return builder()
+        } catch (e: ArithmeticException) {
+            throw PositiveIntOverflowException()
+        }
+    }
 
     operator fun minus(other: PositiveInt): PositiveInt {
         try {
@@ -30,13 +42,21 @@ class PositiveInt(private val value: Int) : Number(), Comparable<PositiveInt> {
         }
     }
 
-    operator fun times(other: PositiveInt) = PositiveInt(toInt() * other.toInt())
+    operator fun times(other: PositiveInt): PositiveInt {
+        return buildCheckingForOverflow {
+            PositiveInt(Math.multiplyExact(toInt(), other.toInt()))
+        }
+    }
 
     operator fun div(other: PositiveInt) = PositiveInt(toInt() / other.toInt())
 
     operator fun rem(other: PositiveInt) = PositiveInt(toInt() % other.toInt())
 
-    operator fun inc() = PositiveInt(value.inc())
+    operator fun inc(): PositiveInt {
+        return buildCheckingForOverflow {
+            PositiveInt(Math.incrementExact(toInt()))
+        }
+    }
 
     operator fun dec(): PositiveInt {
         try {
@@ -52,4 +72,8 @@ class PositiveInt(private val value: Int) : Number(), Comparable<PositiveInt> {
     override fun hashCode(): Int = toInt()
 
     override fun toString() = "PositiveInt($value)"
+
+    companion object {
+        val MAX_VALUE: PositiveInt = PositiveInt(Int.MAX_VALUE)
+    }
 }
