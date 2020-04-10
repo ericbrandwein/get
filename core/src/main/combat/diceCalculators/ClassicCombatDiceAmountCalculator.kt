@@ -3,11 +3,11 @@ package combat.diceCalculators
 import PositiveInt as Pos
 
 class ClassicCombatDiceAmountCalculator(
-    private val attackingArmies: Pos, private val defendingArmies: Pos) {
+    private val attackingArmies: Pos, private val defendingArmies: Pos
+) : DiceAmountCalculator {
 
-    fun forAttacker(): Pos {
-        var dice = minOf(
-            MAXIMUM_DICE_AMOUNT, attackingArmies - Pos(1))
+    override fun forAttacker(): Pos {
+        var dice = minOf(MAXIMUM_DICE_AMOUNT, attackingArmies - Pos(1))
         if (shouldAddOneDieToAttacker()) {
             dice++
         }
@@ -17,8 +17,7 @@ class ClassicCombatDiceAmountCalculator(
     private fun shouldAddOneDieToAttacker() =
         attackingArmies >= Pos(2) * defendingArmies && defendingArmies >= Pos(3)
 
-    fun forDefender() = minOf(
-        MAXIMUM_DICE_AMOUNT, defendingArmies)
+    override fun forDefender() = minOf(MAXIMUM_DICE_AMOUNT, defendingArmies)
 
     companion object {
         private val MAXIMUM_DICE_AMOUNT = Pos(3)
