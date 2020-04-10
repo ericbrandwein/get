@@ -3,8 +3,8 @@ package combat.diceCalculators
 import PositiveInt as Pos
 
 class ClassicCombatDiceAmountCalculator(
-    private val attackingArmies: Pos, private val defendingArmies: Pos
-) : DiceAmountCalculator {
+    attackingArmies: Pos, defendingArmies: Pos
+) : DiceAmountCalculator(attackingArmies, defendingArmies) {
 
     override fun forAttacker(): Pos {
         var dice = minOf(MAXIMUM_DICE_AMOUNT, attackingArmies - Pos(1))
