@@ -1,14 +1,14 @@
-package countries.dealers
+package countries.occupations.dealers
 
 import Country
 import Player
+import countries.occupations.Occupation
 import PositiveInt
-import countries.Occupation
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-class DeterministicCountryDealerTest {
+class DeterministicOccupationsDealerTest {
     private fun <T> assertSameElements(expected: Collection<T>, actual: Collection<T>) {
         assertEquals(expected.toSet(), actual.toSet())
     }
@@ -24,7 +24,7 @@ class DeterministicCountryDealerTest {
         players: List<Player>, countries: List<Country>,
         countriesDistribution: Map<Player, List<Country>>) {
 
-        val actualOccupations = DeterministicCountryDealer(countries).dealTo(players)
+        val actualOccupations = DeterministicOccupationsDealer(countries).dealTo(players)
         val expectedOccupations = buildOccupationsFrom(countriesDistribution)
         assertSameElements(expectedOccupations, actualOccupations)
     }
@@ -68,7 +68,7 @@ class DeterministicCountryDealerTest {
     @Test
     fun `Can't deal to zero players`() {
         val countries = listOf("Argentina", "Uruguay")
-        val dealer = DeterministicCountryDealer(countries)
+        val dealer = DeterministicOccupationsDealer(countries)
 
         assertFailsWith<NoPlayersToDealToException> {
             dealer.dealTo(setOf())

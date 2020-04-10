@@ -1,4 +1,4 @@
-package countries
+package countries.occupations
 
 import PositiveInt
 import kotlin.test.Test

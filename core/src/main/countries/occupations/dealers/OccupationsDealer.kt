@@ -1,11 +1,11 @@
-package countries.dealers
+package countries.occupations.dealers
 
 import Country
 import Player
 import PositiveInt
-import countries.Occupation
+import countries.occupations.Occupation
 
-abstract class CountryDealer(protected val countries: List<Country>) {
+abstract class OccupationsDealer(protected val countries: List<Country>) {
 
     abstract fun dealTo(players: Collection<Player>): Collection<Occupation>
 
