@@ -1,33 +1,30 @@
 package situations
 
-import PositiveArmiesAsserter
-import kotlin.math.min
+import PositiveInt
 
 class ClassicCombatDiceAmountCalculator(
-    private val attackingArmies: Int, private val defendingArmies: Int) {
+    private val attackingArmies: PositiveInt, private val defendingArmies: PositiveInt) {
 
-    init {
-        val asserter = PositiveArmiesAsserter()
-        asserter.assertPositive(attackingArmies)
-        asserter.assertPositive(defendingArmies)
-    }
-
-    fun forAttacker(): Int {
-        var dice = boundByMaximumDiceAmount(attackingArmies - 1)
+    fun forAttacker(): PositiveInt {
+        var dice = boundByMaximumDiceAmount(attackingArmies - PositiveInt(1))
         if (shouldAddOneDieToAttacker()) {
             dice++
         }
         return dice
     }
 
-    private fun boundByMaximumDiceAmount(dice: Int) = min(MAXIMUM_DICE_AMOUNT, dice)
+    private fun boundByMaximumDiceAmount(dice: PositiveInt) =
+        minOf(MAXIMUM_DICE_AMOUNT, dice)
 
     private fun shouldAddOneDieToAttacker() =
-        attackingArmies >= 2 * defendingArmies && defendingArmies >= 3
+        attackerHasAtLeastDoubleTheArmies() && defendingArmies >= PositiveInt(3)
+
+    private fun attackerHasAtLeastDoubleTheArmies() =
+        attackingArmies >= PositiveInt(2) * defendingArmies
 
     fun forDefender() = boundByMaximumDiceAmount(defendingArmies)
 
     companion object {
-        private const val MAXIMUM_DICE_AMOUNT = 3
+        private val MAXIMUM_DICE_AMOUNT = PositiveInt(3)
     }
 }
