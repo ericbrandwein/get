@@ -2,6 +2,7 @@ package countries.occupations
 
 import Country
 import Player
+import PositiveInt
 import countries.NonExistentCountryException
 
 class CountryOccupations(occupations: Collection<Occupation>) {
@@ -12,7 +13,7 @@ class CountryOccupations(occupations: Collection<Occupation>) {
 
     fun armiesOf(country: Country) = occupationOf(country).armies
 
-    fun occupy(country: Country, player: Player, armies: Int) {
+    fun occupy(country: Country, player: Player, armies: PositiveInt) {
         removePreviousOccupation(country)
         addNewOccupation(country, player, armies)
     }
@@ -22,14 +23,15 @@ class CountryOccupations(occupations: Collection<Occupation>) {
         occupations.remove(previousOccupation)
     }
 
-    private fun addNewOccupation(country: Country, player: Player, armies: Int) {
+    private fun addNewOccupation(country: Country, player: Player, armies: PositiveInt) {
         val newOccupation = Occupation(country, player, armies)
         occupations.add(newOccupation)
     }
 
-    fun addArmies(country: Country, armies: Int) = occupationOf(country).addArmies(armies)
+    fun addArmies(country: Country, armies: PositiveInt) =
+        occupationOf(country).addArmies(armies)
 
-    fun removeArmies(country: Country, armies: Int) =
+    fun removeArmies(country: Country, armies: PositiveInt) =
         occupationOf(country).removeArmies(armies)
 
     private fun occupationOf(country: Country): Occupation {
