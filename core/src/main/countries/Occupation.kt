@@ -3,6 +3,7 @@ package countries
 import Country
 import Player
 import PositiveInt
+import TooBigToSubtractException
 
 class Occupation(val country: Country, val occupier: Player, armies: PositiveInt) {
 
@@ -14,12 +15,9 @@ class Occupation(val country: Country, val occupier: Player, armies: PositiveInt
     }
 
     fun removeArmies(removed: PositiveInt) {
-        assertCanRemove(removed)
-        mutableArmies -= removed
-    }
-
-    private fun assertCanRemove(removed: PositiveInt) {
-        if (removed >= armies) {
+        try {
+            mutableArmies -= removed
+        } catch (e: TooBigToSubtractException) {
             throw TooManyArmiesRemovedException(removed)
         }
     }
