@@ -2,6 +2,7 @@ package countries.dealers
 
 import Country
 import Player
+import PositiveInt
 import countries.Occupation
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -15,7 +16,7 @@ class DeterministicCountryDealerTest {
     private fun buildOccupationsFrom(
         countriesByPlayer: Map<Player, List<Country>>): List<Occupation> {
         return countriesByPlayer.flatMap { (player, countries) ->
-            countries.map { country -> Occupation(country, player, 1) }
+            countries.map { country -> Occupation(country, player, PositiveInt(1)) }
         }
     }
 
