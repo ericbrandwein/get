@@ -4,13 +4,13 @@ import PositiveInt
 import kotlin.math.min
 
 /**
- * Resolves combats between an attacker and a defender,
- * using the rolls passed as a parameter to determine how many armies each one lost.
+ * Calculates the armies lost by the attacker and the defender,
+ * given the rolls passed as a parameter.
  *
  * The lost armies total is equal to the amount contested.
  */
-class CombatResolver {
-    fun combat(
+class LostArmiesCalculator {
+    fun armiesLostForRolls(
         attackerRolls: Collection<Int>, defenderRolls: Collection<Int>,
         contestedArmies: PositiveInt
     ): Pair<Int, Int> {
