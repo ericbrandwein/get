@@ -21,14 +21,8 @@ class PositiveInt(private val value: Int) : Number(), Comparable<PositiveInt> {
     override operator fun compareTo(other: PositiveInt) = toInt().compareTo(other.toInt())
 
     operator fun plus(other: PositiveInt): PositiveInt {
-        return buildCheckingForOverflow {
-            PositiveInt(Math.addExact(toInt(), other.toInt()))
-        }
-    }
-
-    private fun buildCheckingForOverflow(builder: () -> PositiveInt): PositiveInt {
         try {
-            return builder()
+            return PositiveInt(Math.addExact(toInt(), other.toInt()))
         } catch (e: ArithmeticException) {
             throw PositiveIntOverflowException()
         }
@@ -43,8 +37,10 @@ class PositiveInt(private val value: Int) : Number(), Comparable<PositiveInt> {
     }
 
     operator fun times(other: PositiveInt): PositiveInt {
-        return buildCheckingForOverflow {
-            PositiveInt(Math.multiplyExact(toInt(), other.toInt()))
+        try {
+            return PositiveInt(Math.multiplyExact(toInt(), other.toInt()))
+        } catch (e: ArithmeticException) {
+            throw PositiveIntOverflowException()
         }
     }
 
@@ -53,8 +49,10 @@ class PositiveInt(private val value: Int) : Number(), Comparable<PositiveInt> {
     operator fun rem(other: PositiveInt) = PositiveInt(toInt() % other.toInt())
 
     operator fun inc(): PositiveInt {
-        return buildCheckingForOverflow {
-            PositiveInt(Math.incrementExact(toInt()))
+        try {
+            return PositiveInt(Math.incrementExact(toInt()))
+        } catch (e: ArithmeticException) {
+            throw PositiveIntOverflowException()
         }
     }
 
