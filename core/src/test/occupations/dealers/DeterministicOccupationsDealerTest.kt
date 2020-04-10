@@ -1,8 +1,8 @@
-package countries.occupations.dealers
+package occupations.dealers
 
 import Country
 import Player
-import countries.occupations.Occupation
+import occupations.Occupation
 import PositiveInt
 import kotlin.test.Test
 import kotlin.test.assertEquals

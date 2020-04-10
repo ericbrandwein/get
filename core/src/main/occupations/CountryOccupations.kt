@@ -1,4 +1,4 @@
-package countries.occupations
+package occupations
 
 import Country
 import Player

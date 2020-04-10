@@ -1,8 +1,8 @@
-package countries.occupations.dealers
+package occupations.dealers
 
 import Country
 import Player
-import countries.occupations.Occupation
+import occupations.Occupation
 
 class DeterministicOccupationsDealer(countries: List<Country>) : OccupationsDealer(countries) {
 

@@ -1,9 +1,9 @@
-package countries.occupations.dealers
+package occupations.dealers
 
 import Country
 import Player
 import PositiveInt
-import countries.occupations.Occupation
+import occupations.Occupation
 
 abstract class OccupationsDealer(protected val countries: List<Country>) {
 
