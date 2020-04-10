@@ -1,4 +1,4 @@
-package combat
+package combat.diceCalculators
 
 import PositiveInt as Pos
 
