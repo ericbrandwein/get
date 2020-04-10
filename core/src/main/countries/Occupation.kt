@@ -2,34 +2,23 @@ package countries
 
 import Country
 import Player
+import PositiveInt
 
-class Occupation(val country: Country, val occupier: Player, armies: Int) {
+class Occupation(val country: Country, val occupier: Player, armies: PositiveInt) {
 
-    private var mutableArmies: Int = armies
+    private var mutableArmies: PositiveInt = armies
     val armies get() = mutableArmies
 
-    init {
-        assertPositiveArmies(mutableArmies)
-    }
-
-    private fun assertPositiveArmies(added: Int) {
-        if (added <= 0) {
-            throw NonPositiveArmiesException(added)
-        }
-    }
-
-    fun addArmies(added: Int) {
-        assertPositiveArmies(added)
+    fun addArmies(added: PositiveInt) {
         mutableArmies += added
     }
 
-    fun removeArmies(removed: Int) {
-        assertPositiveArmies(removed)
+    fun removeArmies(removed: PositiveInt) {
         assertCanRemove(removed)
         mutableArmies -= removed
     }
 
-    private fun assertCanRemove(removed: Int) {
+    private fun assertCanRemove(removed: PositiveInt) {
         if (removed >= armies) {
             throw TooManyArmiesRemovedException(removed)
         }
@@ -45,7 +34,7 @@ class Occupation(val country: Country, val occupier: Player, armies: Int) {
     override fun hashCode(): Int {
         var result = country.hashCode()
         result = 31 * result + occupier.hashCode()
-        result = 31 * result + armies
+        result = 31 * result + armies.hashCode()
         return result
     }
 
