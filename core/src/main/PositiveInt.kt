@@ -18,7 +18,7 @@ class PositiveInt(private val value: Int) : Number(), Comparable<PositiveInt> {
     override fun toLong() = value.toLong()
     override fun toShort() = value.toShort()
 
-    override operator fun compareTo(other: PositiveInt) = value.compareTo(other.value)
+    override operator fun compareTo(other: PositiveInt) = toInt().compareTo(other.toInt())
 
     operator fun plus(other: PositiveInt): PositiveInt {
         return buildCheckingForOverflow {
