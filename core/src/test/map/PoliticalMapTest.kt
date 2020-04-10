@@ -1,4 +1,4 @@
-package countries
+package map
 
 import Country
 import kotlin.test.*

@@ -3,7 +3,7 @@ package occupations
 import Country
 import Player
 import PositiveInt
-import countries.NonExistentCountryException
+import map.NonExistentCountryException
 
 class CountryOccupations(occupations: Collection<Occupation>) {
 

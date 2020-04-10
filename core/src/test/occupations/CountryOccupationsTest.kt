@@ -1,7 +1,7 @@
 package occupations
 
 import PositiveInt
-import countries.NonExistentCountryException
+import map.NonExistentCountryException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
