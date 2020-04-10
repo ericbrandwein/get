@@ -1,5 +1,7 @@
-package combat
+package combat.lostArmiesCalculator
 
+import combat.lostArmiesCalculator.LostArmiesCalculator
+import combat.lostArmiesCalculator.TooManyArmiesContestedException
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
