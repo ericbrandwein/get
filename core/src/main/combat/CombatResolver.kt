@@ -1,5 +1,6 @@
 package combat
 
+import PositiveInt
 import kotlin.math.min
 
 /**
@@ -11,30 +12,23 @@ import kotlin.math.min
 class CombatResolver {
     fun combat(
         attackerRolls: Collection<Int>, defenderRolls: Collection<Int>,
-        contestedArmies: Int
+        contestedArmies: PositiveInt
     ): Pair<Int, Int> {
 
-        assertPositiveAmountOfArmiesContested(contestedArmies)
         assertEnoughDiceForContestedArmies(
             attackerRolls.size, defenderRolls.size, contestedArmies)
 
         val armiesLostByDefender = min(
             rollsLostByDefender(attackerRolls, defenderRolls),
-            contestedArmies
+            contestedArmies.toInt()
         )
-        val armiesLostByAttacker = contestedArmies - armiesLostByDefender
+        val armiesLostByAttacker = contestedArmies.toInt() - armiesLostByDefender
         return Pair(armiesLostByAttacker, armiesLostByDefender)
     }
 
-    private fun assertPositiveAmountOfArmiesContested(contestedArmies: Int) {
-        if (contestedArmies <= 0) {
-            throw NonPositiveArmiesContestedException(contestedArmies)
-        }
-    }
-
     private fun assertEnoughDiceForContestedArmies(
-        attackerDice: Int, defenderDice: Int, contestedArmies: Int) {
-        if (min(attackerDice, defenderDice) < contestedArmies) {
+        attackerDice: Int, defenderDice: Int, contestedArmies: PositiveInt) {
+        if (min(attackerDice, defenderDice) < contestedArmies.toInt()) {
             throw TooManyArmiesContestedException(contestedArmies)
         }
     }
