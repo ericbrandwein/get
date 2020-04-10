@@ -1,7 +1,7 @@
 package combat
 
 import PositiveInt
-import combat.diceCalculators.DiceAmountCalculatorFactory
+import combat.diceCalculators.DiceAmountCalculator
 import combat.lostArmiesCalculator.LostArmiesCalculator
 import dice.Die
 
@@ -10,8 +10,7 @@ import dice.Die
  * based on the results.
  */
 class CombatResolver(
-    private val diceAmountCalculatorFactory: DiceAmountCalculatorFactory,
-    private val die: Die
+    private val diceAmountCalculator: DiceAmountCalculator, private val die: Die
 ) {
 
     private val lostArmiesCalculator = LostArmiesCalculator()
@@ -29,10 +28,10 @@ class CombatResolver(
     private fun rollDiceForCombat(
         attackingArmies: PositiveInt, defendingArmies: PositiveInt
     ): Pair<Collection<Int>, Collection<Int>> {
-        val diceAmountCalculator =
-            diceAmountCalculatorFactory.forAttack(attackingArmies, defendingArmies)
-        val attackerRolls = roll(diceAmountCalculator.forAttacker())
-        val defenderRolls = roll(diceAmountCalculator.forDefender())
+        val (attackerDice, defenderDice) =
+            diceAmountCalculator.forAttack(attackingArmies, defendingArmies)
+        val attackerRolls = roll(attackerDice)
+        val defenderRolls = roll(defenderDice)
         return Pair(attackerRolls, defenderRolls)
     }
 

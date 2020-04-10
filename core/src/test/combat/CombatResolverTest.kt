@@ -1,6 +1,6 @@
 package combat
 
-import combat.diceCalculators.ClassicCombatDiceAmountCalculatorFactory
+import combat.diceCalculators.ClassicCombatDiceAmountCalculator
 import dice.FixedDie
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -9,7 +9,7 @@ import PositiveInt as Pos
 
 class CombatResolverTest {
     private fun resolverWithDieRolls(vararg rolls: Int): CombatResolver =
-        CombatResolver(ClassicCombatDiceAmountCalculatorFactory(), FixedDie(*rolls))
+        CombatResolver(ClassicCombatDiceAmountCalculator(), FixedDie(*rolls))
 
     @Test
     fun `Only attacker loses one army when losing one roll`() {

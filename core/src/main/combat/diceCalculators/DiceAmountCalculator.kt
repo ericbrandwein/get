@@ -4,23 +4,24 @@ import PositiveInt
 import combat.NotEnoughArmiesForAttackException
 
 
-abstract class DiceAmountCalculator(
-    protected val attackingArmies: PositiveInt,
-    protected val defendingArmies: PositiveInt
-) {
+abstract class DiceAmountCalculator {
 
-    init {
-        assertEnoughAttackerArmies()
+    fun forAttack(
+        attackingArmies: PositiveInt, defendingArmies: PositiveInt
+    ): Pair<PositiveInt, PositiveInt> {
+        assertEnoughAttackingArmies(attackingArmies)
+        return forAttackWithValidArmies(attackingArmies, defendingArmies)
     }
 
-    private fun assertEnoughAttackerArmies() {
+    private fun assertEnoughAttackingArmies(attackingArmies: PositiveInt) {
         if (attackingArmies < ATTACKER_MINIMUM_ARMIES) {
             throw NotEnoughArmiesForAttackException()
         }
     }
 
-    abstract fun forAttacker(): PositiveInt
-    abstract fun forDefender(): PositiveInt
+    protected abstract fun forAttackWithValidArmies(
+        attackingArmies: PositiveInt, defendingArmies: PositiveInt
+    ): Pair<PositiveInt, PositiveInt>
 
     companion object {
         val ATTACKER_MINIMUM_ARMIES = PositiveInt(2)
