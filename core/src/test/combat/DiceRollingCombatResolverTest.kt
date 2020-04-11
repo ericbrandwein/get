@@ -8,98 +8,140 @@ import kotlin.test.assertFailsWith
 import PositiveInt as Pos
 
 class DiceRollingCombatResolverTest {
+    private fun resolverWithDieRolls(
+        attackerRolls: Collection<Int>, defenderRolls: Collection<Int>,
+        vararg extraRolls: Int
+    ): CombatResolver {
+        val rolls = attackerRolls + defenderRolls + extraRolls.toTypedArray()
+        return resolverWithDieRolls(*rolls.toIntArray())
+    }
+
+
     private fun resolverWithDieRolls(vararg rolls: Int): CombatResolver {
         val combatDiceRoller =
             CombatDiceRoller(ClassicCombatDiceAmountCalculator(), FixedDie(*rolls))
         return DiceRollingCombatResolver(combatDiceRoller)
     }
 
+    private fun assertArmiesLostAre(
+        lostByAttacker: Int, lostByDefender: Int, combatResults: CombatResults
+    ) {
+        assertEquals(lostByAttacker, combatResults.armiesLostByAttacker)
+        assertEquals(lostByDefender, combatResults.armiesLostByDefender)
+    }
+
+    private fun assertRollsAre(
+        attackerRolls: List<Int>,
+        defenderRolls: List<Int>,
+        combatResults: CombatResults
+    ) {
+        assertEquals(attackerRolls, combatResults.attackerRolls)
+        assertEquals(defenderRolls, combatResults.defenderRolls)
+    }
+
     @Test
     fun `Only attacker loses one army when losing one roll`() {
-        val resolver = resolverWithDieRolls(1, 4)
+        val attackerRolls = listOf(1)
+        val defenderRolls = listOf(4)
+        val resolver = resolverWithDieRolls(attackerRolls, defenderRolls)
 
-        val (armiesLostByAttacker, armiesLostByDefender) = resolver.armiesLostForCombat(
+        val combatResults = resolver.combat(
             attackingArmies = Pos(2), defendingArmies = Pos(1))
 
-        assertEquals(1, armiesLostByAttacker)
-        assertEquals(0, armiesLostByDefender)
+        assertArmiesLostAre(1, 0, combatResults)
+        assertRollsAre(attackerRolls, defenderRolls, combatResults)
     }
 
     @Test
     fun `Only defender loses one army when losing one roll`() {
-        val resolver = resolverWithDieRolls(4, 1)
+        val attackerRolls = listOf(4)
+        val defenderRolls = listOf(1)
+        val resolver = resolverWithDieRolls(attackerRolls, defenderRolls)
 
-        val (armiesLostByAttacker, armiesLostByDefender) = resolver.armiesLostForCombat(
+        val combatResults = resolver.combat(
             attackingArmies = Pos(2), defendingArmies = Pos(1))
 
-        assertEquals(0, armiesLostByAttacker)
-        assertEquals(1, armiesLostByDefender)
+        assertArmiesLostAre(0, 1, combatResults)
+        assertRollsAre(attackerRolls, defenderRolls, combatResults)
     }
 
     @Test
     fun `Attacker loses the amount of rolls lost when only he loses rolls`() {
-        val resolver = resolverWithDieRolls(1, 1, 3, 4)
+        val attackerRolls = listOf(1, 1)
+        val defenderRolls = listOf(3, 4)
+        val resolver = resolverWithDieRolls(attackerRolls, defenderRolls)
 
-        val (armiesLostByAttacker, armiesLostByDefender) = resolver.armiesLostForCombat(
+        val combatResults = resolver.combat(
             attackingArmies = Pos(3), defendingArmies = Pos(2))
 
-        assertEquals(2, armiesLostByAttacker)
-        assertEquals(0, armiesLostByDefender)
+        assertArmiesLostAre(2, 0, combatResults)
+        assertRollsAre(attackerRolls, defenderRolls, combatResults)
     }
 
     @Test
     fun `Attacker and defender both lose armies when both lose rolls`() {
-        val resolver = resolverWithDieRolls(2, 6, 6, 1)
+        val attackerRolls = listOf(2, 6)
+        val defenderRolls = listOf(6, 1)
+        val resolver = resolverWithDieRolls(attackerRolls, defenderRolls)
 
-        val (armiesLostByAttacker, armiesLostByDefender) = resolver.armiesLostForCombat(
+        val combatResults = resolver.combat(
             attackingArmies = Pos(3), defendingArmies = Pos(2))
 
-        assertEquals(1, armiesLostByAttacker)
-        assertEquals(1, armiesLostByDefender)
+        assertArmiesLostAre(1, 1, combatResults)
+        assertRollsAre(attackerRolls, defenderRolls, combatResults)
     }
 
     @Test
     fun `Contested armies are not more than the amount of attacking armies`() {
-        val resolver = resolverWithDieRolls(6, 1, 1, 1)
+        val attackerRolls = listOf(6)
+        val defenderRolls = listOf(1, 1, 1)
+        val resolver = resolverWithDieRolls(attackerRolls, defenderRolls)
 
-        val (armiesLostByAttacker, armiesLostByDefender) = resolver.armiesLostForCombat(
+        val combatResults = resolver.combat(
             attackingArmies = Pos(2), defendingArmies = Pos(3))
 
-        assertEquals(0, armiesLostByAttacker)
-        assertEquals(1, armiesLostByDefender)
+        assertArmiesLostAre(0, 1, combatResults)
+        assertRollsAre(attackerRolls, defenderRolls, combatResults)
     }
 
     @Test
     fun `Doesn't roll more for the attacker than what the diceAmountCalculatorFactory tells it to`() {
-        val resolver = resolverWithDieRolls(6, 5, 4, 1, 2, 6)
+        val attackerRolls = listOf(6, 5, 4)
+        val defenderRolls = listOf(1, 2)
+        val resolver = resolverWithDieRolls(attackerRolls, defenderRolls, 6)
 
-        val (armiesLostByAttacker, armiesLostByDefender) = resolver.armiesLostForCombat(
+        val combatResults = resolver.combat(
             attackingArmies = Pos(5), defendingArmies = Pos(2))
 
-        assertEquals(0, armiesLostByAttacker)
-        assertEquals(2, armiesLostByDefender)
+        assertArmiesLostAre(0, 2, combatResults)
+        assertRollsAre(attackerRolls, defenderRolls, combatResults)
     }
 
     @Test
     fun `Doesn't roll more for the defender than what the diceAmountCalculatorFactory tells it to`() {
-        val resolver = resolverWithDieRolls(6, 1, 1, 1, 6)
+        val attackerRolls = listOf(6)
+        val defenderRolls = listOf(1, 1, 1)
+        val resolver = resolverWithDieRolls(attackerRolls, defenderRolls, 6)
 
-        val (armiesLostByAttacker, armiesLostByDefender) = resolver.armiesLostForCombat(
+        val combatResults = resolver.combat(
             attackingArmies = Pos(2), defendingArmies = Pos(4))
 
-        assertEquals(0, armiesLostByAttacker)
-        assertEquals(1, armiesLostByDefender)
+
+        assertArmiesLostAre(0, 1, combatResults)
+        assertRollsAre(attackerRolls, defenderRolls, combatResults)
     }
 
     @Test
     fun `Can't contest more than 3 armies`() {
-        val resolver = resolverWithDieRolls(1, 3, 5, 1, 2, 6)
+        val attackerRolls = listOf(1, 3, 5)
+        val defenderRolls = listOf(1, 2, 6)
+        val resolver = resolverWithDieRolls(attackerRolls, defenderRolls)
 
-        val (armiesLostByAttacker, armiesLostByDefender) = resolver.armiesLostForCombat(
+        val combatResults = resolver.combat(
             attackingArmies = Pos(5), defendingArmies = Pos(5))
 
-        assertEquals(2, armiesLostByAttacker)
-        assertEquals(1, armiesLostByDefender)
+        assertArmiesLostAre(2, 1, combatResults)
+        assertRollsAre(attackerRolls, defenderRolls, combatResults)
     }
 
     @Test
@@ -107,8 +149,7 @@ class DiceRollingCombatResolverTest {
         val resolver = resolverWithDieRolls(1)
 
         assertFailsWith<NotEnoughArmiesForAttackException> {
-            resolver.armiesLostForCombat(
-                attackingArmies = Pos(1), defendingArmies = Pos(2))
+            resolver.combat(attackingArmies = Pos(1), defendingArmies = Pos(2))
         }
     }
 }

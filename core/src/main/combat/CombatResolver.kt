@@ -3,7 +3,7 @@ package combat
 import PositiveInt
 
 interface CombatResolver {
-    fun armiesLostForCombat(
+    fun combat(
         attackingArmies: PositiveInt, defendingArmies: PositiveInt
-    ): Pair<Int, Int>
+    ): CombatResults
 }

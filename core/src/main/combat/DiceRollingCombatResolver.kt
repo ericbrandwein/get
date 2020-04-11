@@ -9,14 +9,16 @@ class DiceRollingCombatResolver(
 
     private val lostArmiesCalculator = LostArmiesCalculator()
 
-    override fun armiesLostForCombat(
+    override fun combat(
         attackingArmies: PositiveInt, defendingArmies: PositiveInt
-    ): Pair<Int, Int> {
-        val (attackerRolls, defenderRolls) =
-            diceRoller.forCombat(attackingArmies, defendingArmies)
+    ): CombatResults {
+        val rolls = diceRoller.forCombat(attackingArmies, defendingArmies)
+        val attackerRolls = rolls.first
+        val defenderRolls = rolls.second
         val contestedArmies =
             ContestedArmiesCalculator(attackingArmies, defendingArmies).getArmies()
-        return lostArmiesCalculator.armiesLostForRolls(
+        val lostArmies = lostArmiesCalculator.armiesLostForRolls(
             attackerRolls, defenderRolls, contestedArmies)
+        return CombatResults(lostArmies, rolls)
     }
 }
