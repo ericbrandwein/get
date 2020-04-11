@@ -1,9 +1,9 @@
-typealias Country = String
+package map
 
-data class Continent(val name: String, val countries: Set<Country>)
+import Country
 
 class PoliticalMap private constructor(
-    public val continents: Set<Continent>,
+    val continents: Set<Continent>,
     private val borders: Map<Country, Collection<Country>>
 ) {
 
@@ -25,12 +25,12 @@ class PoliticalMap private constructor(
 
         fun addContinent(continent: Continent): Builder {
             val intersection = countries.intersect(continent.countries)
-            if (!intersection.isEmpty()) {
+            if (intersection.isNotEmpty()) {
                 throw CountryAlreadyExistsException(intersection.elementAt(0))
             }
             countries.addAll(continent.countries)
             continents.add(continent)
-            continent.countries.forEach {borders[it] = mutableSetOf()}
+            continent.countries.forEach { borders[it] = mutableSetOf() }
             return this
         }
 
@@ -46,17 +46,18 @@ class PoliticalMap private constructor(
     }
 }
 
-val Set<Continent>.countries : Set<Country>
-        get() = flatMap { continent -> continent.countries }.toSet()
+val Set<Continent>.countries: Set<Country>
+    get() = flatMap { continent -> continent.countries }.toSet()
 
 fun Set<Continent>.forCountry(country: Country): Continent {
     try { return first { it.countries.contains(country) } }
-    catch (e:  NoSuchElementException) {
+    catch (e: NoSuchElementException) {
         throw NonExistentCountryException(country)
     }
-
 }
 
 fun Set<Continent>.assertCountryExists(country: Country) {
-    if (!any { it.countries.contains(country) } ) { throw NonExistentCountryException(country) }
+    if (!any { it.countries.contains(country) }) {
+        throw NonExistentCountryException(country)
+    }
 }

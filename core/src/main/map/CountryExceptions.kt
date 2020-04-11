@@ -1,3 +1,5 @@
+package map
+
 import java.lang.Exception
 
 class NonExistentCountryException(val country: String) :
