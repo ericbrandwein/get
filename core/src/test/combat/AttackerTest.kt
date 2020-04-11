@@ -134,7 +134,6 @@ class AttackTester(attackerLostArmies: Int, defenderLostArmies: Int) {
         assertArmiesOfCountryAre(expectedAttackerArmies - 1, ATTACKING_COUNTRY)
         assertEquals(ATTACKING_PLAYER, countryOccupations.occupierOf(DEFENDING_COUNTRY))
         assertArmiesOfCountryAre(1, DEFENDING_COUNTRY)
-
     }
 
     private fun assertArmiesOfCountryAre(expected: Int, country: Country) =
