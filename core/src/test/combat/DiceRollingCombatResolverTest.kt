@@ -7,11 +7,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import PositiveInt as Pos
 
-class CombatResolverTest {
+class DiceRollingCombatResolverTest {
     private fun resolverWithDieRolls(vararg rolls: Int): CombatResolver {
         val combatDiceRoller =
             CombatDiceRoller(ClassicCombatDiceAmountCalculator(), FixedDie(*rolls))
-        return CombatResolver(combatDiceRoller)
+        return DiceRollingCombatResolver(combatDiceRoller)
     }
 
     @Test
