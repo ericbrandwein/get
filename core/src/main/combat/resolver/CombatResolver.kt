@@ -1,6 +1,7 @@
-package combat
+package combat.resolver
 
 import PositiveInt
+import combat.CombatResults
 
 interface CombatResolver {
     fun combat(

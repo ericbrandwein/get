@@ -1,6 +1,9 @@
-package combat
+package combat.resolver
 
 import PositiveInt
+import combat.CombatDiceRoller
+import combat.CombatResults
+import combat.ContestedArmiesCalculator
 import combat.lostArmiesCalculator.LostArmiesCalculator
 
 class DiceRollingCombatResolver(
@@ -16,7 +19,8 @@ class DiceRollingCombatResolver(
         val attackerRolls = rolls.first
         val defenderRolls = rolls.second
         val contestedArmies =
-            ContestedArmiesCalculator(attackingArmies, defendingArmies).getArmies()
+            ContestedArmiesCalculator(
+                attackingArmies, defendingArmies).getArmies()
         val lostArmies = lostArmiesCalculator.armiesLostForRolls(
             attackerRolls, defenderRolls, contestedArmies)
         return CombatResults(lostArmies, rolls)

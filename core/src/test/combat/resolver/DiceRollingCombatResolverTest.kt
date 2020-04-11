@@ -1,5 +1,8 @@
-package combat
+package combat.resolver
 
+import combat.CombatDiceRoller
+import combat.CombatResults
+import combat.NotEnoughArmiesForAttackException
 import combat.diceCalculators.ClassicCombatDiceAmountCalculator
 import dice.FixedDie
 import kotlin.test.Test
@@ -19,8 +22,10 @@ class DiceRollingCombatResolverTest {
 
     private fun resolverWithDieRolls(vararg rolls: Int): CombatResolver {
         val combatDiceRoller =
-            CombatDiceRoller(ClassicCombatDiceAmountCalculator(), FixedDie(*rolls))
-        return DiceRollingCombatResolver(combatDiceRoller)
+            CombatDiceRoller(
+                ClassicCombatDiceAmountCalculator(), FixedDie(*rolls))
+        return DiceRollingCombatResolver(
+            combatDiceRoller)
     }
 
     private fun assertArmiesLostAre(
