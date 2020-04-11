@@ -20,7 +20,8 @@ class CombatResolver(
     ): Pair<Int, Int> {
         val (attackerRolls, defenderRolls) =
             rollDiceForCombat(attackingArmies, defendingArmies)
-        val contestedArmies = calculateContestedArmies(attackingArmies, defendingArmies)
+        val contestedArmies =
+            ContestedArmiesCalculator(attackingArmies, defendingArmies).getArmies()
         return lostArmiesCalculator.armiesLostForRolls(
             attackerRolls, defenderRolls, contestedArmies)
     }
@@ -36,18 +37,4 @@ class CombatResolver(
     }
 
     private fun roll(amount: PositiveInt) = die.roll(amount.toInt())
-
-    private fun calculateContestedArmies(
-        attackingArmies: PositiveInt, defendingArmies: PositiveInt): PositiveInt {
-        val maxAttackerContestedArmies = attackingArmies - PositiveInt(1)
-        return minOf(
-            maxAttackerContestedArmies,
-            defendingArmies,
-            MAX_CONTESTED_ARMIES
-        )
-    }
-
-    companion object {
-        val MAX_CONTESTED_ARMIES = PositiveInt(3)
-    }
 }
