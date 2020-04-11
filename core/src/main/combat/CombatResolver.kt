@@ -20,21 +20,17 @@ class CombatResolver(
     ): Pair<Int, Int> {
         val (attackerRolls, defenderRolls) =
             rollDiceForCombat(attackingArmies, defendingArmies)
-        val contestedArmies =
-            ContestedArmiesCalculator(attackingArmies, defendingArmies).getArmies()
+        val contestedArmies = calculateContestedArmies(attackingArmies, defendingArmies)
         return lostArmiesCalculator.armiesLostForRolls(
             attackerRolls, defenderRolls, contestedArmies)
     }
 
-    private fun rollDiceForCombat(
-        attackingArmies: PositiveInt, defendingArmies: PositiveInt
-    ): Pair<Collection<Int>, Collection<Int>> {
-        val (attackerDice, defenderDice) =
-            diceAmountCalculator.forAttack(attackingArmies, defendingArmies)
-        val attackerRolls = roll(attackerDice)
-        val defenderRolls = roll(defenderDice)
-        return Pair(attackerRolls, defenderRolls)
-    }
+    private fun calculateContestedArmies(
+        attackingArmies: PositiveInt, defendingArmies: PositiveInt) =
+        ContestedArmiesCalculator(attackingArmies, defendingArmies).getArmies()
 
-    private fun roll(amount: PositiveInt) = die.roll(amount.toInt())
+    private fun rollDiceForCombat(
+        attackingArmies: PositiveInt, defendingArmies: PositiveInt) =
+        CombatDiceRoller(diceAmountCalculator, die).forCombat(attackingArmies, defendingArmies)
+
 }
