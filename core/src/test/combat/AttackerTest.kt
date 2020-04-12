@@ -87,6 +87,17 @@ class AttackerTest {
 
         attackTester.assertDefendingCountryOccupiedByAttackerWithOneArmy()
     }
+
+    @Test
+    fun `Attacking returns the results of combat`() {
+        val attackerLostArmies = 0
+        val defenderLostArmies = 2
+        val attackTester = AttackTester(attackerLostArmies, defenderLostArmies)
+
+        val results = attackTester.attack()
+
+        assertEquals(attackTester.combatResults, results)
+    }
 }
 
 class AttackTester(attackerLostArmies: Int, defenderLostArmies: Int) {
@@ -96,7 +107,7 @@ class AttackTester(attackerLostArmies: Int, defenderLostArmies: Int) {
         INITIAL_ATTACKER_ARMIES.toInt() - attackerLostArmies
     private val expectedDefenderArmies =
         INITIAL_DEFENDER_ARMIES.toInt() - defenderLostArmies
-    private val combatResults =
+    val combatResults =
         combatResultsWithLostArmies(Pair(attackerLostArmies, defenderLostArmies))
     private val attacker: Attacker
 
@@ -123,7 +134,7 @@ class AttackTester(attackerLostArmies: Int, defenderLostArmies: Int) {
     fun attack(
         attackingCountry: Country = ATTACKING_COUNTRY,
         defendingCountry: Country = DEFENDING_COUNTRY
-    ) = attacker.attack(attackingCountry, defendingCountry)
+    ) : CombatResults = attacker.attack(attackingCountry, defendingCountry)
 
     fun assertRightAmountOfArmiesWasRemoved() {
         assertArmiesOfCountryAre(expectedAttackerArmies, ATTACKING_COUNTRY)

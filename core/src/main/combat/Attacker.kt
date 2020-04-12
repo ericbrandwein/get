@@ -10,9 +10,10 @@ class Attacker(
 ) {
     private val resultsApplier = CombatResultsApplier(countryOccupations)
 
-    fun attack(from: Country, to: Country) {
+    fun attack(from: Country, to: Country): CombatResults {
         val combatResults = resolveCombat(from, to)
         resultsApplier.apply(combatResults, from, to)
+        return combatResults
     }
 
     private fun resolveCombat(from: Country, to: Country): CombatResults {
