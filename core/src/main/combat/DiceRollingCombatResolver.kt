@@ -1,13 +1,11 @@
 package combat
 
 import PositiveInt
-import combat.lostArmiesCalculator.LostArmiesCalculator
+import combat.lostArmiesCalculator.calculateArmiesLostForRolls
 
 class DiceRollingCombatResolver(
     private val diceRoller: CombatDiceRoller
 ) : CombatResolver {
-
-    private val lostArmiesCalculator = LostArmiesCalculator()
 
     override fun combat(
         attackingArmies: PositiveInt, defendingArmies: PositiveInt
@@ -16,8 +14,8 @@ class DiceRollingCombatResolver(
         val attackerRolls = rolls.first
         val defenderRolls = rolls.second
         val contestedArmies = calculateContestedArmies(attackingArmies, defendingArmies)
-        val lostArmies = lostArmiesCalculator.armiesLostForRolls(
-            attackerRolls, defenderRolls, contestedArmies)
+        val lostArmies =
+            calculateArmiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
         return CombatResults(lostArmies, rolls)
     }
 }

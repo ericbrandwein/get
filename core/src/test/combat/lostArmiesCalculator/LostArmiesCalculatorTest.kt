@@ -1,21 +1,11 @@
 package combat.lostArmiesCalculator
 
-import combat.lostArmiesCalculator.LostArmiesCalculator
-import combat.lostArmiesCalculator.TooManyArmiesContestedException
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import PositiveInt as Pos
 
 class LostArmiesCalculatorTest {
-
-    private lateinit var resolver: LostArmiesCalculator
-
-    @BeforeTest
-    fun setup() {
-        resolver = LostArmiesCalculator()
-    }
 
     @Test
     fun `Attacker wins when he rolls higher`() {
@@ -24,7 +14,7 @@ class LostArmiesCalculatorTest {
         val contestedArmies = Pos(1)
 
         val (lostAttackerArmies, lostDefenderArmies) =
-            resolver.armiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
+            calculateArmiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
 
         assertEquals(0, lostAttackerArmies)
         assertEquals(1, lostDefenderArmies)
@@ -37,7 +27,7 @@ class LostArmiesCalculatorTest {
         val contestedArmies = Pos(1)
 
         val (lostAttackerArmies, lostDefenderArmies) =
-            resolver.armiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
+            calculateArmiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
 
         assertEquals(1, lostAttackerArmies)
         assertEquals(0, lostDefenderArmies)
@@ -50,7 +40,7 @@ class LostArmiesCalculatorTest {
         val contestedArmies = Pos(1)
 
         val (lostAttackerArmies, lostDefenderArmies) =
-            resolver.armiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
+            calculateArmiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
 
         assertEquals(1, lostAttackerArmies)
         assertEquals(0, lostDefenderArmies)
@@ -63,7 +53,7 @@ class LostArmiesCalculatorTest {
         val contestedArmies = Pos(2)
 
         val (lostAttackerArmies, lostDefenderArmies) =
-            resolver.armiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
+            calculateArmiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
 
         assertEquals(0, lostAttackerArmies)
         assertEquals(2, lostDefenderArmies)
@@ -76,7 +66,7 @@ class LostArmiesCalculatorTest {
         val contestedArmies = Pos(1)
 
         val (lostAttackerArmies, lostDefenderArmies) =
-            resolver.armiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
+            calculateArmiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
 
         assertEquals(0, lostAttackerArmies)
         assertEquals(1, lostDefenderArmies)
@@ -89,7 +79,7 @@ class LostArmiesCalculatorTest {
         val contestedArmies = Pos(1)
 
         val (lostAttackerArmies, lostDefenderArmies) =
-            resolver.armiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
+            calculateArmiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
 
         assertEquals(1, lostAttackerArmies)
         assertEquals(0, lostDefenderArmies)
@@ -102,7 +92,7 @@ class LostArmiesCalculatorTest {
         val contestedArmies = Pos(1)
 
         val (lostAttackerArmies, lostDefenderArmies) =
-            resolver.armiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
+            calculateArmiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
 
         assertEquals(0, lostAttackerArmies)
         assertEquals(1, lostDefenderArmies)
@@ -115,7 +105,7 @@ class LostArmiesCalculatorTest {
         val contestedArmies = Pos(1)
 
         val (lostAttackerArmies, lostDefenderArmies) =
-            resolver.armiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
+            calculateArmiesLostForRolls(attackerRolls, defenderRolls, contestedArmies)
 
         assertEquals(1, lostAttackerArmies)
         assertEquals(0, lostDefenderArmies)
@@ -125,7 +115,7 @@ class LostArmiesCalculatorTest {
     fun `Can't contest more armies than the attacker's rolled dice`() {
         val contested = Pos(2)
         val exception = assertFailsWith<TooManyArmiesContestedException> {
-            resolver.armiesLostForRolls(listOf(1), listOf(2, 3), contestedArmies = contested)
+            calculateArmiesLostForRolls(listOf(1), listOf(2, 3), contestedArmies = contested)
         }
         assertEquals(contested, exception.armies)
     }
@@ -134,7 +124,7 @@ class LostArmiesCalculatorTest {
     fun `Can't contest more armies than the defender's rolled dice`() {
         val contested = Pos(3)
         val exception = assertFailsWith<TooManyArmiesContestedException> {
-            resolver.armiesLostForRolls(listOf(1, 2, 3, 4), listOf(1), contestedArmies = contested)
+            calculateArmiesLostForRolls(listOf(1, 2, 3, 4), listOf(1), contestedArmies = contested)
         }
         assertEquals(contested, exception.armies)
     }
