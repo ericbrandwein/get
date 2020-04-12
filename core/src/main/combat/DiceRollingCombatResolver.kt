@@ -15,8 +15,7 @@ class DiceRollingCombatResolver(
         val rolls = diceRoller.forCombat(attackingArmies, defendingArmies)
         val attackerRolls = rolls.first
         val defenderRolls = rolls.second
-        val contestedArmies =
-            ContestedArmiesCalculator(attackingArmies, defendingArmies).getArmies()
+        val contestedArmies = calculateContestedArmies(attackingArmies, defendingArmies)
         val lostArmies = lostArmiesCalculator.armiesLostForRolls(
             attackerRolls, defenderRolls, contestedArmies)
         return CombatResults(lostArmies, rolls)
