@@ -1,7 +1,6 @@
-package combat.diceCalculators
+package combat
 
 import PositiveInt
-import combat.NotEnoughArmiesForAttackException
 
 
 abstract class DiceAmountCalculator {

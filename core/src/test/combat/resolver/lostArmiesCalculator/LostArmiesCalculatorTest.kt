@@ -1,4 +1,4 @@
-package combat.lostArmiesCalculator
+package combat.resolver.lostArmiesCalculator
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

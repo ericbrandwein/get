@@ -1,6 +1,6 @@
-package combat
+package combat.resolver
 
-import combat.diceCalculators.ClassicCombatDiceAmountCalculator
+import situations.classicCombat.ClassicCombatDiceAmountCalculator
 import dice.FixedDie
 import kotlin.test.Test
 import kotlin.test.assertEquals

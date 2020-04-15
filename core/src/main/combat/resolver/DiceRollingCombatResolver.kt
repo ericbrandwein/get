@@ -1,10 +1,8 @@
 package combat.resolver
 
 import PositiveInt
-import combat.CombatDiceRoller
 import combat.CombatResults
-import combat.calculateContestedArmies
-import combat.lostArmiesCalculator.calculateArmiesLostForRolls
+import combat.resolver.lostArmiesCalculator.calculateArmiesLostForRolls
 
 class DiceRollingCombatResolver(
     private val diceRoller: CombatDiceRoller

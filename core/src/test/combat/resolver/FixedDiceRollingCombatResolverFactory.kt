@@ -1,7 +1,6 @@
 package combat.resolver
 
-import combat.CombatDiceRoller
-import combat.diceCalculators.ClassicCombatDiceAmountCalculator
+import situations.classicCombat.ClassicCombatDiceAmountCalculator
 import dice.FixedDie
 
 class FixedDiceRollingCombatResolverFactory {
