@@ -10,7 +10,7 @@ class AttackOccupations(
     private val attackingCountry: Country,
     private val defendingCountry: Country
 ) {
-    fun attackingPlayer() = countryOccupations.occupierOf(attackingCountry)
+    private fun attackingPlayer() = countryOccupations.occupierOf(attackingCountry)
     fun armiesOfAttacker() = countryOccupations.armiesOf(attackingCountry)
     fun armiesOfDefender() = countryOccupations.armiesOf(defendingCountry)
     fun removeArmiesFromAttacker(armies: Int) = removeArmies(armies, attackingCountry)
@@ -22,6 +22,6 @@ class AttackOccupations(
         }
     }
 
-    fun occupyDefendingCountry(player: Player, armies: PositiveInt) =
-        countryOccupations.occupy(defendingCountry, player, armies)
+    fun occupyDefendingCountryWithAttackingPlayer(armies: PositiveInt) =
+        countryOccupations.occupy(defendingCountry, attackingPlayer(), armies)
 }
