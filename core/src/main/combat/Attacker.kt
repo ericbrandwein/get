@@ -8,17 +8,8 @@ class Attacker(
     private val countryOccupations: CountryOccupations,
     private val combatResolver: CombatResolver
 ) {
-    private val resultsApplier = CombatResultsApplier(countryOccupations)
-
-    fun attack(from: Country, to: Country): CombatResults {
-        val combatResults = resolveCombat(from, to)
-        resultsApplier.apply(combatResults, from, to)
-        return combatResults
-    }
-
-    private fun resolveCombat(from: Country, to: Country): CombatResults {
-        val attackerArmies = countryOccupations.armiesOf(from)
-        val defenderArmies = countryOccupations.armiesOf(to)
-        return combatResolver.combat(attackerArmies, defenderArmies)
+    fun attack(from: Country, to: Country, conqueror: Conqueror): CombatResults {
+        val attackingOccupations = AttackOccupations(countryOccupations, from, to)
+        return Attack(attackingOccupations, combatResolver, conqueror).run()
     }
 }

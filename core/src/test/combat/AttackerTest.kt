@@ -5,6 +5,7 @@ import combat.resolver.FixedCombatResolver
 import map.NonExistentCountryException
 import occupations.CountryOccupations
 import occupations.Occupation
+import occupations.TooManyArmiesRemovedException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -71,21 +72,53 @@ class AttackerTest {
     }
 
     @Test
-    fun `Removing all armies of the defender occupies the country with one army of the attacker`() {
+    fun `Removing all armies of the defender asks the conqueror for the amount of armies to move`() {
         val attackTester = AttackTester(0, AttackTester.INITIAL_DEFENDER_ARMIES.toInt())
 
-        attackTester.attack()
+        attackTester.attack(conqueror = object : Conqueror {
+            override fun armiesToMove(remainingAttackingArmies: Pos) =
+                remainingAttackingArmies - Pos(2)
+        })
 
-        attackTester.assertDefendingCountryOccupiedByAttackerWithOneArmy()
+        attackTester.assertDefendingCountryOccupiedByAttackerWith(
+            AttackTester.INITIAL_ATTACKER_ARMIES - Pos(2))
     }
 
     @Test
     fun `Occupying a country removes lost armies for the attacker as well as the occupying army`() {
         val attackTester = AttackTester(2, AttackTester.INITIAL_DEFENDER_ARMIES.toInt())
 
-        attackTester.attack()
+        attackTester.attack(conqueror = SingleArmyConqueror())
 
-        attackTester.assertDefendingCountryOccupiedByAttackerWithOneArmy()
+        attackTester.assertDefendingCountryOccupiedByAttackerWith(Pos(1))
+    }
+
+    @Test
+    fun `The conqueror can't move more armies than the remaining ones minus one`() {
+        val attackTester = AttackTester(2, AttackTester.INITIAL_DEFENDER_ARMIES.toInt())
+
+        val exception = assertFailsWith<TooManyArmiesRemovedException> {
+            attackTester.attack(conqueror = object : Conqueror {
+                override fun armiesToMove(remainingAttackingArmies: Pos) =
+                    remainingAttackingArmies
+            })
+        }
+
+        assertEquals(AttackTester.INITIAL_ATTACKER_ARMIES - Pos(2), exception.armies)
+    }
+
+    @Test
+    fun `The conqueror can't move more than 3 armies`() {
+        val attackTester = AttackTester(0, AttackTester.INITIAL_DEFENDER_ARMIES.toInt())
+
+        val armiesMoved = Pos(4)
+        val exception = assertFailsWith<TooManyArmiesMovedException> {
+            attackTester.attack(conqueror = object : Conqueror {
+                override fun armiesToMove(remainingAttackingArmies: Pos) = armiesMoved
+            })
+        }
+
+        assertEquals(armiesMoved, exception.armies)
     }
 
     @Test
@@ -133,18 +166,20 @@ class AttackTester(attackerLostArmies: Int, defenderLostArmies: Int) {
 
     fun attack(
         attackingCountry: Country = ATTACKING_COUNTRY,
-        defendingCountry: Country = DEFENDING_COUNTRY
-    ) : CombatResults = attacker.attack(attackingCountry, defendingCountry)
+        defendingCountry: Country = DEFENDING_COUNTRY,
+        conqueror: Conqueror = SingleArmyConqueror()
+    ): CombatResults = attacker.attack(attackingCountry, defendingCountry, conqueror)
 
     fun assertRightAmountOfArmiesWasRemoved() {
         assertArmiesOfCountryAre(expectedAttackerArmies, ATTACKING_COUNTRY)
         assertArmiesOfCountryAre(expectedDefenderArmies, DEFENDING_COUNTRY)
     }
 
-    fun assertDefendingCountryOccupiedByAttackerWithOneArmy() {
-        assertArmiesOfCountryAre(expectedAttackerArmies - 1, ATTACKING_COUNTRY)
+    fun assertDefendingCountryOccupiedByAttackerWith(armies: Pos) {
+        assertArmiesOfCountryAre(
+            expectedAttackerArmies - armies.toInt(), ATTACKING_COUNTRY)
         assertEquals(ATTACKING_PLAYER, countryOccupations.occupierOf(DEFENDING_COUNTRY))
-        assertArmiesOfCountryAre(1, DEFENDING_COUNTRY)
+        assertArmiesOfCountryAre(armies.toInt(), DEFENDING_COUNTRY)
     }
 
     private fun assertArmiesOfCountryAre(expected: Int, country: Country) =
@@ -157,7 +192,7 @@ class AttackTester(attackerLostArmies: Int, defenderLostArmies: Int) {
         const val DEFENDING_COUNTRY = "Uruguay"
         private const val ATTACKING_PLAYER = "Eric"
         private const val DEFENDING_PLAYER = "Nico"
-        val INITIAL_ATTACKER_ARMIES = Pos(4)
+        val INITIAL_ATTACKER_ARMIES = Pos(5)
         val INITIAL_DEFENDER_ARMIES = Pos(3)
     }
 }
