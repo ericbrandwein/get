@@ -1,4 +1,3 @@
-//import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.InputProcessor
@@ -7,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.viewport.Viewport
 import com.badlogic.gdx.utils.viewport.FitViewport
@@ -17,9 +17,13 @@ class Kamchatka : Game(), InputProcessor {
     lateinit var worldmap: Texture
     lateinit var camera: OrthographicCamera
     lateinit var viewport: Viewport
+    lateinit var state : GameState
 
+    lateinit var message: BitmapFont
     
     override fun create() {
+        state = StateReady(this)
+        message = BitmapFont()
         batch = SpriteBatch()
         worldmap = Texture("Sudamerica.png")
         camera = OrthographicCamera()
@@ -39,14 +43,7 @@ class Kamchatka : Game(), InputProcessor {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         batch.projectionMatrix = camera.combined
 
-        
-        batch.begin()
-        batch.draw(worldmap,
-                   -worldmap.width.toFloat()/2,
-                   -worldmap.height.toFloat()/2
-        )
-
-        batch.end()
+        state.render()
 
     }
 
@@ -60,6 +57,7 @@ class Kamchatka : Game(), InputProcessor {
     }
 
     override fun keyDown(keycode: Int): Boolean {
+        state.keyDown(keycode)
         return false
         TODO("Not yet implemented")
     }
@@ -108,4 +106,5 @@ class Kamchatka : Game(), InputProcessor {
         worldmap.textureData.prepare()
         return Color(worldmap.textureData.consumePixmap().getPixel(x,y))
     }
+
 }
