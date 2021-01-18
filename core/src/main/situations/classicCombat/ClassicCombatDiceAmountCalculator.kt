@@ -1,5 +1,6 @@
-package combat.diceCalculators
+package situations.classicCombat
 
+import combat.DiceAmountCalculator
 import PositiveInt as Pos
 
 class ClassicCombatDiceAmountCalculator : DiceAmountCalculator() {

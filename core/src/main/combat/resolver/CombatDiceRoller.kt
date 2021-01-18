@@ -1,7 +1,7 @@
-package combat
+package combat.resolver
 
 import PositiveInt
-import combat.diceCalculators.DiceAmountCalculator
+import combat.DiceAmountCalculator
 import dice.Die
 
 class CombatDiceRoller(

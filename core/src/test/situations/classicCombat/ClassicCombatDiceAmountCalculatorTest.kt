@@ -1,4 +1,4 @@
-package combat.diceCalculators
+package situations.classicCombat
 
 import PositiveInt
 import combat.NotEnoughArmiesForAttackException

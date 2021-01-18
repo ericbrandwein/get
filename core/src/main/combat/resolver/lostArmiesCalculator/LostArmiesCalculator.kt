@@ -1,4 +1,4 @@
-package combat.lostArmiesCalculator
+package combat.resolver.lostArmiesCalculator
 
 import PositiveInt
 import kotlin.math.min
