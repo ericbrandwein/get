@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.freetype.FreeType
 import com.badlogic.gdx.utils.viewport.FitViewport
 
 
@@ -81,6 +80,7 @@ class ReadyScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
 
 class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
     private val worldmap: Texture = Texture("mapa.png")
+    private val countryColorsMap: Texture = Texture("colores-paises.png")
 
     init {
         game.viewport = FitViewport(
@@ -120,13 +120,23 @@ class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
         return true
     }
 
-    private fun getMapColorAtPoint(x: Int, y: Int) : Color {
-        val resizeX = (worldmap.textureData.width.toFloat()/game.viewport.screenWidth.toFloat())
-        val resizeY = (worldmap.textureData.height.toFloat()/game.viewport.screenHeight.toFloat())
-        val actualX = (resizeX * (x - game.viewport.screenX).toFloat()).toInt()
-        val actualY = (resizeY * (y- game.viewport.screenY).toFloat()).toInt()
-        worldmap.textureData.prepare()
-        return Color(worldmap.textureData.consumePixmap().getPixel(actualX,actualY))
+    private fun getMapColorAtPoint(screenX: Int, screenY: Int) : Color {
+        val (actualX, actualY) = screenPositionToWorldMapPosition(screenX, screenY)
+        val textureData = countryColorsMap.textureData
+        if (!textureData.isPrepared) {
+            textureData.prepare()
+        }
+        return Color(textureData.consumePixmap().getPixel(actualX, actualY))
+    }
+
+    private fun screenPositionToWorldMapPosition(screenX: Int, screenY: Int) : Pair<Int, Int> {
+        val textureData = worldmap.textureData
+        val viewport = game.viewport
+        val resizeX = textureData.width.toFloat() / viewport.screenWidth.toFloat()
+        val resizeY = textureData.height.toFloat() / viewport.screenHeight.toFloat()
+        val textureX = (resizeX * (screenX - viewport.screenX).toFloat()).toInt()
+        val textureY = (resizeY * (screenY - viewport.screenY).toFloat()).toInt()
+        return Pair(textureX, textureY)
     }
 
 }
