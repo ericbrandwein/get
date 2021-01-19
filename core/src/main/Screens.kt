@@ -80,7 +80,7 @@ class ReadyScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
 }
 
 class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
-    private val worldmap: Texture = Texture("Sudamerica.png")
+    private val worldmap: Texture = Texture("mapa.png")
 
     init {
         game.viewport = FitViewport(
