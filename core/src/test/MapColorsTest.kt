@@ -1,6 +1,7 @@
 import com.badlogic.gdx.graphics.Color
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class MapColorsTest {
@@ -37,10 +38,10 @@ class MapColorsTest {
         val colors = colorStrings.map { Color.valueOf(it) }
         val result = MapColors.fromJson(
             """
-                {
-                    "${names[0]}": "${colorStrings[0]}",
-                    "${names[1]}": "${colorStrings[1]}"
-                }
+            {
+                "${names[0]}": "${colorStrings[0]}",
+                "${names[1]}": "${colorStrings[1]}"
+            }
             """.trimIndent()
         )
 
@@ -50,5 +51,26 @@ class MapColorsTest {
             assertEquals(colors[index], result[name])
             assertEquals(name, result[colors[index]])
         }
+    }
+
+    @Test
+    fun `Doesn't contain a color not present in the JSON`() {
+        val result = MapColors.fromJson("{}")
+
+        assertFalse(Color.BLACK in result)
+    }
+
+    @Test
+    fun `Contains a color present in the JSON`() {
+        val colorString = "#112233"
+        val color = Color.valueOf(colorString)
+        val result = MapColors.fromJson(
+            """
+            {
+                "Argentina": "$colorString"
+            }
+            """.trimIndent())
+
+        assertTrue(color in result)
     }
 }

@@ -11,6 +11,10 @@ class MapColors(
         return countryToColor.filterValues { it == color }.keys.first()
     }
 
+    operator fun contains(color: Color): Boolean {
+        return countryToColor.any { (_, value) -> value == color }
+    }
+
     companion object {
         fun fromJsonFile(filePath: String): MapColors {
             return fromJson(File(filePath).readText())
