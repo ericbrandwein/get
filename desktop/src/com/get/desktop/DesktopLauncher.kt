@@ -9,7 +9,7 @@ object DesktopLauncher {
     fun main(arg: Array<String>) {
         val config = Lwjgl3ApplicationConfiguration()
         config.setTitle("Kamchatcka!");
-        config.setWindowedMode(529, 662);
+        config.setWindowedMode(1536,810 );
         Lwjgl3Application(Kamchatka(), config)
     }
 }
