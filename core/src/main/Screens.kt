@@ -116,11 +116,18 @@ class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
     override fun touchDown(
         screenX: Int, screenY: Int, pointer: Int, button: Int
     ): Boolean {
-        println("The color at ($screenX, $screenY) is ${getMapColorAtPoint(screenX, screenY)}.")
+        val mapColors = MapColors.fromJsonFile("mapa.json")
+        val color = getMapColorAtPoint(screenX, screenY)
+        if (color in mapColors) {
+            val country = mapColors[color]
+            println("position: ($screenX, $screenY), country: $country, color: $color.")
+        } else {
+            println("There's no country in position ($screenX, $screenY).")
+        }
         return true
     }
 
-    private fun getMapColorAtPoint(screenX: Int, screenY: Int) : Color {
+    private fun getMapColorAtPoint(screenX: Int, screenY: Int): Color {
         val (actualX, actualY) = screenPositionToWorldMapPosition(screenX, screenY)
         val textureData = countryColorsMap.textureData
         if (!textureData.isPrepared) {
@@ -129,7 +136,9 @@ class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
         return Color(textureData.consumePixmap().getPixel(actualX, actualY))
     }
 
-    private fun screenPositionToWorldMapPosition(screenX: Int, screenY: Int) : Pair<Int, Int> {
+    private fun screenPositionToWorldMapPosition(
+        screenX: Int, screenY: Int
+    ): Pair<Int, Int> {
         val textureData = worldmap.textureData
         val viewport = game.viewport
         val resizeX = textureData.width.toFloat() / viewport.screenWidth.toFloat()

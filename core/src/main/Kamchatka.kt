@@ -1,16 +1,9 @@
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Game
-import com.badlogic.gdx.InputProcessor
-import com.badlogic.gdx.Screen
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Texture
-
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.utils.viewport.Viewport
 import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.Viewport
 
 
 class Kamchatka : Game() {
@@ -18,7 +11,7 @@ class Kamchatka : Game() {
     lateinit var camera: OrthographicCamera
     lateinit var viewport: Viewport
 
-    
+
     override fun create() {
         batch = SpriteBatch()
         camera = OrthographicCamera()
@@ -35,4 +28,5 @@ class Kamchatka : Game() {
         super.setScreen(screen)
         Gdx.input.inputProcessor = screen
     }
+
 }
