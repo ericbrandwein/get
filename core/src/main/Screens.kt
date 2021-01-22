@@ -4,6 +4,7 @@ import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.utils.viewport.FitViewport
@@ -81,6 +82,10 @@ class ReadyScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
 class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
     private val worldmap: Texture = Texture("mapa.png")
     private val countryColorsMap: Texture = Texture("colores-paises.png")
+    private var currentCountry: String? = null
+    private val mapColors = MapColors.fromJsonFile("mapa.json")
+    private val message = BitmapFont()
+    private val worldmapPixmap: Pixmap
 
     init {
         game.viewport = FitViewport(
@@ -88,16 +93,26 @@ class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
             worldmap.height.toFloat(),
             game.camera
         )
+        val textureData = countryColorsMap.textureData
+        if (!textureData.isPrepared) {
+            textureData.prepare()
+        }
+        worldmapPixmap = textureData.consumePixmap()
+
     }
 
     override fun render(delta: Float) {
         super.render(delta)
         game.batch.begin()
+
         game.batch.draw(
             worldmap,
             -worldmap.width.toFloat() / 2,
             -worldmap.height.toFloat() / 2
         )
+        if (currentCountry != null) {
+            message.draw(game.batch, currentCountry, 1F, 1F)
+        }
         game.batch.end()
     }
 
@@ -113,10 +128,10 @@ class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
         worldmap.dispose()
     }
 
+
     override fun touchDown(
         screenX: Int, screenY: Int, pointer: Int, button: Int
     ): Boolean {
-        val mapColors = MapColors.fromJsonFile("mapa.json")
         val color = getMapColorAtPoint(screenX, screenY)
         if (color in mapColors) {
             val country = mapColors[color]
@@ -127,13 +142,15 @@ class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
         return true
     }
 
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        val color = getMapColorAtPoint(screenX, screenY)
+        currentCountry = mapColors[color]
+        return true
+    }
+
     private fun getMapColorAtPoint(screenX: Int, screenY: Int): Color {
         val (actualX, actualY) = screenPositionToWorldMapPosition(screenX, screenY)
-        val textureData = countryColorsMap.textureData
-        if (!textureData.isPrepared) {
-            textureData.prepare()
-        }
-        return Color(textureData.consumePixmap().getPixel(actualX, actualY))
+        return Color(worldmapPixmap.getPixel(actualX, actualY))
     }
 
     private fun screenPositionToWorldMapPosition(
