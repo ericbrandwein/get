@@ -2,6 +2,7 @@ import com.badlogic.gdx.graphics.Color
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class MapColorsTest {
@@ -72,5 +73,12 @@ class MapColorsTest {
             """.trimIndent())
 
         assertTrue(color in result)
+    }
+
+    @Test
+    fun `Get Color returns null if value is not present`() {
+        val result = MapColors.fromJson("{}")
+
+        assertNull(result[Color.BLACK])
     }
 }

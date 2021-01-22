@@ -7,8 +7,8 @@ class MapColors(
     private val countryToColor: Map<String, Color>
 ) : Map<String, Color> by countryToColor {
 
-    operator fun get(color: Color): String {
-        return countryToColor.filterValues { it == color }.keys.first()
+    operator fun get(color: Color): String? {
+        return countryToColor.filterValues { it == color }.keys.firstOrNull()
     }
 
     operator fun contains(color: Color): Boolean {
