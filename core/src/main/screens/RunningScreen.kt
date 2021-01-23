@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.Sprite
+import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.viewport.FitViewport
 
 class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
@@ -83,13 +84,16 @@ class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
     private fun screenPositionToWorldMapPosition(
         screenX: Int, screenY: Int
     ): Pair<Int, Int> {
-        val textureData = worldmap.texture.textureData
-        val viewport = game.viewport
-        val resizeX = textureData.width.toFloat() / viewport.screenWidth.toFloat()
-        val resizeY = textureData.height.toFloat() / viewport.screenHeight.toFloat()
-        val textureX = (resizeX * (screenX - viewport.screenX).toFloat()).toInt()
-        val textureY = (resizeY * (screenY - viewport.screenY).toFloat()).toInt()
-        return Pair(textureX, textureY)
+        val screenPosition = Vector3(screenX.toFloat(), screenY.toFloat(), 0F)
+        val worldPosition = game.camera.unproject(screenPosition)
+        // worldPosition starts from the top left,
+        // spritePosition starts from the bottom left.
+        // This means that the y coordinate must be "inverted"
+        return Pair(
+            (worldPosition.x - worldmap.x).toInt(),
+            (worldmap.height - (worldPosition.y - worldmap.y)).toInt()
+        )
+
     }
 
 }
