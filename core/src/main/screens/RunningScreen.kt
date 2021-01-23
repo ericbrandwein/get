@@ -7,10 +7,11 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.utils.viewport.FitViewport
 
 class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
-    private val worldmap: Texture = Texture("mapa.png")
+    private val worldmap: Sprite = Sprite(Texture("mapa.png"))
     private val countryColorsMap: Texture = Texture("colores-paises.png")
     private var currentCountry: String? = null
     private val mapColors = MapColors.fromJsonFile("mapa.json")
@@ -19,8 +20,8 @@ class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
 
     init {
         game.viewport = FitViewport(
-            worldmap.width.toFloat(),
-            worldmap.height.toFloat(),
+            worldmap.width,
+            worldmap.height,
             game.camera
         )
         val textureData = countryColorsMap.textureData
@@ -28,18 +29,14 @@ class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
             textureData.prepare()
         }
         worldmapPixmap = textureData.consumePixmap()
-
+        worldmap.setPosition(-worldmap.width / 2, -worldmap.height / 2)
     }
 
     override fun render(delta: Float) {
         super.render(delta)
         game.batch.begin()
 
-        game.batch.draw(
-            worldmap,
-            -worldmap.width.toFloat() / 2,
-            -worldmap.height.toFloat() / 2
-        )
+        worldmap.draw(game.batch)
         if (currentCountry != null) {
             message.draw(game.batch, currentCountry, 1F, 1F)
         }
@@ -55,7 +52,7 @@ class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
 
     override fun dispose() {
         super.dispose()
-        worldmap.dispose()
+        worldmap.texture.dispose()
     }
 
 
@@ -86,7 +83,7 @@ class RunningScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
     private fun screenPositionToWorldMapPosition(
         screenX: Int, screenY: Int
     ): Pair<Int, Int> {
-        val textureData = worldmap.textureData
+        val textureData = worldmap.texture.textureData
         val viewport = game.viewport
         val resizeX = textureData.width.toFloat() / viewport.screenWidth.toFloat()
         val resizeY = textureData.height.toFloat() / viewport.screenHeight.toFloat()
