@@ -1,5 +1,6 @@
 import com.badlogic.gdx.graphics.Color
 import org.junit.Test
+import screens.running.MapColors
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
