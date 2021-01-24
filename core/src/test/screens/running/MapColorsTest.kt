@@ -1,3 +1,5 @@
+package screens.running
+
 import com.badlogic.gdx.graphics.Color
 import org.junit.Test
 import kotlin.test.assertEquals

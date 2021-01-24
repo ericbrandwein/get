@@ -1,3 +1,5 @@
+package screens.running
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.JsonReader
 import com.badlogic.gdx.utils.JsonValue
