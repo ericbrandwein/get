@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.JsonReader
 import com.badlogic.gdx.utils.JsonValue
 import java.io.File
 
-class MapColors(
+class CountryColors(
     private val countryToColor: Map<String, Color>
 ) : Map<String, Color> by countryToColor {
 
@@ -18,17 +18,17 @@ class MapColors(
     }
 
     companion object {
-        fun fromJsonFile(filePath: String): MapColors {
+        fun fromJsonFile(filePath: String): CountryColors {
             return fromJson(File(filePath).readText())
         }
 
-        fun fromJson(json: String): MapColors {
+        fun fromJson(json: String): CountryColors {
             val jsonValue: JsonValue = JsonReader().parse(json)
             val map = jsonValue.associateBy(
                 { it.name },
                 { Color.valueOf(it.asString()) }
             )
-            return MapColors(map)
+            return CountryColors(map)
         }
     }
 }

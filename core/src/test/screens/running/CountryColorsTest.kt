@@ -7,10 +7,10 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class MapColorsTest {
+class CountryColorsTest {
     @Test
     fun `Empty JSON object should parse to an empty Map`() {
-        val colors = MapColors.fromJson("{}")
+        val colors = CountryColors.fromJson("{}")
 
         assertTrue(colors.isEmpty())
     }
@@ -20,7 +20,7 @@ class MapColorsTest {
         val name = "Argentina"
         val colorString = "#aabbcc"
         val color = Color.valueOf(colorString)
-        val colors = MapColors.fromJson(
+        val colors = CountryColors.fromJson(
             """
                 {
                     "$name": "$colorString"
@@ -39,7 +39,7 @@ class MapColorsTest {
         val names = listOf("Argentina", "Brasil")
         val colorStrings = listOf("#aabbcc", "#ddeeff")
         val colors = colorStrings.map { Color.valueOf(it) }
-        val result = MapColors.fromJson(
+        val result = CountryColors.fromJson(
             """
             {
                 "${names[0]}": "${colorStrings[0]}",
@@ -58,7 +58,7 @@ class MapColorsTest {
 
     @Test
     fun `Doesn't contain a color not present in the JSON`() {
-        val result = MapColors.fromJson("{}")
+        val result = CountryColors.fromJson("{}")
 
         assertFalse(Color.BLACK in result)
     }
@@ -67,7 +67,7 @@ class MapColorsTest {
     fun `Contains a color present in the JSON`() {
         val colorString = "#112233"
         val color = Color.valueOf(colorString)
-        val result = MapColors.fromJson(
+        val result = CountryColors.fromJson(
             """
             {
                 "Argentina": "$colorString"
@@ -79,7 +79,7 @@ class MapColorsTest {
 
     @Test
     fun `Get Color returns null if value is not present`() {
-        val result = MapColors.fromJson("{}")
+        val result = CountryColors.fromJson("{}")
 
         assertNull(result[Color.BLACK])
     }
