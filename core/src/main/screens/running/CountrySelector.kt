@@ -5,10 +5,9 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 
-class CountrySelector(assetManager: AssetManager) {
+class CountrySelector(assetManager: AssetManager, private val countryColors: CountryColors) {
     private val countryColorsMap: Texture
     private val countryColorsPixmap: Pixmap
-    private val countryColors = CountryColors.fromJsonFile("mapa.json")
 
     init {
         val countryColorsFileName = "colores-paises.png"

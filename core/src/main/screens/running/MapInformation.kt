@@ -11,7 +11,7 @@ import java.io.File
 private const val CONTINENTS_FIELD = "continents"
 private const val BORDERS_FIELD = "borders"
 
-fun parseMapInfoJson(filePath: String) : Pair<CountryColors, PoliticalMap> =
+fun parseMapInfoFromJsonFile(filePath: String) : Pair<CountryColors, PoliticalMap> =
     parseMapInfoFromJsonString(File(filePath).readText())
 
 fun parseMapInfoFromJsonString(json: String): Pair<CountryColors, PoliticalMap> {

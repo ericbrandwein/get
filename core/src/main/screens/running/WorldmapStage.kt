@@ -10,13 +10,16 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.viewport.Viewport
+import gamelogic.map.PoliticalMap
 
 class WorldmapStage(assetManager: AssetManager, worldmapTexture: Texture, viewport: Viewport): Stage(viewport) {
     private val countryLabel = Label("", Label.LabelStyle(BitmapFont(), Color.WHITE))
-    private val countrySelector = CountrySelector(assetManager)
+    private val countrySelector: CountrySelector
     private var currentCountry: String? = null
 
     init {
+        val (countryColors, politicalMap) = parseMapInfoFromJsonFile("mapa.json")
+        countrySelector = CountrySelector(assetManager, countryColors)
         setupWorldmapImage(worldmapTexture)
         setupCountryLabel()
     }
