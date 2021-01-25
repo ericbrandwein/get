@@ -18,14 +18,15 @@ class RunningScreen(game: Kamchatka) : KamchatkaScreen(game) {
     override val inputProcessor: InputProcessor
 
     init {
-        assetManager.load("mapa.png", Texture::class.java)
-        worldmapTexture = assetManager.finishLoadingAsset<Texture>("mapa.png")
+        val mapFileName = "mapa.png"
+        assetManager.load(mapFileName, Texture::class.java)
+        worldmapTexture = assetManager.finishLoadingAsset<Texture>(mapFileName)
         viewport = FitViewport(
             worldmapTexture.width.toFloat(),
             worldmapTexture.height.toFloat(),
             game.camera
         )
-        stage = WorldmapStage(worldmapTexture, viewport)
+        stage = WorldmapStage(assetManager, worldmapTexture, viewport)
         inputProcessor = stage
     }
 

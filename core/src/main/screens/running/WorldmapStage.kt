@@ -1,5 +1,6 @@
 package screens.running
 
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -10,9 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.viewport.Viewport
 
-class WorldmapStage(worldmapTexture: Texture, viewport: Viewport): Stage(viewport) {
+class WorldmapStage(assetManager: AssetManager, worldmapTexture: Texture, viewport: Viewport): Stage(viewport) {
     private val countryLabel = Label("", Label.LabelStyle(BitmapFont(), Color.WHITE))
-    private val countrySelector = CountrySelector()
+    private val countrySelector = CountrySelector(assetManager)
     private var currentCountry: String? = null
 
     init {
