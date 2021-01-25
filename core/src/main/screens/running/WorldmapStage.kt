@@ -17,13 +17,14 @@ class WorldmapStage(assetManager: AssetManager, worldmapTexture: Texture, viewpo
     private var currentCountry: String? = null
 
     init {
+        setupWorldmapImage(worldmapTexture)
+        setupCountryLabel()
+    }
+
+    private fun setupWorldmapImage(worldmapTexture: Texture) {
         val worldmapImage = Image(worldmapTexture)
-        addActor(worldmapImage)
-        countryLabel.setFontScale(4F)
-        countryLabel.setPosition(8F, 20F)
-        addActor(countryLabel)
         worldmapImage.setPosition(0F, 0F)
-        worldmapImage.addListener(object: InputListener() {
+        worldmapImage.addListener(object : InputListener() {
             override fun mouseMoved(event: InputEvent?, x: Float, y: Float): Boolean {
                 currentCountry = countrySelector.selectByMapPosition(x, y)
                 if (currentCountry == null) {
@@ -34,5 +35,12 @@ class WorldmapStage(assetManager: AssetManager, worldmapTexture: Texture, viewpo
                 return true
             }
         })
+        addActor(worldmapImage)
+    }
+
+    private fun setupCountryLabel() {
+        countryLabel.setFontScale(4F)
+        countryLabel.setPosition(8F, 20F)
+        addActor(countryLabel)
     }
 }
