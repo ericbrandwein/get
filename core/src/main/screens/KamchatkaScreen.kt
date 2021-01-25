@@ -11,8 +11,8 @@ import com.badlogic.gdx.utils.viewport.Viewport
 abstract class KamchatkaScreen(
     private val game: Kamchatka
 ) : ScreenAdapter() {
-    abstract var viewport: Viewport
-    abstract var inputProcessor: InputProcessor
+    abstract val viewport: Viewport
+    abstract val inputProcessor: InputProcessor
 
     override fun render(delta: Float) {
         super.render(delta)

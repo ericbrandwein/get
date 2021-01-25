@@ -12,8 +12,8 @@ import screens.running.RunningScreen
 
 class ReadyScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
     private val message = BitmapFont()
-    override var viewport: Viewport = FitViewport(800F, 480F, game.camera)
-    override var inputProcessor: InputProcessor = object: InputAdapter() {
+    override val viewport: Viewport = FitViewport(800F, 480F, game.camera)
+    override val inputProcessor: InputProcessor = object: InputAdapter() {
         override fun keyDown(keycode: Int): Boolean {
             when (keycode) {
                 Input.Keys.Q -> Gdx.app.exit()
