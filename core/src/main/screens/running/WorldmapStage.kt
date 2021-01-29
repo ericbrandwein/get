@@ -17,6 +17,10 @@ class WorldmapStage(
     private val countryLabel = Label("", Label.LabelStyle(BitmapFont(), Color.WHITE))
     private val countrySelector: CountrySelector
     private var currentCountry: String? = null
+        set(value) {
+            countryLabel.setText(value ?: "")
+            field = value
+        }
 
     init {
         val (countryColors, politicalMap) = parseMapInfoFromJsonFile(MAP_INFO_JSON_FILE)
@@ -31,11 +35,6 @@ class WorldmapStage(
         worldmapImage.addListener(object : InputListener() {
             override fun mouseMoved(event: InputEvent?, x: Float, y: Float): Boolean {
                 currentCountry = countrySelector.selectByMapPosition(x, y)
-                if (currentCountry == null) {
-                    countryLabel.setText("")
-                } else {
-                    countryLabel.setText(currentCountry)
-                }
                 return true
             }
         })
