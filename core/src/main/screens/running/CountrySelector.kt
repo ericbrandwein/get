@@ -1,18 +1,13 @@
 package screens.running
 
-import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 
-class CountrySelector(assetManager: AssetManager, private val countryColors: CountryColors) {
-    private val countryColorsMap: Texture
+class CountrySelector(private val countryColorsMap: Texture, private val countryColors: CountryColors) {
     private val countryColorsPixmap: Pixmap
 
     init {
-        val countryColorsFileName = "colores-paises.png"
-        assetManager.load(countryColorsFileName, Texture::class.java)
-        countryColorsMap = assetManager.finishLoadingAsset<Texture>(countryColorsFileName)
         val textureData = countryColorsMap.textureData
         if (!textureData.isPrepared) {
             textureData.prepare()

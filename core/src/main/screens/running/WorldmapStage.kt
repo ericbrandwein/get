@@ -10,16 +10,17 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.viewport.Viewport
-import gamelogic.map.PoliticalMap
 
-class WorldmapStage(assetManager: AssetManager, worldmapTexture: Texture, viewport: Viewport): Stage(viewport) {
+class WorldmapStage(
+    assetManager: AssetManager, worldmapTexture: Texture, viewport: Viewport
+) : Stage(viewport) {
     private val countryLabel = Label("", Label.LabelStyle(BitmapFont(), Color.WHITE))
     private val countrySelector: CountrySelector
     private var currentCountry: String? = null
 
     init {
-        val (countryColors, politicalMap) = parseMapInfoFromJsonFile("mapa.json")
-        countrySelector = CountrySelector(assetManager, countryColors)
+        val (countryColors, politicalMap) = parseMapInfoFromJsonFile(MAP_INFO_JSON_FILE)
+        countrySelector = createCountrySelector(assetManager, countryColors)
         setupWorldmapImage(worldmapTexture)
         setupCountryLabel()
     }
@@ -41,9 +42,23 @@ class WorldmapStage(assetManager: AssetManager, worldmapTexture: Texture, viewpo
         addActor(worldmapImage)
     }
 
+    private fun createCountrySelector(
+        assetManager: AssetManager, countryColors: CountryColors
+    ): CountrySelector {
+        assetManager.load(COUNTRY_COLORS_FILE, Texture::class.java)
+        val countryColorsMap =
+            assetManager.finishLoadingAsset<Texture>(COUNTRY_COLORS_FILE)
+        return CountrySelector(countryColorsMap, countryColors)
+    }
+
     private fun setupCountryLabel() {
         countryLabel.setFontScale(4F)
         countryLabel.setPosition(8F, 20F)
         addActor(countryLabel)
+    }
+
+    companion object {
+        private const val MAP_INFO_JSON_FILE = "mapa.json"
+        private const val COUNTRY_COLORS_FILE = "colores-paises.png"
     }
 }
