@@ -173,7 +173,7 @@
         ["Polonia", "Albania"],
         ["Polonia", "Ucrania"],
         ["Polonia", "Bielorrusia"],
-        ["Albania", "ucrania"],
+        ["Albania", "Ucrania"],
         ["Ucrania", "Bielorrusia"],
         ["Bielorrusia", "Finlandia"],
         ["Finlandia", "Noruega"],
@@ -224,7 +224,7 @@
         ["Irak", "Egipto"],
         ["Israel", "Egipto"],
 
-        ["Cukchi", "Alaska"],
+        ["Chukchi", "Alaska"],
         ["Kamchatka", "Alaska"],
 
         ["India", "Sumatra"],
