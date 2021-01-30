@@ -10,6 +10,13 @@ import java.util.*
 class GdxTestRunner(klass: Class<*>?) : BlockJUnit4ClassRunner(
     klass), ApplicationListener {
     private val invokeInRender: MutableMap<FrameworkMethod, RunNotifier> = HashMap()
+
+    init {
+        val conf = HeadlessApplicationConfiguration()
+        HeadlessApplication(this, conf)
+        //        Gdx.gl = mock(GL20::class.java)
+    }
+
     override fun create() {}
     override fun resume() {}
     override fun render() {
@@ -48,11 +55,5 @@ class GdxTestRunner(klass: Class<*>?) : BlockJUnit4ClassRunner(
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
-    }
-
-    init {
-        val conf = HeadlessApplicationConfiguration()
-        HeadlessApplication(this, conf)
-        //        Gdx.gl = mock(GL20::class.java)
     }
 }
