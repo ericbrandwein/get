@@ -61,5 +61,7 @@ project(":core") {
         api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
         testImplementation "org.jetbrains.kotlin:kotlin-test"
         testImplementation "org.jetbrains.kotlin:kotlin-test-junit"
+        testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }
 }
