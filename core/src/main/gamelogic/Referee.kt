@@ -44,7 +44,7 @@ class Regrouping(val from:Country, val to:Country, val n: PositiveInt, val refer
             throw Exception("Cannot move ${n.toInt()} armies if they are not available in country")
         }
         if (!referee.politicalMap.areBordering(from, to)) {
-            throw Exception("countries must be bordering to regroup nut ${from} and ${to} are not")
+            throw Exception("countries must be bordering to regroup but ${from} and ${to} are not")
         }
     }
     public fun apply() {
