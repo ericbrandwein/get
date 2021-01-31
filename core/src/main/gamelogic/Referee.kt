@@ -89,13 +89,13 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     fun currentPlayer(): Player {  return players[player_index % players.size].name }
     private fun changeTurn(){ ++player_index }
 
-    fun gameIsOver() : Boolean {
-        return players.any{ it.reachedTheGoal(this) }
-    }
+    var gameIsOver : Boolean = false
+        get() = players.any{ it.reachedTheGoal(this) }
 
-    fun winners() : List<Player> {
-        return players.filter{ it.reachedTheGoal(this) }.map{it.name}
-    }
+
+    var winners : List<Player> = listOf()
+        get() = players.filter{ it.reachedTheGoal(this) }.map{it.name}
+
     fun addArmies(reinforcements: List<CountryReinforcement>) {
         reinforcements.forEach { it.apply(currentPlayer(), occupations) }
         toNextState()

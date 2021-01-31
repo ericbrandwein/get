@@ -54,8 +54,8 @@ class RefereeTest {
 
     @Test
     fun `Game is not over if nobody achieved goal`() {
-        assertFalse(sampleReferee.gameIsOver())
-        assertTrue (sampleReferee.winners().isEmpty())
+        assertFalse(sampleReferee.gameIsOver)
+        assertTrue (sampleReferee.winners.isEmpty())
     }
 
     @Test
@@ -70,8 +70,8 @@ class RefereeTest {
             politicalMap,
             CountryOccupations(occupationsEric.union(occupationsNico))
         )
-        assertTrue(referee.gameIsOver())
-        assertTrue (referee.winners().contains(nico) and !referee.winners().contains(eric))
+        assertTrue(referee.gameIsOver)
+        assertTrue (referee.winners.contains(nico) and !referee.winners.contains(eric))
     }
 
     @Test
