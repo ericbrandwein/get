@@ -19,7 +19,7 @@ import gamelogic.situations.classicCombat.ClassicCombatDiceAmountCalculator
 //      queda para otro backlog item.
 class SkipRegroup : Conqueror {
     override fun armiesToMove(remainingAttackingArmies: PositiveInt): PositiveInt {
-        return PositiveInt(0)
+        return PositiveInt(1)
     }
 
 }
@@ -84,6 +84,9 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     var currentState:State = state
         get() = state
 
+    var currentAttackState:AttackState = attackState
+        get() = attackState
+
     private fun toNextState() {
         state = state.next(this)
     }
@@ -112,9 +115,8 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
         }
         val combatResolver = DiceRollingCombatResolver(CombatDiceRoller(ClassicCombatDiceAmountCalculator(), RandomDie()))
         val attacker = Attacker(occupations, combatResolver)
-        val result = attacker.attack(from, to, SkipRegroup())
-        if (result.armiesLostByAttacker == 0) {
-            // If attacker lost 0 armies he conquered the country
+        attacker.attack(from, to, SkipRegroup())
+        if (occupations.occupierOf(to) == currentPlayer()) {
             attackState = AttackState.Occupation
             occupiedCountry = to
         }
@@ -129,8 +131,11 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
         if (occupations.armiesOf(attackerCountry!!) <= armies) {
             throw Exception("Not enough countries to occupy the conquered one")
         }
-        occupations.addArmies(occupiedCountry!!, armies)
-        occupations.removeArmies(attackerCountry!!, armies)
+        if (armies > PositiveInt(1)) {
+            val armiesToMove = armies - PositiveInt(1)
+            occupations.addArmies(occupiedCountry!!, armiesToMove)
+            occupations.removeArmies(attackerCountry!!, armiesToMove)
+        }
         attackState = AttackState.Fight
         occupiedCountry = null
         attackerCountry = null

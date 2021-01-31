@@ -122,7 +122,7 @@ class RefereeTest {
     }
 
     @Test
-    fun `Attack does not change neutral countries`() {
+    fun `Attack does not change neutral countries but change non neutral ones`() {
 
         val occupationsSampleLarge = listOf(
             Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)), Occupation(chi,nico, PositiveInt(1)),
@@ -135,15 +135,19 @@ class RefereeTest {
         )
         val reinforcements = listOf(CountryReinforcement(arg, PositiveInt(3)))
         referee.addArmies(reinforcements)
-        //TODO: cannot test this until attacker refactor. The occupation must be split from the fight
-        //referee.makeAttack(arg, bra)
-/*
-        if (referee.attackState == Referee.AttackState.Occupation) {
+        referee.makeAttack(arg, bra)
+        //TODO: Use a deterministic Die and (therefore) a deterministic test
+        if (referee.currentAttackState== Referee.AttackState.Occupation) {
             referee.occupyConqueredCountry(PositiveInt(1))
+            assertEquals(referee.occupations.occupierOf(bra), nico )
+            assertEquals(referee.occupations.armiesOf(bra), PositiveInt(1))
+            assertEquals(referee.occupations.armiesOf(arg), PositiveInt(3))
+        } else {
+            assertEquals(referee.occupations.occupierOf(bra), eric)
+            assertEquals(referee.occupations.armiesOf(bra), PositiveInt(1))
+            assertEquals(referee.occupations.armiesOf(arg), PositiveInt(3))
         }
         referee.endAttack()
-*/
-        //referee.regroup(listOf(Regrouping(arg, chi, PositiveInt(2), referee)))
         assertEquals(referee.occupations.armiesOf(kam), PositiveInt(1))
         assertEquals(referee.occupations.armiesOf(chi), PositiveInt(1))
         assertEquals(referee.occupations.armiesOf(jap), PositiveInt(1))
