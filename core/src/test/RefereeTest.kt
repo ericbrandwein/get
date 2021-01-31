@@ -132,7 +132,7 @@ class RefereeTest {
         )
         val reinforcements = listOf(CountryReinforcement(arg, PositiveInt(3)))
         referee.addArmies(reinforcements)
-        //TODO: cannot test this until attacker refactor
+        //TODO: cannot test this until attacker refactor. The occupation must be split from the fight
         //referee.makeAttack(arg, bra)
 /*
         if (referee.attackState == Referee.AttackState.Occupation) {
