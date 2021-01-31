@@ -27,7 +27,7 @@ class SkipRegroup : Conqueror {
 class CountryReinforcement(val country:Country, val n: PositiveInt) {
     public fun apply(player: Player,occupations: CountryOccupations) {
         if (occupations.occupierOf(country) != player) {
-            throw java.lang.Exception("Player ${player} cannot add army to country")
+            throw Exception("Player ${player} cannot add army to country")
         }
        occupations.addArmies(country, n)
     }
@@ -65,7 +65,14 @@ class Regrouping(val from:Country, val to:Country, val n: PositiveInt, val refer
  * Regroup: when current player moves his armies after the Attack phase
  */
 class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalMap, val occupations: CountryOccupations){
-    enum class State{AddArmies, Attack, Regroup}
+    enum class State{
+        AddArmies {
+        override fun next(referee: Referee): State { return Attack }
+    }, Attack {
+        override fun next(referee: Referee): State { return Regroup }
+    }, Regroup {
+        override fun next(referee: Referee): State { referee.changeTurn(); return AddArmies }
+    }; abstract fun next(referee: Referee):State}
     enum class AttackState{Fight, Occupation}
 
     var player_index = 0
@@ -74,17 +81,8 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     var occupiedCountry : Country? = null
     var attackerCountry : Country? = null
 
-    public fun next(state:State) : State{
-        when (state) {
-            State.AddArmies -> return State.Attack
-            State.Attack -> return State.Regroup
-            State.Regroup -> return State.AddArmies
-        }
-    }
-
     private fun toNextState() {
-        state = next(state)
-        if (state == State.AddArmies) { changeTurn() }
+        state = state.next(this)
     }
     fun currentPlayer(): Player {  return players[player_index % players.size].name }
     private fun changeTurn(){ ++player_index }
@@ -103,7 +101,7 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
 
     fun makeAttack(from:Country, to:Country) {
         if (state != State.Attack) { throw Exception("Cannot attack when not attacking state") }
-        else if (attackState != AttackState.Fight) { throw java.lang.Exception("Cannot attack if not fighting") }
+        else if (attackState != AttackState.Fight) { throw Exception("Cannot attack if not fighting") }
         attackerCountry = from
 
         if (occupations.occupierOf(from) != currentPlayer()){
@@ -120,7 +118,7 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     }
     fun occupyConqueredCountry(armies: PositiveInt) {
         if (state != State.Attack || attackState != AttackState.Occupation) {
-           throw java.lang.Exception("Not th emoment to occypy conquered country")
+           throw Exception("Not the moment to occupy conquered country")
         }
         if (attackerCountry == null || occupiedCountry == null) {
            throw Exception("Mmm, no country from|to occupy...")
@@ -142,7 +140,7 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     fun validateRegroupings(regroupings: List<Regrouping>) {
 
         if(regroupings.any{ occupations.occupierOf(it.from) != currentPlayer() || occupations.occupierOf(it.to) != currentPlayer() }) {
-            throw java.lang.Exception("player must occupy both countries to regroup")
+            throw Exception("player must occupy both countries to regroup")
         }
 
         if (regroupings.distinctBy { it.from }.count() != regroupings.count()) {
