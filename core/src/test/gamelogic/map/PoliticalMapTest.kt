@@ -265,8 +265,20 @@ class PoliticalMapTest {
         assertTrue(continents.contains(secondContinent))
     }
 
+    @Test
+    fun `Can't add a border between the same country`() {
+        val country = "Argentina"
+        val continent = Continent("America", setOf(country))
+        val builder = PoliticalMap.Builder()
+            .addContinent(continent)
 
-
+        val exception = assertFailsWith<SameCountryBorderException> {
+            builder.addBorder(country, country)
+        }
+        assertEquals(country, exception.country)
+        val map = builder.build()
+        assertFalse(map.areBordering(country, country))
+    }
 }
 
 

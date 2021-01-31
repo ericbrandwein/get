@@ -1,19 +1,13 @@
 package screens.running
 
-import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 
-class CountrySelector(assetManager: AssetManager) {
-    private val countryColorsMap: Texture
+class CountrySelector(private val countryColorsMap: Texture, private val countryColors: CountryColors) {
     private val countryColorsPixmap: Pixmap
-    private val mapColors = MapColors.fromJsonFile("mapa.json")
 
     init {
-        val countryColorsFileName = "colores-paises.png"
-        assetManager.load(countryColorsFileName, Texture::class.java)
-        countryColorsMap = assetManager.finishLoadingAsset<Texture>(countryColorsFileName)
         val textureData = countryColorsMap.textureData
         if (!textureData.isPrepared) {
             textureData.prepare()
@@ -28,6 +22,6 @@ class CountrySelector(assetManager: AssetManager) {
         val pixel = countryColorsPixmap.getPixel(
             mapX.toInt(), countryColorsMap.height - mapY.toInt()
         )
-        return mapColors[Color(pixel)]
+        return countryColors[Color(pixel)]
     }
 }
