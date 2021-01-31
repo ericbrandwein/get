@@ -24,7 +24,7 @@ class SkipRegroup : Conqueror {
 
 }
 
-class CountryReinforcement(val country:Country, val n: PositiveInt) {
+class CountryReinforcement(val country:Country, val armies: PositiveInt) {
     public fun apply(player: Player,occupations: CountryOccupations) {
         if (occupations.occupierOf(country) != player) {
             throw Exception("Player ${player} cannot add army to country")
