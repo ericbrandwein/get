@@ -34,9 +34,9 @@ class CountryReinforcement(val country:Country, val n: PositiveInt) {
 }
 
 /**
- * preconds (checkqed in validateRegroupings method):
- *      1. regroupings.distinctBy { it.from }.count() == regroupings.count()
- *      2. occupier of from and to is the same and the currentPlayer
+ * preconditions (checked in [validateRegroupings] method):
+ *      1. `regroupings.distinctBy { it.from }.count() == regroupings.count()`
+ *      2. occupier of from and to is the same as the currentPlayer
  */
 class Regrouping(val from:Country, val to:Country, val n: PositiveInt, val referee: Referee) {
     init {
