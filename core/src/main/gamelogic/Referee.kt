@@ -40,7 +40,6 @@ class CountryReinforcement(val country:Country, val n: PositiveInt) {
  */
 class Regrouping(val from:Country, val to:Country, val n: PositiveInt, val referee: Referee) {
     init {
-        if (n.toInt() > 3) { throw Exception("At most 3 armies can be regrouped") }
         if (referee.occupations.armiesOf(from) <= n) {
             throw Exception("Cannot move ${n.toInt()} countries if they are not available in country")
         }
