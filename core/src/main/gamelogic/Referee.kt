@@ -100,7 +100,7 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     }
 
     fun makeAttack(from:Country, to:Country) {
-        if (state != State.Attack) { throw Exception("Cannot attack when not attacking state") }
+        if (state != State.Attack) { throw Exception("Cannot attack when not in attacking state") }
         else if (attackState != AttackState.Fight) { throw Exception("Cannot attack if not fighting") }
         attackerCountry = from
 
