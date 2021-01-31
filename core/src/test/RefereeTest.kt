@@ -98,7 +98,7 @@ class RefereeTest {
     }
 
     @Test
-    fun `Regroup move the armies and change turn`() {
+    fun `Regroup moves the armies and changes turn`() {
 
         val occupationsSampleLarge = listOf(
             Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)), Occupation(chi,nico, PositiveInt(1)),
