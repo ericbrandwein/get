@@ -7,7 +7,7 @@ abstract class SubGoal {
     abstract fun achieved(player:PlayerInfo, referee:Referee):Boolean
 }
 
-class Goal(val subGoals: List<SubGoal>) : SubGoal() {
+class Goal(private val subGoals: Collection<SubGoal>) : SubGoal() {
     override fun achieved(player: PlayerInfo, referee: Referee): Boolean {
         return subGoals.all{it.achieved(player, referee)}
     }
