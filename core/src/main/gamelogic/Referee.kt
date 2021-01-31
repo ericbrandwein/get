@@ -41,7 +41,7 @@ class CountryReinforcement(val country:Country, val n: PositiveInt) {
 class Regrouping(val from:Country, val to:Country, val n: PositiveInt, val referee: Referee) {
     init {
         if (referee.occupations.armiesOf(from) <= n) {
-            throw Exception("Cannot move ${n.toInt()} countries if they are not available in country")
+            throw Exception("Cannot move ${n.toInt()} armies if they are not available in country")
         }
         if (!referee.politicalMap.areBordering(from, to)) {
             throw Exception("countries must be bordering to regroup nut ${from} and ${to} are not")
