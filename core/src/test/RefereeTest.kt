@@ -3,7 +3,10 @@ import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
 import gamelogic.occupations.Occupation
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class RefereeTest {
 
@@ -76,7 +79,7 @@ class RefereeTest {
 
     @Test
     fun `Turns change according to list of playerInfo`() {
-        assertTrue  (sampleReferee.currentPlayer() == nico)
+        assertEquals(sampleReferee.currentPlayer(), nico)
     }
 
     @Test
@@ -85,8 +88,8 @@ class RefereeTest {
         val reinforcements = listOf(CountryReinforcement(arg,armiesToAdd) )
         val  armiesBefore = sampleReferee.occupations.armiesOf(arg)
         sampleReferee.addArmies(reinforcements)
-        assertTrue (sampleReferee.currentState == Referee.State.Attack)
-        assertTrue (sampleReferee.occupations.armiesOf(arg) == armiesBefore + armiesToAdd)
+        assertEquals(sampleReferee.currentState, Referee.State.Attack)
+        assertEquals(sampleReferee.occupations.armiesOf(arg), armiesBefore + armiesToAdd)
     }
 
     @Test
@@ -94,7 +97,7 @@ class RefereeTest {
         val reinforcements = listOf(CountryReinforcement(arg, PositiveInt(1)))
         sampleReferee.addArmies(reinforcements)
         sampleReferee.endAttack()
-        assertTrue (sampleReferee.currentState == Referee.State.Regroup)
+        assertEquals(sampleReferee.currentState, Referee.State.Regroup)
     }
 
     @Test
@@ -113,9 +116,9 @@ class RefereeTest {
         referee.addArmies(reinforcements)
         referee.endAttack()
         referee.regroup(listOf(Regrouping(arg, chi, PositiveInt(2), referee)))
-        assertTrue  (referee.occupations.armiesOf(chi) == PositiveInt(3))
-        assertTrue (referee.currentState == Referee.State.AddArmies)
-        assertTrue (referee.currentPlayer() == eric)
+        assertEquals(referee.occupations.armiesOf(chi), PositiveInt(3))
+        assertEquals(referee.currentState, Referee.State.AddArmies)
+        assertEquals(referee.currentPlayer(), eric)
     }
 
     @Test
@@ -141,10 +144,10 @@ class RefereeTest {
         referee.endAttack()
 */
         //referee.regroup(listOf(Regrouping(arg, chi, PositiveInt(2), referee)))
-        assertTrue(referee.occupations.armiesOf(kam) == PositiveInt(1))
-        assertTrue(referee.occupations.armiesOf(chi) == PositiveInt(1))
-        assertTrue(referee.occupations.armiesOf(jap) == PositiveInt(1))
-        assertTrue(referee.occupations.armiesOf(vie) == PositiveInt(1))
+        assertEquals(referee.occupations.armiesOf(kam), PositiveInt(1))
+        assertEquals(referee.occupations.armiesOf(chi), PositiveInt(1))
+        assertEquals(referee.occupations.armiesOf(jap), PositiveInt(1))
+        assertEquals(referee.occupations.armiesOf(vie), PositiveInt(1))
     }
 
 }
