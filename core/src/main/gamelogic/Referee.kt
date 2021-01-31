@@ -67,8 +67,13 @@ class Regrouping(val from:Country, val to:Country, val n: PositiveInt, val refer
  */
 class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalMap, val occupations: CountryOccupations){
     enum class State{AddArmies, Attack, Regroup}
+    enum class AttackState{Fight, Occupation}
+
     var player_index = 0
     var state = State.AddArmies
+    var attackState = AttackState.Fight
+    var occupiedCountry : Country? = null
+    var attackerCountry : Country? = null
 
     public fun next(state:State) : State{
         when (state) {
@@ -78,7 +83,6 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
         }
     }
 
-    fun currentState():State { return state }
     private fun toNextState() {
         state = next(state)
         if (state == State.AddArmies) { changeTurn() }
@@ -94,16 +98,47 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
         return players.filter{ it.reachedTheGoal(this) }.map{it.name}
     }
     fun addArmies(reinforcements: List<CountryReinforcement>) {
-       reinforcements.forEach { it.apply(currentPlayer(), occupations) }
+        reinforcements.forEach { it.apply(currentPlayer(), occupations) }
+        toNextState()
     }
 
     fun makeAttack(from:Country, to:Country) {
+        if (state != State.Attack) { throw Exception("Cannot attack when not attacking state") }
+        else if (attackState != AttackState.Fight) { throw java.lang.Exception("Cannot attack if not fighting") }
+        attackerCountry = from
+
         if (occupations.occupierOf(from) != currentPlayer()){
             throw Exception("Player ${currentPlayer()} does not occupy ${from}")
         }
         val combatResolver = DiceRollingCombatResolver(CombatDiceRoller(ClassicCombatDiceAmountCalculator(), RandomDie()))
         val attacker = Attacker(occupations, combatResolver)
-        attacker.attack(from, to, SkipRegroup())
+        val result = attacker.attack(from, to, SkipRegroup())
+        if (result.armiesLostByAttacker == 0) {
+            // If attacker lost 0 armies he conquered the country
+            attackState = AttackState.Occupation
+            occupiedCountry = to
+        }
+    }
+    fun occupyConqueredCountry(armies: PositiveInt) {
+        if (state != State.Attack || attackState != AttackState.Occupation) {
+           throw java.lang.Exception("Not th emoment to occypy conquered country")
+        }
+        if (attackerCountry == null || occupiedCountry == null) {
+           throw Exception("Mmm, no country from|to occupy...")
+        }
+        if (occupations.armiesOf(attackerCountry!!) <= armies) {
+            throw Exception("Not enough countries to occupy the conquered one")
+        }
+        occupations.addArmies(occupiedCountry!!, armies)
+        occupations.removeArmies(attackerCountry!!, armies)
+        attackState = AttackState.Fight
+        occupiedCountry = null
+        attackerCountry = null
+    }
+
+    fun endAttack() {
+        if (state != State.Attack) { throw Exception("Cannot end attack if not attaking")}
+        toNextState()
     }
     fun validateRegroupings(regroupings: List<Regrouping>) {
 
@@ -117,7 +152,9 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     }
 
     fun regroup(regroupings: List<Regrouping>){
+        if (state != State.Regroup) { throw Exception("Cannot regroup if not regrouping") }
         validateRegroupings(regroupings)
         regroupings.map { it.apply() }
+        toNextState()
     }
 }
