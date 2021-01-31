@@ -80,7 +80,7 @@ class RefereeTest {
     }
 
     @Test
-    fun `AddArmies add armies and change referee's state`() {
+    fun `AddArmies adds armies and changes referee's state`() {
         val armiesToAdd = PositiveInt(1)
         val reinforcements = listOf(CountryReinforcement(arg,armiesToAdd) )
         val  armiesBefore = sampleReferee.occupations.armiesOf(arg)
@@ -90,7 +90,7 @@ class RefereeTest {
     }
 
     @Test
-    fun `EndAttack ends the atack`() {
+    fun `EndAttack ends the attack`() {
         val reinforcements = listOf(CountryReinforcement(arg, PositiveInt(1)))
         sampleReferee.addArmies(reinforcements)
         sampleReferee.endAttack()
@@ -98,7 +98,7 @@ class RefereeTest {
     }
 
     @Test
-    fun `Regroup move the armies and change turn`() {
+    fun `Regroup moves the armies and changes turn`() {
 
         val occupationsSampleLarge = listOf(
             Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)), Occupation(chi,nico, PositiveInt(1)),
