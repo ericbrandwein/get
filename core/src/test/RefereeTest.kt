@@ -80,7 +80,7 @@ class RefereeTest {
     }
 
     @Test
-    fun `AddArmies add armies and change referee's state`() {
+    fun `AddArmies adds armies and changes referee's state`() {
         val armiesToAdd = PositiveInt(1)
         val reinforcements = listOf(CountryReinforcement(arg,armiesToAdd) )
         val  armiesBefore = sampleReferee.occupations.armiesOf(arg)
