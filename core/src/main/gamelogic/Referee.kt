@@ -29,7 +29,7 @@ class CountryReinforcement(val country:Country, val armies: PositiveInt) {
         if (occupations.occupierOf(country) != player) {
             throw Exception("Player ${player} cannot add army to country")
         }
-       occupations.addArmies(country, n)
+       occupations.addArmies(country, armies)
     }
 }
 
