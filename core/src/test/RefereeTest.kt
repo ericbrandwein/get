@@ -86,7 +86,7 @@ class RefereeTest {
         val  armiesBefore = sampleReferee.occupations.armiesOf(arg)
         sampleReferee.addArmies(reinforcements)
         assertTrue (sampleReferee.currentState == Referee.State.Attack)
-        assertTrue (sampleReferee.occupations.armiesOf(arg) == armiesBefore.plus(armiesToAdd))
+        assertTrue (sampleReferee.occupations.armiesOf(arg) == armiesBefore + armiesToAdd)
     }
 
     @Test

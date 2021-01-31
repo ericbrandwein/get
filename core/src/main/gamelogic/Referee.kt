@@ -38,18 +38,18 @@ class CountryReinforcement(val country:Country, val armies: PositiveInt) {
  *      1. `regroupings.distinctBy { it.from }.count() == regroupings.count()`
  *      2. occupier of from and to is the same as the currentPlayer
  */
-class Regrouping(val from:Country, val to:Country, val n: PositiveInt, val referee: Referee) {
+class Regrouping(val from:Country, val to:Country, val armies: PositiveInt, val referee: Referee) {
     init {
-        if (referee.occupations.armiesOf(from) <= n) {
-            throw Exception("Cannot move ${n.toInt()} armies if they are not available in country")
+        if (referee.occupations.armiesOf(from) <= armies) {
+            throw Exception("Cannot move ${armies.toInt()} armies if they are not available in country")
         }
         if (!referee.politicalMap.areBordering(from, to)) {
             throw Exception("countries must be bordering to regroup but ${from} and ${to} are not")
         }
     }
     public fun apply() {
-        referee.occupations.removeArmies(from, n)
-        referee.occupations.addArmies(to, n)
+        referee.occupations.removeArmies(from, armies)
+        referee.occupations.addArmies(to, armies)
     }
 }
 /**
