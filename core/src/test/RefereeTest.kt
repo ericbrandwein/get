@@ -90,7 +90,7 @@ class RefereeTest {
     }
 
     @Test
-    fun `EndAttack ends the atack`() {
+    fun `EndAttack ends the attack`() {
         val reinforcements = listOf(CountryReinforcement(arg, PositiveInt(1)))
         sampleReferee.addArmies(reinforcements)
         sampleReferee.endAttack()
