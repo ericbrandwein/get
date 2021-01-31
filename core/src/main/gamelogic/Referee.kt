@@ -33,30 +33,24 @@ class CountryReinforcement(val country:Country, val n: PositiveInt) {
     }
 }
 
-//TODO: Hay que hacer un chequeo de que en el resultado final de la suma de agrupamientos
-//      el reagrupamiento es valido en el sentido en que nadie mueve un ejercito mas de una vez
 /**
- * precond: regroupings.distinctBy { it.from }.count() == regroupings.count()
+ * preconds (checkqed in validateRegroupings method):
+ *      1. regroupings.distinctBy { it.from }.count() == regroupings.count()
+ *      2. occupier of from and to is the same and the currentPlayer
  */
-class Regrouping(val from:Country, val to:Country, val n: PositiveInt) {
+class Regrouping(val from:Country, val to:Country, val n: PositiveInt, val referee: Referee) {
     init {
-        if (n.toInt() > 3) {
-            throw Exception("At most 3 armes==ies can be regrouped")
+        if (n.toInt() > 3) { throw Exception("At most 3 armies can be regrouped") }
+        if (referee.occupations.armiesOf(from) <= n) {
+            throw Exception("Cannot move ${n.toInt()} countries if they are not available in country")
+        }
+        if (!referee.politicalMap.areBordering(from, to)) {
+            throw Exception("countries must be bordering to regroup nut ${from} and ${to} are not")
         }
     }
-    public fun apply(player: Player, politicalMap: PoliticalMap, occupations: CountryOccupations){
-       if (occupations.occupierOf(from) != player || occupations.occupierOf(to) != player) {
-           throw Exception("player ${player} must occupy countries ${from} and ${to} to reagroup")
-       }
-       if (!politicalMap.areBordering(from, to)) {
-           throw Exception("countries must be bordering to regroup nut ${from} and ${to} are not")
-       }
-       if (occupations.armiesOf(from) < n.plus(PositiveInt(1)) ) {
-           throw Exception("At least one army must remain in each country after regroup, ${from} has to few")
-       }
-
-        occupations.removeArmies(from, n)
-        occupations.addArmies(to, n)
+    public fun apply() {
+        referee.occupations.removeArmies(from, n)
+        referee.occupations.addArmies(to, n)
     }
 }
 /**
@@ -65,8 +59,13 @@ class Regrouping(val from:Country, val to:Country, val n: PositiveInt) {
  * @property players the players sorted according to their turns
  * @property politicalMap the board with countries, continents and connexions between countries
  * @property occupations the players' occupations (Starts being the initial setting, it is updated after each attack).
+ *
+ * Referee has 3 states.
+ * AddArmies: when current player adds armies to his countries (this is one action)
+ * Attack: when current player attacks any enemy. This action may be repeated
+ * Regroup: when current player moves his armies after the Attack phase
  */
-class Referee (val players:List<PlayerInfo>, val politicalMap: PoliticalMap, val occupations: CountryOccupations){
+class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalMap, val occupations: CountryOccupations){
     enum class State{AddArmies, Attack, Regroup}
     var player_index = 0
     var state = State.AddArmies
@@ -103,14 +102,19 @@ class Referee (val players:List<PlayerInfo>, val politicalMap: PoliticalMap, val
         val attacker = Attacker(occupations, combatResolver)
         attacker.attack(from, to, SkipRegroup())
     }
+    fun validateRegroupings(regroupings: List<Regrouping>) {
+
+        if(regroupings.any{ occupations.occupierOf(it.from) != currentPlayer() || occupations.occupierOf(it.to) != currentPlayer() }) {
+            throw java.lang.Exception("player must occupy both countries to regroup")
+        }
+
+        if (regroupings.distinctBy { it.from }.count() != regroupings.count()) {
+            throw Exception("Only one regroup per country per turn is allowed (to facilitate validation)")
+        }
+    }
 
     fun regroup(regroupings: List<Regrouping>){
-        if(regroupings.any{ occupations.occupierOf(it.from) != currentPlayer() || occupations.occupierOf(it.to) != currentPlayer() }) {
-            throw java.lang.Exception("player must occupy both countrys to regroup")
-        }
-        if (regroupings.distinctBy { it.from }.count() != regroupings.count()) {
-           throw java.lang.Exception ("Only one time we allow a country to regroup per turn, this make easier to validate the move")
-        }
-        regroupings.map { it.apply(currentPlayer(),politicalMap,occupations) }
+        validateRegroupings(regroupings)
+        regroupings.map { it.apply() }
     }
 }
