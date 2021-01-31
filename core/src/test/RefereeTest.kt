@@ -75,7 +75,7 @@ class RefereeTest {
     }
 
     @Test
-    fun `Turns change according list of playerInfo`() {
+    fun `Turns change according to list of playerInfo`() {
         assertTrue  (sampleReferee.currentPlayer() == nico)
     }
 
