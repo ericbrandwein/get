@@ -59,7 +59,7 @@ class RefereeTest {
     }
 
     @Test
-    fun `Nico wins if he plays against eric (and achieve his goal first)`() {
+    fun `Nico wins if he plays against eric (and achieves his goal first)`() {
         val occupationsNico = listOf(
             Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)),
             Occupation(bra, nico, PositiveInt(1))
