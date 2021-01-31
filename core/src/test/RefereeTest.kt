@@ -7,29 +7,29 @@ import kotlin.test.*
 
 class RefereeTest {
 
-    val nico = "Nico"
-    val eric = "Eric"
+    private val nico = "Nico"
+    private val eric = "Eric"
 
-    val arg = "Argentina"
-    val bra = "Brasil"
-    val chi = "Chile"
-    val kam = "Kamchatka"
-    val jap = "Japón"
-    val vie = "Vietnam"
+    private val arg = "Argentina"
+    private val bra = "Brasil"
+    private val chi = "Chile"
+    private val kam = "Kamchatka"
+    private val jap = "Japón"
+    private val vie = "Vietnam"
 
-    val sudamerica = Continent("Sudamérica", setOf(arg, bra))
-    val asia = Continent("Asia", setOf(kam, jap))
-    val sudamericaLarge = Continent("Sudamérica", setOf(arg, bra, chi))
-    val asiaLarge = Continent("Asia", setOf(kam, jap, vie))
+    private val sudamerica = Continent("Sudamérica", setOf(arg, bra))
+    private val asia = Continent("Asia", setOf(kam, jap))
+    private val sudamericaLarge = Continent("Sudamérica", setOf(arg, bra, chi))
+    private val asiaLarge = Continent("Asia", setOf(kam, jap, vie))
 
-    val politicalMap = PoliticalMap.Builder()
+    private val politicalMap = PoliticalMap.Builder()
         .addContinent(sudamerica)
         .addContinent(asia)
         .addBorder(arg, bra)
         .addBorder(kam, jap)
         .build()
 
-    val politicalMapLarge = PoliticalMap.Builder()
+    private val politicalMapLarge = PoliticalMap.Builder()
         .addContinent(sudamericaLarge)
         .addContinent(asiaLarge)
         .addBorder(arg, bra)
@@ -38,15 +38,15 @@ class RefereeTest {
         .addBorder(kam, vie)
         .build()
 
-    val goalNico = Goal(listOf(OccupyContinent(sudamerica)))
-    val goalEric = Goal(listOf(OccupyContinent(asia)))
+    private val goalNico = Goal(listOf(OccupyContinent(sudamerica)))
+    private val goalEric = Goal(listOf(OccupyContinent(asia)))
 
-    val occupationsSample = listOf(
+    private val occupationsSample = listOf(
         Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)),
         Occupation(bra, eric, PositiveInt(1)), Occupation(jap, eric, PositiveInt(1))
     )
 
-    val sampleReferee = Referee(mutableListOf<PlayerInfo>(PlayerInfo(nico, Color.Blue,goalNico), PlayerInfo(eric, Color.Brown, goalEric)),
+    private val sampleReferee = Referee(mutableListOf<PlayerInfo>(PlayerInfo(nico, Color.Blue,goalNico), PlayerInfo(eric, Color.Brown, goalEric)),
         politicalMap,
         CountryOccupations(occupationsSample)
     )
