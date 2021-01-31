@@ -85,7 +85,7 @@ class RefereeTest {
         val reinforcements = listOf(CountryReinforcement(arg,armiesToAdd) )
         val  armiesBefore = sampleReferee.occupations.armiesOf(arg)
         sampleReferee.addArmies(reinforcements)
-        assertTrue (sampleReferee.state == Referee.State.Attack)
+        assertTrue (sampleReferee.currentState == Referee.State.Attack)
         assertTrue (sampleReferee.occupations.armiesOf(arg) == armiesBefore.plus(armiesToAdd))
     }
 
@@ -94,7 +94,7 @@ class RefereeTest {
         val reinforcements = listOf(CountryReinforcement(arg, PositiveInt(1)))
         sampleReferee.addArmies(reinforcements)
         sampleReferee.endAttack()
-        assertTrue (sampleReferee.state == Referee.State.Regroup)
+        assertTrue (sampleReferee.currentState == Referee.State.Regroup)
     }
 
     @Test
@@ -114,7 +114,7 @@ class RefereeTest {
         referee.endAttack()
         referee.regroup(listOf(Regrouping(arg, chi, PositiveInt(2), referee)))
         assertTrue  (referee.occupations.armiesOf(chi) == PositiveInt(3))
-        assertTrue (referee.state == Referee.State.AddArmies)
+        assertTrue (referee.currentState == Referee.State.AddArmies)
         assertTrue (referee.currentPlayer() == eric)
     }
 

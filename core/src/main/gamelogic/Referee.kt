@@ -75,17 +75,20 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     }; abstract fun next(referee: Referee):State}
     enum class AttackState{Fight, Occupation}
 
-    private var player_index = 0
-    var state = State.AddArmies
+    private var playerIndex = 0
+    private var state = State.AddArmies
     private var attackState = AttackState.Fight
     private var occupiedCountry : Country? = null
     private var attackerCountry : Country? = null
 
+    var currentState:State = state
+        get() = state
+
     private fun toNextState() {
         state = state.next(this)
     }
-    fun currentPlayer(): Player {  return players[player_index % players.size].name }
-    private fun changeTurn(){ ++player_index }
+    fun currentPlayer(): Player {  return players[playerIndex % players.size].name }
+    private fun changeTurn(){ ++playerIndex }
 
     var gameIsOver : Boolean = false
         get() = players.any{ it.reachedTheGoal(this) }
