@@ -75,11 +75,11 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     }; abstract fun next(referee: Referee):State}
     enum class AttackState{Fight, Occupation}
 
-    var player_index = 0
+    private var player_index = 0
     var state = State.AddArmies
-    var attackState = AttackState.Fight
-    var occupiedCountry : Country? = null
-    var attackerCountry : Country? = null
+    private var attackState = AttackState.Fight
+    private var occupiedCountry : Country? = null
+    private var attackerCountry : Country? = null
 
     private fun toNextState() {
         state = state.next(this)
