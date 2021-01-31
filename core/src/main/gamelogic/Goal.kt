@@ -3,12 +3,14 @@ package gamelogic
 import gamelogic.map.Continent
 import java.lang.Exception
 
-abstract class Goal {
+abstract class SubGoal {
     abstract fun achieved(player:PlayerInfo, referee:Referee):Boolean
 }
 
-
-abstract class SubGoal : Goal() {
+class Goal(val subGoals: List<SubGoal>) : SubGoal() {
+    override fun achieved(player: PlayerInfo, referee: Referee): Boolean {
+        return subGoals.all{it.achieved(player, referee)}
+    }
 
 }
 
@@ -29,7 +31,7 @@ class OccupySubContinent(val continent:Continent, val countries:Int): SubGoal() 
     }
 }
 
-class Destroy(val army:PlayerInfo) : Goal() {
+class Destroy(val army:PlayerInfo) : SubGoal() {
     override fun achieved(player: PlayerInfo, referee: Referee): Boolean {
         if (referee.players.contains(player) && player.name == referee.currentPlayer() &&
             !referee.politicalMap.countries.any { referee.occupations.occupierOf(it) == player.name }) {
