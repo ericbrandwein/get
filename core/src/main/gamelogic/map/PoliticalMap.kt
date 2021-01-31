@@ -37,9 +37,18 @@ class PoliticalMap private constructor(
         fun addBorder(firstCountry: Country, secondCountry: Country): Builder {
             continents.assertCountryExists(firstCountry)
             continents.assertCountryExists(secondCountry)
+            assertDifferentCountriesForBorder(firstCountry, secondCountry)
             borders.getValue(firstCountry).add(secondCountry)
             borders.getValue(secondCountry).add(firstCountry)
             return this
+        }
+
+        private fun assertDifferentCountriesForBorder(
+            firstCountry: Country, secondCountry: Country
+        ) {
+            if (firstCountry == secondCountry) {
+                throw SameCountryBorderException(firstCountry)
+            }
         }
 
         fun build() = PoliticalMap(continents, borders)
