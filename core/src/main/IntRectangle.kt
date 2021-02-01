@@ -15,7 +15,7 @@ data class IntRectangle(
      * when using an IntRectangle as a texture region, where the width is defined in
      * pixels.
      */
-    private var maxX
+    var maxX: Int
         get() = x + width - 1
         set(value) {
             width = value - x + 1
@@ -27,7 +27,7 @@ data class IntRectangle(
      * when using an IntRectangle as a texture region, where the height is defined in
      * pixels.
      */
-    private var maxY
+    var maxY: Int
         get() = y + height - 1
         set(value) {
             height = value - y + 1
