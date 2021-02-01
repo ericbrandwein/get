@@ -7,6 +7,10 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 
+/**
+ * An [Image] that corresponds to the position and dimensions of a country in the
+ * worldmap Pixmap. It can be [highlight]ed so as to appear brighter.
+ */
 class CountryImage(
     x: Float, y: Float, private val highlightPixmap: Pixmap
 ) : Image(Texture(highlightPixmap)) {
