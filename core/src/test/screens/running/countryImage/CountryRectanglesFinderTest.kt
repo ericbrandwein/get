@@ -1,4 +1,4 @@
-package screens.running
+package screens.running.countryImage
 
 import Country
 import GdxTestRunner
@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import junit.framework.TestCase
 import org.junit.runner.RunWith
+import screens.running.CountryColors
 import kotlin.test.Test
 
 @RunWith(GdxTestRunner::class)

@@ -1,9 +1,10 @@
-package screens.running
+package screens.running.countryImage
 
 import Country
 import IntRectangle
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
+import screens.running.CountryColors
+import screens.running.forEachIndexed
 
 fun findCountryRectangles(
     pixmap: Pixmap, countryColors: CountryColors
