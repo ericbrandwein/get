@@ -81,10 +81,10 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     private var occupiedCountry : Country? = null
     private var attackerCountry : Country? = null
 
-    var currentState:State = state
+    val currentState:State
         get() = state
 
-    var currentAttackState:AttackState = attackState
+    val currentAttackState:AttackState
         get() = attackState
 
     private fun toNextState() {
@@ -93,11 +93,11 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     fun currentPlayer(): Player {  return players[playerIndex % players.size].name }
     private fun changeTurn(){ ++playerIndex }
 
-    var gameIsOver : Boolean = false
+    val gameIsOver : Boolean
         get() = players.any{ it.reachedTheGoal(this) }
 
 
-    var winners : List<Player> = listOf()
+    val winners : List<Player>
         get() = players.filter{ it.reachedTheGoal(this) }.map{it.name}
 
     fun addArmies(reinforcements: List<CountryReinforcement>) {
