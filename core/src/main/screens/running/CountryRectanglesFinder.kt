@@ -19,11 +19,3 @@ fun findCountryRectangles(
     }
     return rectangles
 }
-
-private fun Pixmap.forEachIndexed(block: (Int, Int, Color) -> Unit) {
-    for (x in 0..width) {
-        for (y in 0..height) {
-            block(x, y, Color(getPixel(x, y)))
-        }
-    }
-}
