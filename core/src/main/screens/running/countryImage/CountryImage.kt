@@ -49,7 +49,7 @@ class CountryImage(
         ): CountryImage {
             val highlightPixmap =
                 getHighlightedCountryPixmap(countryColorsPixmap, rectangle, countryColor)
-            val flippedY = flipY(rectangle.y, countryColorsPixmap, rectangle)
+            val flippedY = flipY(rectangle, countryColorsPixmap)
             return CountryImage(
                 rectangle.x.toFloat(), flippedY.toFloat(), highlightPixmap)
         }
@@ -58,7 +58,7 @@ class CountryImage(
          * Coordinates in the rectangle are given from the top left, and an Actor's
          * position is defined from the bottom left, so we have to flip the y axis.
          */
-        private fun flipY(y: Int, pixmap: Pixmap, rectangle: IntRectangle) =
+        private fun flipY(rectangle: IntRectangle, pixmap: Pixmap) =
             pixmap.height - rectangle.maxY - 1
     }
 }
