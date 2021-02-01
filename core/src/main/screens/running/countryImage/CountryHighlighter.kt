@@ -3,7 +3,6 @@ package screens.running.countryImage
 import IntRectangle
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
-import screens.running.PixelOutOfBoundsException
 
 val HIGHLIGHT_COLOR = Color(1f, 1f, 1f, 0.5f)
 

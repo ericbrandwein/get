@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import org.junit.Test
 import org.junit.runner.RunWith
-import screens.running.PixelOutOfBoundsException
 import screens.running.forEachIndexed
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
