@@ -6,7 +6,11 @@ import org.junit.runners.BlockJUnit4ClassRunner
 import org.junit.runners.model.FrameworkMethod
 import java.util.*
 
-
+/**
+ * JUnit Runner to be able to run tests that use things from libGDX.
+ *
+ * Use by adding annotation `@RunWith(GdxTestRunner::class)` to the test class.
+ */
 class GdxTestRunner(klass: Class<*>?) : BlockJUnit4ClassRunner(
     klass), ApplicationListener {
     private val invokeInRender: MutableMap<FrameworkMethod, RunNotifier> = HashMap()
