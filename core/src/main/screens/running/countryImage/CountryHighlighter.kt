@@ -6,6 +6,11 @@ import com.badlogic.gdx.graphics.Pixmap
 
 val HIGHLIGHT_COLOR = Color(1f, 1f, 1f, 0.5f)
 
+/**
+ * Creates a [Pixmap] containing only the pixels from [mapPixmap] inside the [rectangle],
+ * transformed so that every pixel with color equal to the [countryColor] is changed to
+ * [HIGHLIGHT_COLOR] and every other pixel is [Color.CLEAR].
+ */
 fun getHighlightedCountryPixmap(
     mapPixmap: Pixmap, rectangle: IntRectangle, countryColor: Color
 ): Pixmap {
