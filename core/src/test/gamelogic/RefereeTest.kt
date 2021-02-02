@@ -1,4 +1,6 @@
-import gamelogic.*
+package gamelogic
+
+import PositiveInt
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
@@ -104,8 +106,10 @@ class RefereeTest {
     fun `Regroup moves the armies and changes turn`() {
 
         val occupationsSampleLarge = listOf(
-            Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)), Occupation(chi,nico, PositiveInt(1)),
-            Occupation(bra, eric, PositiveInt(1)), Occupation(jap, eric, PositiveInt(1)), Occupation(vie,eric, PositiveInt(1))
+            Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)), Occupation(chi,nico,
+            PositiveInt(1)),
+            Occupation(bra, eric, PositiveInt(1)), Occupation(jap, eric, PositiveInt(1)), Occupation(vie,eric,
+            PositiveInt(1))
         )
 
         val referee = Referee(mutableListOf<PlayerInfo>(PlayerInfo(nico, Color.Blue,goalNico), PlayerInfo(eric, Color.Brown, goalEric)),
@@ -125,8 +129,10 @@ class RefereeTest {
     fun `Attack does not change neutral countries but change non neutral ones`() {
 
         val occupationsSampleLarge = listOf(
-            Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)), Occupation(chi,nico, PositiveInt(1)),
-            Occupation(bra, eric, PositiveInt(1)), Occupation(jap, eric, PositiveInt(1)), Occupation(vie,eric, PositiveInt(1))
+            Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)), Occupation(chi,nico,
+            PositiveInt(1)),
+            Occupation(bra, eric, PositiveInt(1)), Occupation(jap, eric, PositiveInt(1)), Occupation(vie,eric,
+            PositiveInt(1))
         )
 
         val referee = Referee(mutableListOf<PlayerInfo>(PlayerInfo(nico, Color.Blue,goalNico), PlayerInfo(eric, Color.Brown, goalEric)),
