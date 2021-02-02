@@ -34,7 +34,7 @@ class CountryReinforcement(val country:Country, val armies: PositiveInt) {
 }
 
 /**
- * preconditions (checked in [validateRegroupings] method):
+ * preconditions (checked in [Referee.validateRegroupings] method):
  *      1. `regroupings.distinctBy { it.from }.count() == regroupings.count()`
  *      2. occupier of from and to is the same as the currentPlayer
  */
