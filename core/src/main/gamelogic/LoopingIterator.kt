@@ -1,33 +1,52 @@
 package gamelogic
 
-fun <T> Collection<T>.loopingIterator() = LoopingIterator(this)
+fun <T> MutableList<T>.loopingIterator() = LoopingIterator(this)
 
-class LoopingIterator<T>(
-    private val collection: Collection<T>
-) : Iterator<T> {
+/**
+ * An iterator on a [MutableList] that returns to the first element
+ * when calling [LoopingIterator.next] on the last element.
+ */
+class LoopingIterator<T>(private val list: MutableList<T>) {
 
     init {
-        assertIsNotEmpty(collection)
+        assertListIsNotEmpty()
     }
 
-    private var iterator = collection.iterator()
-    private var current: T = iterator.next()
+    var currentIndex = 0
+        private set
+    val current: T
+        get() = list[currentIndex]
+    val nextIndex
+        get() = (currentIndex + 1) % list.size
 
-    fun get() = current
-
-    override fun hasNext() = true
-    override fun next(): T {
-        if (!iterator.hasNext()) {
-            iterator = collection.iterator()
-        }
-        current = iterator.next()
+    fun next(): T {
+        currentIndex = nextIndex
         return current
     }
-}
 
-private fun <T> assertIsNotEmpty(collection: Collection<T>) {
-    if (collection.isEmpty()) {
-        throw UnsupportedOperationException(
-            "Can't create a LoopingIterator of an empty Iterable.")
+    fun remove() = removeAt(currentIndex)
+    fun removeAt(index: Int) {
+        assertListHasMoreThanOneElement()
+        list.removeAt(index)
+        if (index < currentIndex) {
+            currentIndex--
+        }
+        if (currentIndex == list.size) {
+            currentIndex = 0
+        }
+    }
+
+    private fun assertListIsNotEmpty() {
+        if (list.isEmpty()) {
+            throw UnsupportedOperationException(
+                "Can't create a LoopingIterator of an empty List.")
+        }
+    }
+
+    private fun assertListHasMoreThanOneElement() {
+        if (list.size <= 1) {
+            throw UnsupportedOperationException(
+                "Can't remove last element without invalidating the LoopingIterator.")
+        }
     }
 }
