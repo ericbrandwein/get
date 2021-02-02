@@ -75,7 +75,7 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     }; abstract fun next(referee: Referee):State}
     enum class AttackState{Fight, Occupation}
 
-    private var playerIndex = 0
+    private var playerIterator = players.loopingIterator()
     private var state = State.AddArmies
     private var attackState = AttackState.Fight
     private var occupiedCountry : Country? = null
@@ -87,21 +87,23 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     val currentAttackState:AttackState
         get() = attackState
 
-    private fun toNextState() {
-        state = state.next(this)
-    }
-    fun currentPlayer(): Player {  return players[playerIndex % players.size].name }
-    private fun changeTurn(){ ++playerIndex }
+    val currentPlayer
+        get() = playerIterator.current.name
 
     val gameIsOver : Boolean
         get() = players.any{ it.reachedTheGoal(this) }
 
-
     val winners : List<Player>
         get() = players.filter{ it.reachedTheGoal(this) }.map{it.name}
 
+    private fun toNextState() {
+        state = state.next(this)
+    }
+    
+    private fun changeTurn() = playerIterator.next()
+
     fun addArmies(reinforcements: List<CountryReinforcement>) {
-        reinforcements.forEach { it.apply(currentPlayer(), occupations) }
+        reinforcements.forEach { it.apply(currentPlayer, occupations) }
         toNextState()
     }
 
@@ -110,13 +112,13 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
         else if (attackState != AttackState.Fight) { throw Exception("Cannot attack if not fighting") }
         attackerCountry = from
 
-        if (occupations.occupierOf(from) != currentPlayer()){
-            throw Exception("Player ${currentPlayer()} does not occupy ${from}")
+        if (occupations.occupierOf(from) != currentPlayer){
+            throw Exception("Player ${currentPlayer} does not occupy ${from}")
         }
         val combatResolver = DiceRollingCombatResolver(CombatDiceRoller(ClassicCombatDiceAmountCalculator(), RandomDie()))
         val attacker = Attacker(occupations, combatResolver)
         attacker.attack(from, to, SkipRegroup())
-        if (occupations.occupierOf(to) == currentPlayer()) {
+        if (occupations.occupierOf(to) == currentPlayer) {
             attackState = AttackState.Occupation
             occupiedCountry = to
         }
@@ -147,7 +149,7 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     }
     fun validateRegroupings(regroupings: List<Regrouping>) {
 
-        if(regroupings.any{ occupations.occupierOf(it.from) != currentPlayer() || occupations.occupierOf(it.to) != currentPlayer() }) {
+        if(regroupings.any{ occupations.occupierOf(it.from) != currentPlayer || occupations.occupierOf(it.to) != currentPlayer }) {
             throw Exception("player must occupy both countries to regroup")
         }
 
