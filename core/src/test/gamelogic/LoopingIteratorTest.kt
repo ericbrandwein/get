@@ -2,7 +2,6 @@ package gamelogic
 
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
@@ -183,17 +182,52 @@ class LoopingIteratorTest {
     }
 
     @Test
-    fun `nextIndex returns currentIndex + 1 if it is inside the list`() {
+    fun `nextIndex() returns currentIndex + 1 if it is inside the list`() {
         val iterator = mutableListOf(1, 2).loopingIterator()
 
-        assertEquals(1, iterator.nextIndex)
+        assertEquals(1, iterator.nextIndex())
     }
 
     @Test
-    fun `nextIndex returns 0 if at last element`() {
+    fun `nextIndex() returns 0 if at last element`() {
         val iterator = mutableListOf(1).loopingIterator()
 
-        assertEquals(0, iterator.nextIndex)
+        assertEquals(0, iterator.nextIndex())
+    }
+
+    @Test
+    fun `hasNext() always returns true`() {
+        assertTrue(mutableListOf(1).loopingIterator().hasNext())
+    }
+
+    @Test
+    fun `hasPrevious() always returns true`() {
+        assertTrue(mutableListOf(1).loopingIterator().hasPrevious())
+    }
+
+    @Test
+    fun `previousIndex returns currentIndex - 1 if inside the list`() {
+        val iterator = mutableListOf(1, 2).loopingIterator()
+        iterator.next()
+
+        assertEquals(0, iterator.previousIndex())
+    }
+
+    @Test
+    fun `previousIndex() returns lastIndex if currentIndex is 0`() {
+        val iterator = mutableListOf(1, 2).loopingIterator()
+
+        assertEquals(1, iterator.previousIndex())
+    }
+
+    @Test
+    fun `previous() moves to the previousIndex element`() {
+        val list = mutableListOf(1, 2)
+
+        val iterator = list.loopingIterator()
+
+        assertEquals(2, iterator.previous())
+        assertEquals(1, iterator.currentIndex)
     }
 }
 
