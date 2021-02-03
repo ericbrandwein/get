@@ -1,7 +1,5 @@
 package gamelogic
 
-import gamelogic.map.PoliticalMap
-import gamelogic.occupations.CountryOccupations
 import Country
 import Player
 import PositiveInt
@@ -10,6 +8,8 @@ import gamelogic.combat.Conqueror
 import gamelogic.combat.resolver.CombatDiceRoller
 import gamelogic.combat.resolver.DiceRollingCombatResolver
 import gamelogic.dice.RandomDie
+import gamelogic.map.PoliticalMap
+import gamelogic.occupations.CountryOccupations
 import gamelogic.situations.classicCombat.ClassicCombatDiceAmountCalculator
 
 
@@ -25,11 +25,11 @@ class SkipRegroup : Conqueror {
 }
 
 class CountryReinforcement(val country:Country, val armies: PositiveInt) {
-    public fun apply(player: Player,occupations: CountryOccupations) {
+    fun apply(player: Player, occupations: CountryOccupations) {
         if (occupations.occupierOf(country) != player) {
             throw Exception("Player ${player} cannot add army to country")
         }
-       occupations.addArmies(country, armies)
+        occupations.addArmies(country, armies)
     }
 }
 
@@ -67,39 +67,49 @@ class Regrouping(val from:Country, val to:Country, val armies: PositiveInt, val 
 class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalMap, val occupations: CountryOccupations){
     enum class State{
         AddArmies {
-        override fun next(referee: Referee): State { return Attack }
-    }, Attack {
-        override fun next(referee: Referee): State { return Regroup }
-    }, Regroup {
-        override fun next(referee: Referee): State { referee.changeTurn(); return AddArmies }
-    }; abstract fun next(referee: Referee):State}
-    enum class AttackState{Fight, Occupation}
+            override fun next(referee: Referee): State = Attack
+        }, Attack {
+            override fun next(referee: Referee): State = Regroup
+        }, Regroup {
+            override fun next(referee: Referee): State {
+                referee.changeTurn(); return AddArmies
+            }
+        };
+
+        abstract fun next(referee: Referee): State
+    }
+
+    enum class AttackState { Fight, Occupation }
 
     private var playerIterator = players.loopingIterator()
     private var state = State.AddArmies
     private var attackState = AttackState.Fight
-    private var occupiedCountry : Country? = null
-    private var attackerCountry : Country? = null
+    private var occupiedCountry: Country? = null
+    private var attackerCountry: Country? = null
 
-    val currentState:State
+    private val gameInfo
+        get() = GameInfo(
+            players, playerIterator, politicalMap, occupations, PlayerDestructions())
+
+    val currentState: State
         get() = state
 
-    val currentAttackState:AttackState
+    val currentAttackState: AttackState
         get() = attackState
 
     val currentPlayer
         get() = playerIterator.current.name
 
     val gameIsOver : Boolean
-        get() = players.any{ it.reachedTheGoal(this) }
+        get() = players.any { it.reachedTheGoal(gameInfo) }
 
     val winners : List<Player>
-        get() = players.filter{ it.reachedTheGoal(this) }.map{it.name}
+        get() = players.filter { it.reachedTheGoal(gameInfo) }.map { it.name }
 
     private fun toNextState() {
         state = state.next(this)
     }
-    
+
     private fun changeTurn() = playerIterator.next()
 
     fun addArmies(reinforcements: List<CountryReinforcement>) {
