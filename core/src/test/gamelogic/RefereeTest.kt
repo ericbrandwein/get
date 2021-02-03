@@ -88,8 +88,8 @@ class RefereeTest {
     @Test
     fun `AddArmies adds armies and changes referee's state`() {
         val armiesToAdd = PositiveInt(1)
-        val reinforcements = listOf(CountryReinforcement(arg,armiesToAdd) )
-        val  armiesBefore = sampleReferee.occupations.armiesOf(arg)
+        val reinforcements = listOf(CountryReinforcement(arg,armiesToAdd))
+        val armiesBefore = sampleReferee.occupations.armiesOf(arg)
         sampleReferee.addArmies(reinforcements)
         assertEquals(sampleReferee.currentState, Referee.State.Attack)
         assertEquals(sampleReferee.occupations.armiesOf(arg), armiesBefore + armiesToAdd)
@@ -120,7 +120,7 @@ class RefereeTest {
         val reinforcements = listOf(CountryReinforcement(arg, PositiveInt(3)))
         referee.addArmies(reinforcements)
         referee.endAttack()
-        referee.regroup(listOf(Regrouping(arg, chi, PositiveInt(2), referee)))
+        referee.regroup(listOf(Regrouping(arg, chi, PositiveInt(2))))
         assertEquals(referee.occupations.armiesOf(chi), PositiveInt(3))
         assertEquals(referee.currentState, Referee.State.AddArmies)
         assertEquals(referee.currentPlayer, eric)
