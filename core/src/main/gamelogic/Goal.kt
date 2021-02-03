@@ -16,7 +16,7 @@ class Goal(private val subGoals: Collection<SubGoal>) : SubGoal() {
 
 class OccupyContinent(val continent:Continent) : SubGoal() {
     override fun achieved(player: PlayerInfo, referee: Referee): Boolean {
-        return continent.countries.all{ referee.occupations.occupierOf(it) == referee.currentPlayer()}
+        return continent.countries.all{ referee.occupations.occupierOf(it) == referee.currentPlayer }
     }
 }
 
@@ -27,13 +27,13 @@ class OccupySubContinent(val continent:Continent, val countries:Int): SubGoal() 
         }
     }
     override fun achieved(player: PlayerInfo, referee: Referee): Boolean {
-        return continent.countries.count{ referee.occupations.occupierOf(it) == referee.currentPlayer()} >= countries
+        return continent.countries.count{ referee.occupations.occupierOf(it) == referee.currentPlayer } >= countries
     }
 }
 
 class Destroy(val army:PlayerInfo) : SubGoal() {
     override fun achieved(player: PlayerInfo, referee: Referee): Boolean {
-        if (referee.players.contains(player) && player.name == referee.currentPlayer() &&
+        if (referee.players.contains(player) && player.name == referee.currentPlayer &&
             !referee.politicalMap.countries.any { referee.occupations.occupierOf(it) == player.name }) {
             referee.players.remove(army)
             return true

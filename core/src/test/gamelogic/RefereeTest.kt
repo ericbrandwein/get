@@ -1,6 +1,7 @@
 package gamelogic
 
 import PositiveInt
+import gamelogic.*
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
@@ -81,7 +82,7 @@ class RefereeTest {
 
     @Test
     fun `Turns change according to list of playerInfo`() {
-        assertEquals(sampleReferee.currentPlayer(), nico)
+        assertEquals(sampleReferee.currentPlayer, nico)
     }
 
     @Test
@@ -122,7 +123,7 @@ class RefereeTest {
         referee.regroup(listOf(Regrouping(arg, chi, PositiveInt(2), referee)))
         assertEquals(referee.occupations.armiesOf(chi), PositiveInt(3))
         assertEquals(referee.currentState, Referee.State.AddArmies)
-        assertEquals(referee.currentPlayer(), eric)
+        assertEquals(referee.currentPlayer, eric)
     }
 
     @Test
