@@ -1,7 +1,10 @@
 package gamelogic.combat
 
 import Country
+import gamelogic.combat.resolver.CombatDiceRoller
 import gamelogic.combat.resolver.CombatResolver
+import gamelogic.combat.resolver.DiceRollingCombatResolver
+import gamelogic.dice.RandomDie
 import gamelogic.occupations.CountryOccupations
 
 /**
@@ -19,5 +22,16 @@ class Attacker(
     fun makeAttack(from: Country, to: Country): Attack {
         val attackingOccupations = AttackOccupations(countryOccupations, from, to)
         return Attack(attackingOccupations, combatResolver)
+    }
+
+    companion object {
+        fun withDiceAmountCalculator(
+            countryOccupations: CountryOccupations,
+            diceAmountCalculator: DiceAmountCalculator
+        ): Attacker {
+            val diceRoller = CombatDiceRoller(diceAmountCalculator, RandomDie())
+            val combatResolver = DiceRollingCombatResolver(diceRoller)
+            return Attacker(countryOccupations, combatResolver)
+        }
     }
 }
