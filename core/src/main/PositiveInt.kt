@@ -20,13 +20,15 @@ class PositiveInt(private val value: Int) : Number(), Comparable<PositiveInt> {
 
     override operator fun compareTo(other: PositiveInt) = toInt().compareTo(other.toInt())
 
-    operator fun plus(other: PositiveInt): PositiveInt {
+    operator fun plus(other: Int): PositiveInt {
         try {
-            return PositiveInt(Math.addExact(toInt(), other.toInt()))
+            return PositiveInt(Math.addExact(toInt(), other))
         } catch (e: ArithmeticException) {
             throw PositiveIntOverflowException()
         }
     }
+
+    operator fun plus(other: PositiveInt): PositiveInt = plus(other.toInt())
 
     operator fun minus(other: Int): PositiveInt {
         try {
