@@ -3,6 +3,13 @@ package gamelogic.combat
 import PositiveInt
 import gamelogic.combat.resolver.CombatResolver
 
+/**
+ * Represents an attack between two [AttackOccupations]. Can be applied to them by
+ * calling [apply]. If the attack [isConquering], the amount of armies to move from one
+ * country to the other should be passed to [apply].
+ *
+ * @see Attacker
+ */
 class Attack(
     private val attackOccupations: AttackOccupations, combatResolver: CombatResolver
 ) {
