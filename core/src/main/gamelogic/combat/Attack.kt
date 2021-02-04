@@ -10,9 +10,7 @@ import gamelogic.combat.resolver.CombatResolver
  *
  * @see Attacker
  */
-class Attack(
-    private val attackOccupations: AttackOccupations, combatResolver: CombatResolver
-) {
+class Attack(attackOccupations: AttackOccupations, combatResolver: CombatResolver) {
     val isConquering: Boolean
     val armiesLostByDefender: Int
     val armiesLostByAttacker: Int
@@ -20,54 +18,89 @@ class Attack(
     val defenderRolls: Collection<Int>
     val attackerRemainingArmies: PositiveInt
 
+    private val applier: AttackApplier
+
     init {
         val combatResults = combatResolver.combat(
             attackOccupations.armiesOfAttacker(), attackOccupations.armiesOfDefender()
         )
-        isConquering =
-            combatResults.armiesLostByDefender ==
-                attackOccupations.armiesOfDefender().toInt()
         armiesLostByDefender = combatResults.armiesLostByDefender
         armiesLostByAttacker = combatResults.armiesLostByAttacker
         attackerRolls = combatResults.attackerRolls
         defenderRolls = combatResults.defenderRolls
-        attackerRemainingArmies = attackOccupations.armiesOfAttacker() - armiesLostByAttacker
+        attackerRemainingArmies =
+            attackOccupations.armiesOfAttacker() - armiesLostByAttacker
+        applier = AttackApplier.forAttack(
+            attackOccupations, armiesLostByAttacker, armiesLostByDefender)
+        isConquering = applier.isConquering
     }
 
-    fun apply(armiesToMove: PositiveInt) {
-        assertIsConquering()
-        assertCanConquerWithArmies(armiesToMove)
-        val armiesRemovedFromAttacker = (armiesToMove + armiesLostByAttacker).toInt()
-        attackOccupations.removeArmiesFromAttacker(armiesRemovedFromAttacker)
-        attackOccupations.occupyDefendingCountryWithAttackingPlayer(armiesToMove)
-    }
-
-    fun apply() {
-        assertIsNotConquering()
-        attackOccupations.removeArmiesFromAttacker(armiesLostByAttacker)
-        attackOccupations.removeArmiesFromDefender(armiesLostByDefender)
-    }
-
-    private fun assertIsConquering() {
-        if (!isConquering) {
-            throw ArmiesProvidedWhenNotOccupyingException()
-        }
-    }
-
-    private fun assertIsNotConquering() {
-        if (isConquering) {
-            throw NoArmiesProvidedWhenOccupyingException()
-        }
-    }
-
-    private fun assertCanConquerWithArmies(armiesMoved: PositiveInt) {
-        if (armiesMoved > MAX_CONQUERING_ARMIES) {
-            throw TooManyArmiesMovedException(armiesMoved)
-        }
-    }
+    fun apply() = applier.apply()
+    fun apply(armiesToMove: PositiveInt) = applier.apply(armiesToMove)
 
     companion object {
         val MAX_CONQUERING_ARMIES = PositiveInt(3)
+    }
+}
+
+private interface AttackApplier {
+    val isConquering: Boolean
+    fun apply()
+    fun apply(armiesToMove: PositiveInt)
+
+    companion object {
+        fun forAttack(
+            occupations: AttackOccupations,
+            armiesLostByAttacker: Int,
+            armiesLostByDefender: Int
+        ): AttackApplier {
+            val isConquering =
+                armiesLostByDefender == occupations.armiesOfDefender().toInt()
+            return if (isConquering) {
+                ConqueringAttackApplier(occupations, armiesLostByAttacker)
+            } else {
+                NotConqueringAttackApplier(
+                    occupations, armiesLostByAttacker, armiesLostByDefender)
+            }
+        }
+    }
+}
+
+private class NotConqueringAttackApplier(
+    private val occupations: AttackOccupations,
+    private val armiesLostByAttacker: Int,
+    private val armiesLostByDefender: Int
+) : AttackApplier {
+    override val isConquering = false
+
+    override fun apply() {
+        occupations.removeArmiesFromAttacker(armiesLostByAttacker)
+        occupations.removeArmiesFromDefender(armiesLostByDefender)
+    }
+
+    override fun apply(armiesToMove: PositiveInt) =
+        throw ArmiesProvidedWhenNotOccupyingException()
+}
+
+private class ConqueringAttackApplier(
+    private val occupations: AttackOccupations,
+    private val armiesLostByAttacker: Int
+) : AttackApplier {
+    override val isConquering = true
+
+    override fun apply() = throw NoArmiesProvidedWhenOccupyingException()
+
+    override fun apply(armiesToMove: PositiveInt) {
+        assertCanConquerWithArmies(armiesToMove)
+        val armiesRemovedFromAttacker = (armiesToMove + armiesLostByAttacker).toInt()
+        occupations.removeArmiesFromAttacker(armiesRemovedFromAttacker)
+        occupations.occupyDefendingCountryWithAttackingPlayer(armiesToMove)
+    }
+
+    private fun assertCanConquerWithArmies(armiesMoved: PositiveInt) {
+        if (armiesMoved > Attack.MAX_CONQUERING_ARMIES) {
+            throw TooManyArmiesMovedException(armiesMoved)
+        }
     }
 }
 
