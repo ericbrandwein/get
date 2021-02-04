@@ -1,7 +1,5 @@
 package gamelogic
 
-import gamelogic.map.PoliticalMap
-import gamelogic.occupations.CountryOccupations
 import Country
 import Player
 import PositiveInt
@@ -10,6 +8,8 @@ import gamelogic.combat.Conqueror
 import gamelogic.combat.resolver.CombatDiceRoller
 import gamelogic.combat.resolver.DiceRollingCombatResolver
 import gamelogic.dice.RandomDie
+import gamelogic.map.PoliticalMap
+import gamelogic.occupations.CountryOccupations
 import gamelogic.situations.classicCombat.ClassicCombatDiceAmountCalculator
 
 
@@ -25,11 +25,11 @@ class SkipRegroup : Conqueror {
 }
 
 class CountryReinforcement(val country:Country, val armies: PositiveInt) {
-    public fun apply(player: Player,occupations: CountryOccupations) {
+    fun apply(player: Player, occupations: CountryOccupations) {
         if (occupations.occupierOf(country) != player) {
             throw Exception("Player ${player} cannot add army to country")
         }
-       occupations.addArmies(country, armies)
+        occupations.addArmies(country, armies)
     }
 }
 
@@ -38,18 +38,21 @@ class CountryReinforcement(val country:Country, val armies: PositiveInt) {
  *      1. `regroupings.distinctBy { it.from }.count() == regroupings.count()`
  *      2. occupier of from and to is the same as the currentPlayer
  */
-class Regrouping(val from:Country, val to:Country, val armies: PositiveInt, val referee: Referee) {
-    init {
-        if (referee.occupations.armiesOf(from) <= armies) {
-            throw Exception("Cannot move ${armies.toInt()} armies if they are not available in country")
+class Regrouping(val from: Country, val to: Country, val armies: PositiveInt) {
+    fun validate(gameInfo: GameInfo) {
+        if (gameInfo.occupations.armiesOf(from) <= armies) {
+            throw Exception(
+                "Cannot move ${armies.toInt()} armies if they are not available in country")
         }
-        if (!referee.politicalMap.areBordering(from, to)) {
-            throw Exception("countries must be bordering to regroup but ${from} and ${to} are not")
+        if (!gameInfo.politicalMap.areBordering(from, to)) {
+            throw Exception(
+                "countries must be bordering to regroup but $from and $to are not")
         }
     }
-    public fun apply() {
-        referee.occupations.removeArmies(from, armies)
-        referee.occupations.addArmies(to, armies)
+
+    fun apply(occupations: CountryOccupations) {
+        occupations.removeArmies(from, armies)
+        occupations.addArmies(to, armies)
     }
 }
 /**
@@ -64,42 +67,59 @@ class Regrouping(val from:Country, val to:Country, val armies: PositiveInt, val 
  * Attack: when current player attacks any enemy. This action may be repeated
  * Regroup: when current player moves his armies after the Attack phase
  */
-class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalMap, val occupations: CountryOccupations){
-    enum class State{
+class Referee(
+    private val players: MutableList<PlayerInfo>,
+    private val politicalMap: PoliticalMap,
+    val occupations: CountryOccupations
+) {
+    enum class State {
         AddArmies {
-        override fun next(referee: Referee): State { return Attack }
-    }, Attack {
-        override fun next(referee: Referee): State { return Regroup }
-    }, Regroup {
-        override fun next(referee: Referee): State { referee.changeTurn(); return AddArmies }
-    }; abstract fun next(referee: Referee):State}
-    enum class AttackState{Fight, Occupation}
+            override fun next(referee: Referee): State = Attack
+        },
+        Attack {
+            override fun next(referee: Referee): State = Regroup
+        },
+        Regroup {
+            override fun next(referee: Referee): State {
+                referee.changeTurn();
+                return AddArmies
+            }
+        };
+
+        abstract fun next(referee: Referee): State
+    }
+
+    enum class AttackState { Fight, Occupation }
 
     private var playerIterator = players.loopingIterator()
     private var state = State.AddArmies
     private var attackState = AttackState.Fight
-    private var occupiedCountry : Country? = null
-    private var attackerCountry : Country? = null
+    private var occupiedCountry: Country? = null
+    private var attackerCountry: Country? = null
 
-    val currentState:State
+    private val gameInfo
+        get() = GameInfo(
+            players, playerIterator, politicalMap, occupations, PlayerDestructions())
+
+    val currentState: State
         get() = state
 
-    val currentAttackState:AttackState
+    val currentAttackState: AttackState
         get() = attackState
 
     val currentPlayer
         get() = playerIterator.current.name
 
     val gameIsOver : Boolean
-        get() = players.any{ it.reachedTheGoal(this) }
+        get() = players.any { it.reachedTheGoal(gameInfo) }
 
     val winners : List<Player>
-        get() = players.filter{ it.reachedTheGoal(this) }.map{it.name}
+        get() = players.filter { it.reachedTheGoal(gameInfo) }.map { it.name }
 
     private fun toNextState() {
         state = state.next(this)
     }
-    
+
     private fun changeTurn() = playerIterator.next()
 
     fun addArmies(reinforcements: List<CountryReinforcement>) {
@@ -147,8 +167,9 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
         if (state != State.Attack) { throw Exception("Cannot end attack if not attaking")}
         toNextState()
     }
-    fun validateRegroupings(regroupings: List<Regrouping>) {
 
+    fun validateRegroupings(regroupings: List<Regrouping>) {
+        regroupings.forEach { it.validate(gameInfo) }
         if(regroupings.any{ occupations.occupierOf(it.from) != currentPlayer || occupations.occupierOf(it.to) != currentPlayer }) {
             throw Exception("player must occupy both countries to regroup")
         }
@@ -161,7 +182,7 @@ class Referee (val players:MutableList<PlayerInfo>, val politicalMap: PoliticalM
     fun regroup(regroupings: List<Regrouping>){
         if (state != State.Regroup) { throw Exception("Cannot regroup if not regrouping") }
         validateRegroupings(regroupings)
-        regroupings.map { it.apply() }
+        regroupings.map { it.apply(occupations) }
         toNextState()
     }
 }

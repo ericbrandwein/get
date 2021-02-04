@@ -1,44 +1,43 @@
 package gamelogic
 
+import Player
 import gamelogic.map.Continent
-import java.lang.Exception
 
-abstract class SubGoal {
-    abstract fun achieved(player:PlayerInfo, referee:Referee):Boolean
+interface SubGoal {
+    fun achieved(playerInfo: PlayerInfo, gameInfo: GameInfo): Boolean
 }
 
-class Goal(private val subGoals: Collection<SubGoal>) : SubGoal() {
-    override fun achieved(player: PlayerInfo, referee: Referee): Boolean {
-        return subGoals.all{it.achieved(player, referee)}
-    }
-
-}
-
-class OccupyContinent(val continent:Continent) : SubGoal() {
-    override fun achieved(player: PlayerInfo, referee: Referee): Boolean {
-        return continent.countries.all{ referee.occupations.occupierOf(it) == referee.currentPlayer }
+class Goal(private val subGoals: Collection<SubGoal>) : SubGoal {
+    override fun achieved(playerInfo: PlayerInfo, gameInfo: GameInfo): Boolean {
+        return subGoals.all { it.achieved(playerInfo, gameInfo) }
     }
 }
 
-class OccupySubContinent(val continent:Continent, val countries:Int): SubGoal() {
+class OccupyContinent(private val continent: Continent) :
+    SubGoal by OccupySubContinent(continent, continent.countries.size)
+
+class OccupySubContinent(
+    private val continent: Continent, private val countries: Int
+) : SubGoal {
     init {
         if (continent.countries.size < countries) {
-            throw Exception("${continent.name} has less than ${countries} countries")
+            throw Exception("${continent.name} has less than $countries countries")
         }
     }
-    override fun achieved(player: PlayerInfo, referee: Referee): Boolean {
-        return continent.countries.count{ referee.occupations.occupierOf(it) == referee.currentPlayer } >= countries
-    }
+
+    override fun achieved(playerInfo: PlayerInfo, gameInfo: GameInfo): Boolean =
+        countriesOccupiedBy(playerInfo, gameInfo) >= countries
+
+    private fun countriesOccupiedBy(playerInfo: PlayerInfo, gameInfo: GameInfo) =
+        continent.countries.count {
+            gameInfo.occupations.occupierOf(it) == playerInfo.name
+        }
 }
 
-class Destroy(val army:PlayerInfo) : SubGoal() {
-    override fun achieved(player: PlayerInfo, referee: Referee): Boolean {
-        if (referee.players.contains(player) && player.name == referee.currentPlayer &&
-            !referee.politicalMap.countries.any { referee.occupations.occupierOf(it) == player.name }) {
-            referee.players.remove(army)
-            return true
-         } else {
-             return false
-        }
+class Destroy(private val playerToDestroy: Player) : SubGoal {
+    override fun achieved(playerInfo: PlayerInfo, gameInfo: GameInfo): Boolean {
+        val destroyedPlayers = gameInfo.destroyedPlayers
+        return destroyedPlayers.isDestroyed(playerToDestroy) &&
+            destroyedPlayers.destroyerOf(playerToDestroy) == playerInfo.name
     }
 }
