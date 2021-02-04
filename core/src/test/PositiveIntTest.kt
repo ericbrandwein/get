@@ -148,7 +148,14 @@ class PositiveIntTest {
         }
 
         assertEquals(first, exception.minuend)
-        assertEquals(second, exception.subtrahend)
+        assertEquals(second.toInt(), exception.subtrahend)
+    }
+
+    @Test
+    fun `Can subtract an Int smaller than the PositiveInt`() {
+        val result = PositiveInt(2) - (-5)
+
+        assertEquals(PositiveInt(7), result)
     }
 
     @Test

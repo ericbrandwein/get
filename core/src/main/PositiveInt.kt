@@ -28,13 +28,15 @@ class PositiveInt(private val value: Int) : Number(), Comparable<PositiveInt> {
         }
     }
 
-    operator fun minus(other: PositiveInt): PositiveInt {
+    operator fun minus(other: Int): PositiveInt {
         try {
-            return PositiveInt(toInt() - other.toInt())
+            return PositiveInt(toInt() - other)
         } catch (e: NonPositiveNumberException) {
             throw TooBigToSubtractException(this, other)
         }
     }
+
+    operator fun minus(other: PositiveInt): PositiveInt = minus(other.toInt())
 
     operator fun times(other: PositiveInt): PositiveInt {
         try {
