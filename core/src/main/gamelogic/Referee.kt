@@ -3,11 +3,9 @@ package gamelogic
 import Country
 import Player
 import PositiveInt
+import gamelogic.combat.Attack
 import gamelogic.combat.Attacker
 import gamelogic.combat.Conqueror
-import gamelogic.combat.resolver.CombatDiceRoller
-import gamelogic.combat.resolver.DiceRollingCombatResolver
-import gamelogic.dice.RandomDie
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
 import gamelogic.situations.classicCombat.ClassicCombatDiceAmountCalculator
@@ -94,8 +92,7 @@ class Referee(
     private var playerIterator = players.loopingIterator()
     private var state = State.AddArmies
     private var attackState = AttackState.Fight
-    private var occupiedCountry: Country? = null
-    private var attackerCountry: Country? = null
+    private var currentAttack: Attack? = null
 
     private val gameInfo
         get() = GameInfo(
@@ -128,43 +125,40 @@ class Referee(
     }
 
     fun makeAttack(from:Country, to:Country) {
-        if (state != State.Attack) { throw Exception("Cannot attack when not in attacking state") }
-        else if (attackState != AttackState.Fight) { throw Exception("Cannot attack if not fighting") }
-        attackerCountry = from
-
-        if (occupations.occupierOf(from) != currentPlayer){
-            throw Exception("Player ${currentPlayer} does not occupy ${from}")
+        if (state != State.Attack) {
+            throw Exception("Cannot attack when not in attacking state")
+        } else if (attackState != AttackState.Fight) {
+            throw Exception("Cannot attack if not fighting")
         }
-        val combatResolver = DiceRollingCombatResolver(CombatDiceRoller(ClassicCombatDiceAmountCalculator(), RandomDie()))
-        val attacker = Attacker(occupations, combatResolver)
-        attacker.attack(from, to, SkipRegroup())
-        if (occupations.occupierOf(to) == currentPlayer) {
+        if (occupations.occupierOf(from) != currentPlayer) {
+            throw Exception("Player $currentPlayer does not occupy $from")
+        }
+
+        val attacker = Attacker.withDiceAmountCalculator(
+            occupations, ClassicCombatDiceAmountCalculator()
+        )
+        val attack = attacker.makeAttack(from, to)
+        if (attack.isConquering) {
             attackState = AttackState.Occupation
-            occupiedCountry = to
+            currentAttack = attack
+        } else {
+            attack.apply()
         }
     }
+
     fun occupyConqueredCountry(armies: PositiveInt) {
         if (state != State.Attack || attackState != AttackState.Occupation) {
            throw Exception("Not the moment to occupy conquered country")
         }
-        if (attackerCountry == null || occupiedCountry == null) {
-           throw Exception("Mmm, no country from|to occupy...")
-        }
-        if (occupations.armiesOf(attackerCountry!!) <= armies) {
-            throw Exception("Not enough countries to occupy the conquered one")
-        }
-        if (armies > PositiveInt(1)) {
-            val armiesToMove = armies - PositiveInt(1)
-            occupations.addArmies(occupiedCountry!!, armiesToMove)
-            occupations.removeArmies(attackerCountry!!, armiesToMove)
-        }
+        currentAttack!!.apply(armies)
         attackState = AttackState.Fight
-        occupiedCountry = null
-        attackerCountry = null
+        currentAttack = null
     }
 
     fun endAttack() {
-        if (state != State.Attack) { throw Exception("Cannot end attack if not attaking")}
+        if (state != State.Attack) {
+            throw Exception("Cannot end attack if not attacking")
+        }
         toNextState()
     }
 
