@@ -5,22 +5,9 @@ import Player
 import PositiveInt
 import gamelogic.combat.Attack
 import gamelogic.combat.Attacker
-import gamelogic.combat.Conqueror
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
 import gamelogic.situations.classicCombat.ClassicCombatDiceAmountCalculator
-
-
-//TODO: En lugar de crear esta clase lo que hay que hacer es sacar del ataquer la
-//      responsabilidad de mover las fichas después de atacar. Peeero, no solo hay
-//      que hacer refactor del package combat, sino también de los tests!!! Asi que
-//      queda para otro backlog item.
-class SkipRegroup : Conqueror {
-    override fun armiesToMove(remainingAttackingArmies: PositiveInt): PositiveInt {
-        return PositiveInt(1)
-    }
-
-}
 
 class CountryReinforcement(val country:Country, val armies: PositiveInt) {
     fun apply(player: Player, occupations: CountryOccupations) {
