@@ -1,10 +1,10 @@
 package gamelogic
 
 import PositiveInt
+import gamelogic.combat.AttackerWinsAttackerFactory
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
-import gamelogic.occupations.Occupation
 import gamelogic.occupations.PlayerOccupation
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -132,8 +132,9 @@ class RefereeTest {
         assertEquals(referee.currentPlayer, eric)
     }
 
+
     @Test
-    fun `Attack does not change neutral countries but changes non neutral ones`() {
+    fun `Attacking removes correct amount of armies only from the combating countries`() {
 
         val occupationsSampleLarge = listOf(
             PlayerOccupation(arg, nico, PositiveInt(1)),
@@ -148,28 +149,22 @@ class RefereeTest {
             PlayerInfo(nico, Color.Blue, goalNico),
             PlayerInfo(eric, Color.Brown, goalEric)
         )
+        val attackerFactory = AttackerWinsAttackerFactory(PositiveInt(4), PositiveInt(1))
         val referee = Referee(
-            players, politicalMapLarge, CountryOccupations(occupationsSampleLarge)
+            players, politicalMapLarge,
+            CountryOccupations(occupationsSampleLarge),
+            attackerFactory
         )
         val reinforcements = listOf(CountryReinforcement(arg, PositiveInt(3)))
         referee.addArmies(reinforcements)
         referee.makeAttack(arg, bra)
-        //TODO: Use a deterministic Die and (therefore) a deterministic test
-        if (referee.currentAttackState== Referee.AttackState.Occupation) {
-            referee.occupyConqueredCountry(PositiveInt(1))
-            assertEquals(referee.occupations.occupierOf(bra), nico)
-            assertEquals(referee.occupations.armiesOf(bra), 1)
-            assertEquals(referee.occupations.armiesOf(arg), 3)
-        } else {
-            assertEquals(referee.occupations.occupierOf(bra), eric)
-            assertEquals(referee.occupations.armiesOf(bra), 1)
-            assertEquals(referee.occupations.armiesOf(arg), 3)
-        }
+        assertTrue(referee.occupations.isEmpty(bra))
+        assertEquals(referee.occupations.armiesOf(arg), 4)
+
         referee.endAttack()
         assertEquals(referee.occupations.armiesOf(kam), 1)
         assertEquals(referee.occupations.armiesOf(chi), 1)
         assertEquals(referee.occupations.armiesOf(jap), 1)
         assertEquals(referee.occupations.armiesOf(vie), 1)
     }
-
 }

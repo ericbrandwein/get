@@ -4,7 +4,8 @@ import Country
 import Player
 import PositiveInt
 import gamelogic.combat.Attack
-import gamelogic.combat.Attacker
+import gamelogic.combat.AttackerFactory
+import gamelogic.combat.DiceRollingAttackerFactory
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
 import gamelogic.situations.classicCombat.ClassicCombatDiceAmountCalculator
@@ -25,7 +26,7 @@ class CountryReinforcement(val country:Country, val armies: PositiveInt) {
  */
 class Regrouping(val from: Country, val to: Country, val armies: PositiveInt) {
     fun validate(gameInfo: GameInfo) {
-        if (gameInfo.occupations.armiesOf(from) <= armies) {
+        if (gameInfo.occupations.armiesOf(from) <= armies.toInt()) {
             throw Exception(
                 "Cannot move ${armies.toInt()} armies if they are not available in country")
         }
@@ -55,7 +56,8 @@ class Regrouping(val from: Country, val to: Country, val armies: PositiveInt) {
 class Referee(
     private val players: MutableList<PlayerInfo>,
     private val politicalMap: PoliticalMap,
-    val occupations: CountryOccupations
+    val occupations: CountryOccupations,
+    private val attackerFactory: AttackerFactory = DiceRollingAttackerFactory()
 ) {
     enum class State {
         AddArmies {
@@ -121,23 +123,24 @@ class Referee(
             throw Exception("Player $currentPlayer does not occupy $from")
         }
 
-        val attacker = Attacker.withDiceAmountCalculator(
+        val attacker = attackerFactory.create(
             occupations, ClassicCombatDiceAmountCalculator()
         )
-        val attack = attacker.makeAttack(from, to)
-        if (attack.isConquering) {
+        attacker.attack(from, to)
+        if (occupations.isEmpty(to)) {
             attackState = AttackState.Occupation
-            currentAttack = attack
-        } else {
-            attack.apply()
         }
+        //        if (attack.isConquering) {
+        //        } else {
+        //            attack.apply()
+        //        }
     }
 
     fun occupyConqueredCountry(armies: PositiveInt) {
         if (state != State.Attack || attackState != AttackState.Occupation) {
            throw Exception("Not the moment to occupy conquered country")
         }
-        currentAttack!!.apply(armies)
+        //        currentAttack!!.apply(armies)
         attackState = AttackState.Fight
         currentAttack = null
     }
