@@ -5,16 +5,28 @@ import Player
 import PositiveInt
 import TooBigToSubtractException
 
-class Occupation(val country: Country, val occupier: Player, armies: PositiveInt) {
+interface Occupation {
+    val country: Country
+    val occupier: Player
+    val armies: PositiveInt
+
+    fun addArmies(added: PositiveInt)
+
+    fun removeArmies(removed: PositiveInt)
+}
+
+class PlayerOccupation(
+    override val country: Country, override val occupier: Player, armies: PositiveInt
+) : Occupation {
 
     private var mutableArmies: PositiveInt = armies
-    val armies get() = mutableArmies
+    override val armies get() = mutableArmies
 
-    fun addArmies(added: PositiveInt) {
+    override fun addArmies(added: PositiveInt) {
         mutableArmies += added
     }
 
-    fun removeArmies(removed: PositiveInt) {
+    override fun removeArmies(removed: PositiveInt) {
         try {
             mutableArmies -= removed
         } catch (e: TooBigToSubtractException) {
@@ -23,7 +35,7 @@ class Occupation(val country: Country, val occupier: Player, armies: PositiveInt
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Occupation &&
+        return other is PlayerOccupation &&
             other.country == country &&
             other.occupier == occupier &&
             other.armies == armies
@@ -38,6 +50,23 @@ class Occupation(val country: Country, val occupier: Player, armies: PositiveInt
 
     override fun toString(): String {
         return "Occupation on $country by $occupier with $armies armies"
+    }
+}
+
+class NoOccupation : Occupation {
+    override val country: Country
+        get() = TODO("Not yet implemented")
+    override val occupier: Player
+        get() = TODO("Not yet implemented")
+    override val armies: PositiveInt
+        get() = PositiveInt(0)
+
+    override fun addArmies(added: PositiveInt) {
+        TODO("Not yet implemented")
+    }
+
+    override fun removeArmies(removed: PositiveInt) {
+        TODO("Not yet implemented")
     }
 
 }

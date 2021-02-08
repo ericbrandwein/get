@@ -5,6 +5,7 @@ import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
 import gamelogic.occupations.Occupation
+import gamelogic.occupations.PlayerOccupation
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -47,8 +48,10 @@ class RefereeTest {
     private val goalEric = Goal(listOf(OccupyContinent(asia)))
 
     private val occupationsSample = listOf(
-        Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)),
-        Occupation(bra, eric, PositiveInt(1)), Occupation(jap, eric, PositiveInt(1))
+        PlayerOccupation(arg, nico, PositiveInt(1)),
+        PlayerOccupation(kam, nico, PositiveInt(1)),
+        PlayerOccupation(bra, eric, PositiveInt(1)),
+        PlayerOccupation(jap, eric, PositiveInt(1))
     )
 
     private val sampleReferee = Referee(mutableListOf<PlayerInfo>(PlayerInfo(nico, Color.Blue,goalNico), PlayerInfo(eric, Color.Brown, goalEric)),
@@ -66,10 +69,11 @@ class RefereeTest {
     @Test
     fun `Nico wins if he plays against eric (and achieves his goal first)`() {
         val occupationsNico = listOf(
-            Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)),
-            Occupation(bra, nico, PositiveInt(1))
+            PlayerOccupation(arg, nico, PositiveInt(1)),
+            PlayerOccupation(kam, nico, PositiveInt(1)),
+            PlayerOccupation(bra, nico, PositiveInt(1))
         )
-        val occupationsEric = listOf(Occupation(jap, eric, PositiveInt(1)))
+        val occupationsEric = listOf(PlayerOccupation(jap, eric, PositiveInt(1)))
 
         val referee = Referee(mutableListOf<PlayerInfo>(PlayerInfo(nico, Color.Blue,goalNico), PlayerInfo(eric, Color.Brown, goalEric)),
             politicalMap,
@@ -87,11 +91,12 @@ class RefereeTest {
     @Test
     fun `AddArmies adds armies and changes referee's state`() {
         val armiesToAdd = PositiveInt(1)
-        val reinforcements = listOf(CountryReinforcement(arg,armiesToAdd))
+        val reinforcements = listOf(CountryReinforcement(arg, armiesToAdd))
         val armiesBefore = sampleReferee.occupations.armiesOf(arg)
         sampleReferee.addArmies(reinforcements)
         assertEquals(sampleReferee.currentState, Referee.State.Attack)
-        assertEquals(sampleReferee.occupations.armiesOf(arg), armiesBefore + armiesToAdd)
+        assertEquals(
+            sampleReferee.occupations.armiesOf(arg), (armiesToAdd + armiesBefore).toInt())
     }
 
     @Test
@@ -106,10 +111,12 @@ class RefereeTest {
     fun `Regroup moves the armies and changes turn`() {
 
         val occupationsSampleLarge = listOf(
-            Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)), Occupation(chi,nico,
-            PositiveInt(1)),
-            Occupation(bra, eric, PositiveInt(1)), Occupation(jap, eric, PositiveInt(1)), Occupation(vie,eric,
-            PositiveInt(1))
+            PlayerOccupation(arg, nico, PositiveInt(1)),
+            PlayerOccupation(kam, nico, PositiveInt(1)),
+            PlayerOccupation(chi, nico, PositiveInt(1)),
+            PlayerOccupation(bra, eric, PositiveInt(1)),
+            PlayerOccupation(jap, eric, PositiveInt(1)),
+            PlayerOccupation(vie, eric, PositiveInt(1))
         )
 
         val referee = Referee(mutableListOf<PlayerInfo>(PlayerInfo(nico, Color.Blue,goalNico), PlayerInfo(eric, Color.Brown, goalEric)),
@@ -120,7 +127,7 @@ class RefereeTest {
         referee.addArmies(reinforcements)
         referee.endAttack()
         referee.regroup(listOf(Regrouping(arg, chi, PositiveInt(2))))
-        assertEquals(referee.occupations.armiesOf(chi), PositiveInt(3))
+        assertEquals(referee.occupations.armiesOf(chi), PositiveInt(3).toInt())
         assertEquals(referee.currentState, Referee.State.AddArmies)
         assertEquals(referee.currentPlayer, eric)
     }
@@ -129,12 +136,12 @@ class RefereeTest {
     fun `Attack does not change neutral countries but changes non neutral ones`() {
 
         val occupationsSampleLarge = listOf(
-            Occupation(arg, nico, PositiveInt(1)),
-            Occupation(kam, nico, PositiveInt(1)),
-            Occupation(chi, nico, PositiveInt(1)),
-            Occupation(bra, eric, PositiveInt(1)),
-            Occupation(jap, eric, PositiveInt(1)),
-            Occupation(vie, eric, PositiveInt(1))
+            PlayerOccupation(arg, nico, PositiveInt(1)),
+            PlayerOccupation(kam, nico, PositiveInt(1)),
+            PlayerOccupation(chi, nico, PositiveInt(1)),
+            PlayerOccupation(bra, eric, PositiveInt(1)),
+            PlayerOccupation(jap, eric, PositiveInt(1)),
+            PlayerOccupation(vie, eric, PositiveInt(1))
         )
 
         val players = mutableListOf(
@@ -150,19 +157,19 @@ class RefereeTest {
         //TODO: Use a deterministic Die and (therefore) a deterministic test
         if (referee.currentAttackState== Referee.AttackState.Occupation) {
             referee.occupyConqueredCountry(PositiveInt(1))
-            assertEquals(referee.occupations.occupierOf(bra), nico )
-            assertEquals(referee.occupations.armiesOf(bra), PositiveInt(1))
-            assertEquals(referee.occupations.armiesOf(arg), PositiveInt(3))
+            assertEquals(referee.occupations.occupierOf(bra), nico)
+            assertEquals(referee.occupations.armiesOf(bra), 1)
+            assertEquals(referee.occupations.armiesOf(arg), 3)
         } else {
             assertEquals(referee.occupations.occupierOf(bra), eric)
-            assertEquals(referee.occupations.armiesOf(bra), PositiveInt(1))
-            assertEquals(referee.occupations.armiesOf(arg), PositiveInt(3))
+            assertEquals(referee.occupations.armiesOf(bra), 1)
+            assertEquals(referee.occupations.armiesOf(arg), 3)
         }
         referee.endAttack()
-        assertEquals(referee.occupations.armiesOf(kam), PositiveInt(1))
-        assertEquals(referee.occupations.armiesOf(chi), PositiveInt(1))
-        assertEquals(referee.occupations.armiesOf(jap), PositiveInt(1))
-        assertEquals(referee.occupations.armiesOf(vie), PositiveInt(1))
+        assertEquals(referee.occupations.armiesOf(kam), 1)
+        assertEquals(referee.occupations.armiesOf(chi), 1)
+        assertEquals(referee.occupations.armiesOf(jap), 1)
+        assertEquals(referee.occupations.armiesOf(vie), 1)
     }
 
 }

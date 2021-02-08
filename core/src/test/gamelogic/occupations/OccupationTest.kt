@@ -9,14 +9,14 @@ import kotlin.test.assertNotEquals
 class OccupationTest {
 
     private fun occupationWithArmies(armies: PositiveInt) =
-        Occupation("Argentina", "Eric", armies)
+        PlayerOccupation("Argentina", "Eric", armies)
 
     @Test
     fun `Creating an occupation set the required members`() {
         val country = "Argentina"
         val player = "Juan"
         val armies = PositiveInt(1)
-        val occupation = Occupation(country, player, armies)
+        val occupation = PlayerOccupation(country, player, armies)
 
         assertEquals(country, occupation.country)
         assertEquals(player, occupation.occupier)
@@ -76,24 +76,24 @@ class OccupationTest {
 
     @Test
     fun `Occupation does not equal another Occupation with different country`() {
-        val firstOccupation = Occupation("Argentina", "Eric", PositiveInt(1))
-        val secondOccupation = Occupation("Uruguay", "Eric", PositiveInt(1))
+        val firstOccupation = PlayerOccupation("Argentina", "Eric", PositiveInt(1))
+        val secondOccupation = PlayerOccupation("Uruguay", "Eric", PositiveInt(1))
 
         assertNotEquals(firstOccupation, secondOccupation)
     }
 
     @Test
     fun `Occupation does not equal another Occupation with different occupier`() {
-        val firstOccupation = Occupation("Argentina", "Eric", PositiveInt(1))
-        val secondOccupation = Occupation("Argentina", "Nico", PositiveInt(1))
+        val firstOccupation = PlayerOccupation("Argentina", "Eric", PositiveInt(1))
+        val secondOccupation = PlayerOccupation("Argentina", "Nico", PositiveInt(1))
 
         assertNotEquals(firstOccupation, secondOccupation)
     }
 
     @Test
     fun `Occupation does not equal another Occupation with different armies`() {
-        val firstOccupation = Occupation("Argentina", "Eric", PositiveInt(1))
-        val secondOccupation = Occupation("Argentina", "Eric", PositiveInt(2))
+        val firstOccupation = PlayerOccupation("Argentina", "Eric", PositiveInt(1))
+        val secondOccupation = PlayerOccupation("Argentina", "Eric", PositiveInt(2))
 
         assertNotEquals(firstOccupation, secondOccupation)
     }
