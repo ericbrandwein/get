@@ -6,6 +6,7 @@ import PositiveInt
 import TooBigToSubtractException
 
 interface Occupation {
+    val isEmpty: Boolean
     val country: Country
     val occupier: Player
     val armies: PositiveInt
@@ -19,6 +20,7 @@ class PlayerOccupation(
     override val country: Country, override val occupier: Player, armies: PositiveInt
 ) : Occupation {
 
+    override val isEmpty = false
     private var mutableArmies: PositiveInt = armies
     override val armies get() = mutableArmies
 
@@ -54,6 +56,7 @@ class PlayerOccupation(
 }
 
 class NoOccupation : Occupation {
+    override val isEmpty = true
     override val country: Country
         get() = TODO("Not yet implemented")
     override val occupier: Player
