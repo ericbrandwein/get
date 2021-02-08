@@ -43,15 +43,4 @@ class Attacker(
             throw EmptyCountryException(country)
         }
     }
-
-    companion object {
-        fun withDiceAmountCalculator(
-            countryOccupations: CountryOccupations,
-            diceAmountCalculator: DiceAmountCalculator
-        ): Attacker {
-            val diceRoller = CombatDiceRoller(diceAmountCalculator, RandomDie())
-            val combatResolver = DiceRollingCombatResolver(diceRoller)
-            return Attacker(countryOccupations, combatResolver)
-        }
-    }
 }
