@@ -55,20 +55,12 @@ class PlayerOccupation(
     }
 }
 
-class NoOccupation : Occupation {
+class NoOccupation(override val country: Country) : Occupation {
     override val isEmpty = true
-    override val country: Country
-        get() = TODO("Not yet implemented")
     override val occupier: Player
-        get() = TODO("Not yet implemented")
+        get() = throw EmptyCountryException(country)
     override val armies = 0
 
-    override fun addArmies(added: PositiveInt) {
-        TODO("Not yet implemented")
-    }
-
-    override fun removeArmies(removed: PositiveInt) {
-        TODO("Not yet implemented")
-    }
-
+    override fun addArmies(added: PositiveInt) = throw EmptyCountryException(country)
+    override fun removeArmies(removed: PositiveInt) = throw EmptyCountryException(country)
 }
