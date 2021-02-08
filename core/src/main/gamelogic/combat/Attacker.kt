@@ -19,7 +19,7 @@ class Attacker(
     private val occupations: CountryOccupations,
     private val combatResolver: CombatResolver
 ) {
-    fun attack(from: Country, to: Country) {
+    fun attack(from: Country, to: Country): CombatResults {
         assertCountryIsOccupied(from)
         assertCountryIsOccupied(to)
         val armiesOfAttacker = occupations.armiesOf(from)
@@ -29,6 +29,7 @@ class Attacker(
         )
         removeArmies(from, combatResults.armiesLostByAttacker)
         removeArmies(to, combatResults.armiesLostByDefender)
+        return combatResults
     }
 
     private fun removeArmies(country: Country, armies: Int) {
