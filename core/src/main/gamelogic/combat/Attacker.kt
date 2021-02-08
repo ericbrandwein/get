@@ -10,12 +10,10 @@ import gamelogic.occupations.CountryOccupations
 import gamelogic.occupations.EmptyCountryException
 
 /**
- * Creates [Attack] objects that can be applied to some [occupations].
+ * Preforms attacks between two countries.
  *
  * @param occupations In which to apply the attacks.
  * @param combatResolver The resolver of the attacks.
- *
- * @see Attack
  */
 class Attacker(
     private val occupations: CountryOccupations,
