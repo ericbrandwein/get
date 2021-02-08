@@ -35,7 +35,7 @@ class CountryOccupations(occupations: Collection<Occupation>) {
     }
 
     private fun removeOccupation(country: Country) {
-        assertCountryInOccupations(country)
+        assertCountryExists(country)
         occupations[country] = NoOccupation(country)
     }
 
@@ -43,7 +43,7 @@ class CountryOccupations(occupations: Collection<Occupation>) {
         occupations[country] = PlayerOccupation(country, player, armies)
     }
 
-    private fun assertCountryInOccupations(country: Country) {
+    fun assertCountryExists(country: Country) {
         if (country !in occupations) {
             throw NonExistentCountryException(country)
         }
