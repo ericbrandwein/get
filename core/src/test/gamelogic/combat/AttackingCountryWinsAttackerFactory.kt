@@ -4,7 +4,7 @@ import PositiveInt
 import gamelogic.combat.resolver.FixedCombatResolver
 import gamelogic.occupations.CountryOccupations
 
-class AttackerWinsAttackerFactory(
+class AttackingCountryWinsAttackerFactory(
     private val expectedAttackingArmies: PositiveInt,
     private val expectedDefendingArmies: PositiveInt
 ) : AttackerFactory {

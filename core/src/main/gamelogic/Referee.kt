@@ -3,9 +3,9 @@ package gamelogic
 import Country
 import Player
 import PositiveInt
-import gamelogic.combat.Attack
 import gamelogic.combat.AttackerFactory
 import gamelogic.combat.DiceRollingAttackerFactory
+import gamelogic.combat.Occupier
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
 import gamelogic.situations.classicCombat.ClassicCombatDiceAmountCalculator
@@ -81,7 +81,10 @@ class Referee(
     private var playerIterator = players.loopingIterator()
     private var state = State.AddArmies
     private var attackState = AttackState.Fight
-    private var currentAttack: Attack? = null
+    private val occupier = Occupier(occupations)
+    private var occupyingFrom: Country? = null
+    private var occupyingTo: Country? = null
+
 
     private val gameInfo
         get() = GameInfo(
@@ -129,20 +132,18 @@ class Referee(
         attacker.attack(from, to)
         if (occupations.isEmpty(to)) {
             attackState = AttackState.Occupation
+            occupyingFrom = from
+            occupyingTo = to
         }
-        //        if (attack.isConquering) {
-        //        } else {
-        //            attack.apply()
-        //        }
     }
 
     fun occupyConqueredCountry(armies: PositiveInt) {
         if (state != State.Attack || attackState != AttackState.Occupation) {
            throw Exception("Not the moment to occupy conquered country")
         }
-        //        currentAttack!!.apply(armies)
+
+        occupier.occupy(occupyingFrom!!, occupyingTo!!, armies)
         attackState = AttackState.Fight
-        currentAttack = null
     }
 
     fun endAttack() {
