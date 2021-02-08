@@ -9,7 +9,7 @@ interface Occupation {
     val isEmpty: Boolean
     val country: Country
     val occupier: Player
-    val armies: PositiveInt
+    val armies: Int
 
     fun addArmies(added: PositiveInt)
 
@@ -22,7 +22,7 @@ class PlayerOccupation(
 
     override val isEmpty = false
     private var mutableArmies: PositiveInt = armies
-    override val armies get() = mutableArmies
+    override val armies get() = mutableArmies.toInt()
 
     override fun addArmies(added: PositiveInt) {
         mutableArmies += added
@@ -61,8 +61,7 @@ class NoOccupation : Occupation {
         get() = TODO("Not yet implemented")
     override val occupier: Player
         get() = TODO("Not yet implemented")
-    override val armies: PositiveInt
-        get() = PositiveInt(0)
+    override val armies = 0
 
     override fun addArmies(added: PositiveInt) {
         TODO("Not yet implemented")

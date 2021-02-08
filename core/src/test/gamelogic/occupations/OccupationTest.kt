@@ -20,7 +20,7 @@ class OccupationTest {
 
         assertEquals(country, occupation.country)
         assertEquals(player, occupation.occupier)
-        assertEquals(armies, occupation.armies)
+        assertEquals(armies.toInt(), occupation.armies)
     }
 
     @Test
@@ -31,7 +31,7 @@ class OccupationTest {
         val added = PositiveInt(2)
         occupation.addArmies(added)
 
-        assertEquals(armies + added, occupation.armies)
+        assertEquals((armies + added).toInt(), occupation.armies)
     }
 
     @Test
@@ -42,7 +42,7 @@ class OccupationTest {
         val removed = PositiveInt(2)
         occupation.removeArmies(removed)
 
-        assertEquals(armies - removed, occupation.armies)
+        assertEquals((armies - removed).toInt(), occupation.armies)
     }
 
     @Test
