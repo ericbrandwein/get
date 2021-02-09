@@ -2,6 +2,7 @@ package gamelogic
 
 import PositiveInt
 import gamelogic.combat.AttackingCountryWinsAttackerFactory
+import gamelogic.combat.CannotAttackOwnCountryException
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
@@ -56,9 +57,21 @@ class RefereeTest {
         PlayerOccupation(jap, eric, PositiveInt(1))
     )
 
+    private val occupationsSampleLarge = listOf(
+        PlayerOccupation(arg, nico, PositiveInt(1)),
+        PlayerOccupation(kam, nico, PositiveInt(1)),
+        PlayerOccupation(chi, nico, PositiveInt(1)),
+        PlayerOccupation(bra, eric, PositiveInt(1)),
+        PlayerOccupation(jap, eric, PositiveInt(1)),
+        PlayerOccupation(vie, eric, PositiveInt(1))
+    )
+
     private val countryOccupations = CountryOccupations(occupationsSample)
+    private val countryOccupationsLarge = CountryOccupations(occupationsSampleLarge)
 
     private val sampleReferee = Referee(players, politicalMap, countryOccupations)
+    private val sampleRefereeLarge =
+        Referee(players, politicalMapLarge, countryOccupationsLarge)
 
 
     @Test
@@ -112,15 +125,6 @@ class RefereeTest {
     @Test
     fun `Regroup moves the armies and changes turn`() {
 
-        val occupationsSampleLarge = listOf(
-            PlayerOccupation(arg, nico, PositiveInt(1)),
-            PlayerOccupation(kam, nico, PositiveInt(1)),
-            PlayerOccupation(chi, nico, PositiveInt(1)),
-            PlayerOccupation(bra, eric, PositiveInt(1)),
-            PlayerOccupation(jap, eric, PositiveInt(1)),
-            PlayerOccupation(vie, eric, PositiveInt(1))
-        )
-
         val referee = Referee(
             players,
             politicalMapLarge,
@@ -130,22 +134,13 @@ class RefereeTest {
         referee.addArmies(reinforcements)
         referee.endAttack()
         referee.regroup(listOf(Regrouping(arg, chi, PositiveInt(2))))
-        assertEquals(referee.occupations.armiesOf(chi), PositiveInt(3).toInt())
+        assertEquals(referee.occupations.armiesOf(chi), 3)
         assertEquals(referee.currentState, Referee.State.AddArmies)
         assertEquals(referee.currentPlayer, eric)
     }
 
     @Test
     fun `Attacking removes correct amount of armies only from the combating countries`() {
-
-        val occupationsSampleLarge = listOf(
-            PlayerOccupation(arg, nico, PositiveInt(1)),
-            PlayerOccupation(kam, nico, PositiveInt(1)),
-            PlayerOccupation(chi, nico, PositiveInt(1)),
-            PlayerOccupation(bra, eric, PositiveInt(1)),
-            PlayerOccupation(jap, eric, PositiveInt(1)),
-            PlayerOccupation(vie, eric, PositiveInt(1))
-        )
 
         val attackerFactory =
             AttackingCountryWinsAttackerFactory(PositiveInt(4), PositiveInt(1))
@@ -195,6 +190,7 @@ class RefereeTest {
 
         referee.addArmies(listOf(CountryReinforcement(arg, PositiveInt(3))))
         referee.makeAttack(arg, bra)
+
         referee.occupyConqueredCountry(PositiveInt(3))
 
         assertFalse(referee.occupations.isEmpty(bra))
@@ -205,4 +201,47 @@ class RefereeTest {
         assertEquals(1, referee.occupations.armiesOf(arg))
     }
 
+    @Test
+    fun `Cannot attack when not in attacking state`() {
+        sampleReferee.addArmies(listOf(CountryReinforcement(arg, PositiveInt(2))))
+        sampleReferee.endAttack()
+        assertFails {
+            sampleReferee.makeAttack(arg, bra)
+        }
+    }
+
+    @Test
+    fun `Cannot attack when occupying a country`() {
+        val attackerFactory =
+            AttackingCountryWinsAttackerFactory(PositiveInt(4), PositiveInt(1))
+        val referee = Referee(players, politicalMap, countryOccupations, attackerFactory)
+
+        referee.addArmies(
+            listOf(
+                CountryReinforcement(arg, PositiveInt(3)),
+                CountryReinforcement(kam, PositiveInt(2))
+            ))
+        referee.makeAttack(arg, bra)
+
+        assertFails {
+            referee.makeAttack(kam, jap)
+        }
+
+        assertEquals(4, referee.occupations.armiesOf(arg))
+        assertEquals(3, referee.occupations.armiesOf(kam))
+        assertEquals(0, referee.occupations.armiesOf(bra))
+        assertEquals(1, referee.occupations.armiesOf(jap))
+    }
+
+    @Test
+    fun `Cannot attack if current player doesn't occupy attacking country`() {
+        sampleReferee.addArmies(listOf(CountryReinforcement(arg, PositiveInt(2))))
+        sampleReferee.endAttack()
+        sampleReferee.regroup(emptyList())
+        sampleReferee.addArmies(emptyList())
+
+        assertFails {
+            sampleReferee.makeAttack(arg, bra)
+        }
+    }
 }
