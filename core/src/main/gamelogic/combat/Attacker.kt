@@ -22,6 +22,7 @@ class Attacker(
     fun attack(from: Country, to: Country): CombatResults {
         assertCountryIsOccupied(from)
         assertCountryIsOccupied(to)
+        assertDifferentOccupiers(from, to)
         val armiesOfAttacker = occupations.armiesOf(from)
         val armiesOfDefender = occupations.armiesOf(to)
         val combatResults = combatResolver.combat(
@@ -32,15 +33,25 @@ class Attacker(
         return combatResults
     }
 
-    private fun removeArmies(country: Country, armies: Int) {
-        if (armies > 0) {
-            occupations.removeArmies(country, PositiveInt(armies))
-        }
-    }
-
     private fun assertCountryIsOccupied(country: Country) {
         if (occupations.isEmpty(country)) {
             throw EmptyCountryException(country)
         }
     }
+
+    private fun assertDifferentOccupiers(from: Country, to: Country) {
+        if (occupations.occupierOf(from) == occupations.occupierOf(to)) {
+            throw CannotAttackOwnCountryException(from, to)
+        }
+    }
+
+    private fun removeArmies(country: Country, armies: Int) {
+        if (armies > 0) {
+            occupations.removeArmies(country, PositiveInt(armies))
+        }
+    }
 }
+
+class CannotAttackOwnCountryException(val from: Country, val to: Country) :
+    Exception("Cannot attack country $to from $from; " +
+        "the occupier of both countries is the same.")

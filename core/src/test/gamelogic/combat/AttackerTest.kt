@@ -1,6 +1,7 @@
 package gamelogic.combat
 
 import Country
+import gamelogic.CountryReinforcement
 import gamelogic.combat.resolver.FixedCombatResolver
 import gamelogic.map.NonExistentCountryException
 import gamelogic.occupations.CountryOccupations
@@ -130,6 +131,26 @@ class AttackerTest {
         val combatResults = tester.performAttack()
 
         assertEquals(tester.combatResults, combatResults)
+    }
+
+    @Test
+    fun `Cannot attack a country you own`() {
+        val countries = listOf("Argentina", "Brasil")
+        val occupations = countries.map { country ->
+            PlayerOccupation(country, "Eric", Pos(2))
+        }
+        val countryOccupations = CountryOccupations(occupations)
+        val combatResolver = FixedCombatResolver.createEmpty()
+        val attacker = Attacker(countryOccupations, combatResolver)
+
+        val exception = assertFailsWith<CannotAttackOwnCountryException> {
+            attacker.attack(countries[0], countries[1])
+        }
+
+        assertEquals(countries[0], exception.from)
+        assertEquals(countries[1], exception.to)
+        assertEquals(2, countryOccupations.armiesOf(countries[0]))
+        assertEquals(2, countryOccupations.armiesOf(countries[1]))
     }
 }
 
