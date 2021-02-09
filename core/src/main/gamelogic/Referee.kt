@@ -125,7 +125,7 @@ class Referee(
         if (occupations.occupierOf(from) != currentPlayer) {
             throw Exception("Player $currentPlayer does not occupy $from")
         }
-
+        CountriesAreNotBorderingException(from, to).assertAreBorderingIn(politicalMap)
         val attacker = attackerFactory.create(
             occupations, ClassicCombatDiceAmountCalculator()
         )
@@ -169,5 +169,15 @@ class Referee(
         validateRegroupings(regroupings)
         regroupings.map { it.apply(occupations) }
         toNextState()
+    }
+}
+
+class CountriesAreNotBorderingException(val from: Country, val to: Country) :
+    Exception("Countries $from and $to are not bordering.")
+{
+    fun assertAreBorderingIn(politicalMap: PoliticalMap) {
+        if (!politicalMap.areBordering(from, to)) {
+            throw this
+        }
     }
 }

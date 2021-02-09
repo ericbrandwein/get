@@ -244,4 +244,18 @@ class RefereeTest {
             sampleReferee.makeAttack(arg, bra)
         }
     }
+
+    @Test
+    fun `Cannot attack if the countries are not bordering`() {
+        sampleReferee.addArmies(listOf(CountryReinforcement(arg, PositiveInt(2))))
+
+        val exception = assertFailsWith<CountriesAreNotBorderingException> {
+            sampleReferee.makeAttack(arg, jap)
+        }
+
+        assertEquals(arg, exception.from)
+        assertEquals(jap, exception.to)
+        assertEquals(3, sampleReferee.occupations.armiesOf(arg))
+        assertEquals(1, sampleReferee.occupations.armiesOf(jap))
+    }
 }
