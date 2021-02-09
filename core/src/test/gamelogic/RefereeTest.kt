@@ -258,4 +258,19 @@ class RefereeTest {
         assertEquals(3, sampleReferee.occupations.armiesOf(arg))
         assertEquals(1, sampleReferee.occupations.armiesOf(jap))
     }
+
+    @Test
+    fun `Cannot regroup if the countries are not bordering`() {
+        sampleReferee.addArmies(listOf(CountryReinforcement(arg, PositiveInt(2))))
+        sampleReferee.endAttack()
+
+        val exception = assertFailsWith<CountriesAreNotBorderingException> {
+            sampleReferee.regroup(listOf(Regrouping(arg, kam, PositiveInt(2))))
+        }
+
+        assertEquals(arg, exception.from)
+        assertEquals(kam, exception.to)
+        assertEquals(3, sampleReferee.occupations.armiesOf(arg))
+        assertEquals(1, sampleReferee.occupations.armiesOf(kam))
+    }
 }
