@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.viewport.Viewport
+import gamelogic.occupations.CountryOccupations
 import screens.running.countryImage.CountryImage
 import screens.running.countryImage.findCountryRectangles
 
@@ -21,12 +22,22 @@ class WorldmapStage(
     viewport: Viewport,
     assetManager: AssetManager,
     worldmapTexture: Texture,
-    countryColors: CountryColors
+    countryColors: CountryColors,
+    private val occupations: CountryOccupations
 ) : Stage(viewport) {
     private val countryLabel = Label("", Label.LabelStyle(BitmapFont(), Color.WHITE))
     private var currentCountry: String? = null
         set(value) {
-            countryLabel.setText(value ?: "")
+            if (value != null) {
+                countryLabel.setText("""
+                    $value
+                    Occupied by ${
+                        occupations.occupierOf(value)
+                    } with ${occupations.armiesOf(value)} armies.                    
+                """.trimIndent())
+            } else {
+                countryLabel.setText("")
+            }
             field = value
         }
     var countrySelectionListener: CountrySelectionListener = NoCountrySelectionListener()
@@ -101,7 +112,7 @@ class WorldmapStage(
 
     private fun setupCountryLabel() {
         countryLabel.setFontScale(4F)
-        countryLabel.setPosition(8F, 20F)
+        countryLabel.setPosition(8F, 70F)
         addActor(countryLabel)
     }
 

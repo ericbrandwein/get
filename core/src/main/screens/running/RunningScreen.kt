@@ -5,7 +5,6 @@ import Kamchatka
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import gamelogic.Referee
@@ -28,7 +27,8 @@ class RunningScreen(
             worldmapTexture.height.toFloat(),
             game.camera
         )
-        stage = WorldmapStage(viewport, assetManager, worldmapTexture, countryColors)
+        stage = WorldmapStage(
+            viewport, assetManager, worldmapTexture, countryColors, referee.occupations)
         stage.countrySelectionListener = this
         inputProcessor = stage
     }
