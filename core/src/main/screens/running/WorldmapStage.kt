@@ -72,6 +72,10 @@ class WorldmapStage(
         val image = CountryImage.fromPixmapRectangle(
             countryColorsPixmap, rectangle, countryColor)
         image.addListener(object : InputListener() {
+            override fun touchDown(
+                event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int
+            ) = true
+
             override fun touchUp(
                 event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int
             ) = countrySelectionListener.onCountrySelected(country)
@@ -85,8 +89,10 @@ class WorldmapStage(
             override fun exit(
                 event: InputEvent?, x: Float, y: Float, pointer: Int, toActor: Actor?
             ) {
-                image.removeHighlight()
-                currentCountry = null
+                if (image.hit(x, y, false) == null) {
+                    image.removeHighlight()
+                    currentCountry = null
+                }
                 super.exit(event, x, y, pointer, toActor)
             }
         })
