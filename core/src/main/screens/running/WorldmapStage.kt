@@ -29,6 +29,7 @@ class WorldmapStage(
             countryLabel.setText(value ?: "")
             field = value
         }
+    var countrySelectionListener: CountrySelectionListener = NoCountrySelectionListener()
 
     init {
         setupWorldmapImage(worldmapTexture)
@@ -71,6 +72,10 @@ class WorldmapStage(
         val image = CountryImage.fromPixmapRectangle(
             countryColorsPixmap, rectangle, countryColor)
         image.addListener(object : InputListener() {
+            override fun touchUp(
+                event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int
+            ) = countrySelectionListener.onCountrySelected(country)
+
             override fun mouseMoved(event: InputEvent?, x: Float, y: Float): Boolean {
                 image.highlight()
                 currentCountry = country
