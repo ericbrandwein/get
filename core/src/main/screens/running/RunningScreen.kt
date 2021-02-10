@@ -7,25 +7,27 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
+import gamelogic.Referee
 import screens.KamchatkaScreen
 
-private const val MAP_FILE_NAME = "mapa.png"
-
-class RunningScreen(game: Kamchatka) : KamchatkaScreen(game) {
+class RunningScreen(
+    game: Kamchatka, referee: Referee, countryColors: CountryColors
+) : KamchatkaScreen(game) {
     private val assetManager = AssetManager()
     override val viewport: Viewport
     private val stage: Stage
     override val inputProcessor: InputProcessor
 
     init {
-        assetManager.load(MAP_FILE_NAME, Texture::class.java)
-        val worldmapTexture = assetManager.finishLoadingAsset<Texture>(MAP_FILE_NAME)
+        assetManager.load(MAP_IMAGE_FILE_NAME, Texture::class.java)
+        val worldmapTexture =
+            assetManager.finishLoadingAsset<Texture>(MAP_IMAGE_FILE_NAME)
         viewport = FitViewport(
             worldmapTexture.width.toFloat(),
             worldmapTexture.height.toFloat(),
             game.camera
         )
-        stage = WorldmapStage(assetManager, worldmapTexture, viewport)
+        stage = WorldmapStage(viewport, assetManager, worldmapTexture, countryColors)
         inputProcessor = stage
     }
 
@@ -39,6 +41,11 @@ class RunningScreen(game: Kamchatka) : KamchatkaScreen(game) {
     override fun dispose() {
         super.dispose()
         assetManager.dispose()
+    }
+
+
+    companion object {
+        private const val MAP_IMAGE_FILE_NAME = "mapa.png"
     }
 }
 

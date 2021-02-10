@@ -18,7 +18,10 @@ import screens.running.countryImage.CountryImage
 import screens.running.countryImage.findCountryRectangles
 
 class WorldmapStage(
-    assetManager: AssetManager, worldmapTexture: Texture, viewport: Viewport
+    viewport: Viewport,
+    assetManager: AssetManager,
+    worldmapTexture: Texture,
+    countryColors: CountryColors
 ) : Stage(viewport) {
     private val countryLabel = Label("", Label.LabelStyle(BitmapFont(), Color.WHITE))
     private var currentCountry: String? = null
@@ -28,7 +31,6 @@ class WorldmapStage(
         }
 
     init {
-        val (countryColors, politicalMap) = parseMapInfoFromJsonFile(MAP_INFO_JSON_FILE)
         setupWorldmapImage(worldmapTexture)
         setupCountryImages(assetManager, countryColors)
         setupCountryLabel()
@@ -93,7 +95,6 @@ class WorldmapStage(
     }
 
     companion object {
-        private const val MAP_INFO_JSON_FILE = "mapa.json"
         private const val COUNTRY_COLORS_FILE = "colores-paises.png"
     }
 }
