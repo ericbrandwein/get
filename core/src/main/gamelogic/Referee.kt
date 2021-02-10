@@ -8,6 +8,8 @@ import gamelogic.combat.DiceRollingAttackerFactory
 import gamelogic.combat.Occupier
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
+import gamelogic.occupations.dealers.OccupationsDealer
+import gamelogic.occupations.dealers.RandomOccupationsDealer
 import gamelogic.situations.classicCombat.ClassicCombatDiceAmountCalculator
 
 class CountryReinforcement(val country:Country, val armies: PositiveInt) {
@@ -54,7 +56,8 @@ class Regrouping(val from: Country, val to: Country, val armies: PositiveInt) {
 class Referee(
     private val players: MutableList<PlayerInfo>,
     private val politicalMap: PoliticalMap,
-    val occupations: CountryOccupations,
+    occupationsDealer: OccupationsDealer =
+        RandomOccupationsDealer(politicalMap.countries.toList()),
     private val attackerFactory: AttackerFactory = DiceRollingAttackerFactory()
 ) {
     enum class State {
@@ -76,6 +79,8 @@ class Referee(
 
     enum class AttackState { Fight, Occupation }
 
+    val occupations =
+        CountryOccupations(occupationsDealer.dealTo(players.map { it.name }))
     private var playerIterator = players.loopingIterator()
     private var state = State.AddArmies
     private var attackState = AttackState.Fight
