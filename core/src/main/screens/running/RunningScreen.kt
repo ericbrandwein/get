@@ -9,18 +9,17 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import screens.KamchatkaScreen
 
+private const val MAP_FILE_NAME = "mapa.png"
 
 class RunningScreen(game: Kamchatka) : KamchatkaScreen(game) {
     private val assetManager = AssetManager()
-    private val worldmapTexture: Texture
     override val viewport: Viewport
     private val stage: Stage
     override val inputProcessor: InputProcessor
 
     init {
-        val mapFileName = "mapa.png"
-        assetManager.load(mapFileName, Texture::class.java)
-        worldmapTexture = assetManager.finishLoadingAsset<Texture>(mapFileName)
+        assetManager.load(MAP_FILE_NAME, Texture::class.java)
+        val worldmapTexture = assetManager.finishLoadingAsset<Texture>(MAP_FILE_NAME)
         viewport = FitViewport(
             worldmapTexture.width.toFloat(),
             worldmapTexture.height.toFloat(),
