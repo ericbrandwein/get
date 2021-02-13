@@ -3,26 +3,12 @@ package gamelogic
 import Country
 import Player
 import PositiveInt
-import gamelogic.combat.Attacker
-import gamelogic.combat.Conqueror
-import gamelogic.combat.resolver.CombatDiceRoller
-import gamelogic.combat.resolver.DiceRollingCombatResolver
-import gamelogic.dice.RandomDie
+import gamelogic.combat.AttackerFactory
+import gamelogic.combat.DiceRollingAttackerFactory
+import gamelogic.combat.Occupier
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
 import gamelogic.situations.classicCombat.ClassicCombatDiceAmountCalculator
-
-
-//TODO: En lugar de crear esta clase lo que hay que hacer es sacar del ataquer la
-//      responsabilidad de mover las fichas después de atacar. Peeero, no solo hay
-//      que hacer refactor del package combat, sino también de los tests!!! Asi que
-//      queda para otro backlog item.
-class SkipRegroup : Conqueror {
-    override fun armiesToMove(remainingAttackingArmies: PositiveInt): PositiveInt {
-        return PositiveInt(1)
-    }
-
-}
 
 class CountryReinforcement(val country:Country, val armies: PositiveInt) {
     fun apply(player: Player, occupations: CountryOccupations) {
@@ -40,14 +26,12 @@ class CountryReinforcement(val country:Country, val armies: PositiveInt) {
  */
 class Regrouping(val from: Country, val to: Country, val armies: PositiveInt) {
     fun validate(gameInfo: GameInfo) {
-        if (gameInfo.occupations.armiesOf(from) <= armies) {
+        if (gameInfo.occupations.armiesOf(from) <= armies.toInt()) {
             throw Exception(
                 "Cannot move ${armies.toInt()} armies if they are not available in country")
         }
-        if (!gameInfo.politicalMap.areBordering(from, to)) {
-            throw Exception(
-                "countries must be bordering to regroup but $from and $to are not")
-        }
+        CountriesAreNotBorderingException(from, to)
+            .assertAreBorderingIn(gameInfo.politicalMap)
     }
 
     fun apply(occupations: CountryOccupations) {
@@ -70,7 +54,8 @@ class Regrouping(val from: Country, val to: Country, val armies: PositiveInt) {
 class Referee(
     private val players: MutableList<PlayerInfo>,
     private val politicalMap: PoliticalMap,
-    val occupations: CountryOccupations
+    val occupations: CountryOccupations,
+    private val attackerFactory: AttackerFactory = DiceRollingAttackerFactory()
 ) {
     enum class State {
         AddArmies {
@@ -94,8 +79,10 @@ class Referee(
     private var playerIterator = players.loopingIterator()
     private var state = State.AddArmies
     private var attackState = AttackState.Fight
-    private var occupiedCountry: Country? = null
-    private var attackerCountry: Country? = null
+    private val occupier = Occupier(occupations)
+    private var occupyingFrom: Country? = null
+    private var occupyingTo: Country? = null
+
 
     private val gameInfo
         get() = GameInfo(
@@ -128,43 +115,39 @@ class Referee(
     }
 
     fun makeAttack(from:Country, to:Country) {
-        if (state != State.Attack) { throw Exception("Cannot attack when not in attacking state") }
-        else if (attackState != AttackState.Fight) { throw Exception("Cannot attack if not fighting") }
-        attackerCountry = from
-
-        if (occupations.occupierOf(from) != currentPlayer){
-            throw Exception("Player ${currentPlayer} does not occupy ${from}")
+        if (state != State.Attack) {
+            throw Exception("Cannot attack when not in attacking state")
+        } else if (attackState != AttackState.Fight) {
+            throw Exception("Cannot attack if not fighting")
         }
-        val combatResolver = DiceRollingCombatResolver(CombatDiceRoller(ClassicCombatDiceAmountCalculator(), RandomDie()))
-        val attacker = Attacker(occupations, combatResolver)
-        attacker.attack(from, to, SkipRegroup())
-        if (occupations.occupierOf(to) == currentPlayer) {
+        if (occupations.occupierOf(from) != currentPlayer) {
+            throw Exception("Player $currentPlayer does not occupy $from")
+        }
+        CountriesAreNotBorderingException(from, to).assertAreBorderingIn(politicalMap)
+        val attacker = attackerFactory.create(
+            occupations, ClassicCombatDiceAmountCalculator()
+        )
+        attacker.attack(from, to)
+        if (occupations.isEmpty(to)) {
             attackState = AttackState.Occupation
-            occupiedCountry = to
+            occupyingFrom = from
+            occupyingTo = to
         }
     }
+
     fun occupyConqueredCountry(armies: PositiveInt) {
         if (state != State.Attack || attackState != AttackState.Occupation) {
            throw Exception("Not the moment to occupy conquered country")
         }
-        if (attackerCountry == null || occupiedCountry == null) {
-           throw Exception("Mmm, no country from|to occupy...")
-        }
-        if (occupations.armiesOf(attackerCountry!!) <= armies) {
-            throw Exception("Not enough countries to occupy the conquered one")
-        }
-        if (armies > PositiveInt(1)) {
-            val armiesToMove = armies - PositiveInt(1)
-            occupations.addArmies(occupiedCountry!!, armiesToMove)
-            occupations.removeArmies(attackerCountry!!, armiesToMove)
-        }
+
+        occupier.occupy(occupyingFrom!!, occupyingTo!!, armies)
         attackState = AttackState.Fight
-        occupiedCountry = null
-        attackerCountry = null
     }
 
     fun endAttack() {
-        if (state != State.Attack) { throw Exception("Cannot end attack if not attaking")}
+        if (state != State.Attack) {
+            throw Exception("Cannot end attack if not attacking")
+        }
         toNextState()
     }
 
@@ -184,5 +167,15 @@ class Referee(
         validateRegroupings(regroupings)
         regroupings.map { it.apply(occupations) }
         toNextState()
+    }
+}
+
+class CountriesAreNotBorderingException(val from: Country, val to: Country) :
+    Exception("Countries $from and $to are not bordering.")
+{
+    fun assertAreBorderingIn(politicalMap: PoliticalMap) {
+        if (!politicalMap.areBordering(from, to)) {
+            throw this
+        }
     }
 }

@@ -9,18 +9,18 @@ import kotlin.test.assertNotEquals
 class OccupationTest {
 
     private fun occupationWithArmies(armies: PositiveInt) =
-        Occupation("Argentina", "Eric", armies)
+        PlayerOccupation("Argentina", "Eric", armies)
 
     @Test
     fun `Creating an occupation set the required members`() {
         val country = "Argentina"
         val player = "Juan"
         val armies = PositiveInt(1)
-        val occupation = Occupation(country, player, armies)
+        val occupation = PlayerOccupation(country, player, armies)
 
         assertEquals(country, occupation.country)
         assertEquals(player, occupation.occupier)
-        assertEquals(armies, occupation.armies)
+        assertEquals(armies.toInt(), occupation.armies)
     }
 
     @Test
@@ -31,7 +31,7 @@ class OccupationTest {
         val added = PositiveInt(2)
         occupation.addArmies(added)
 
-        assertEquals(armies + added, occupation.armies)
+        assertEquals((armies + added).toInt(), occupation.armies)
     }
 
     @Test
@@ -42,7 +42,7 @@ class OccupationTest {
         val removed = PositiveInt(2)
         occupation.removeArmies(removed)
 
-        assertEquals(armies - removed, occupation.armies)
+        assertEquals((armies - removed).toInt(), occupation.armies)
     }
 
     @Test
@@ -76,24 +76,24 @@ class OccupationTest {
 
     @Test
     fun `Occupation does not equal another Occupation with different country`() {
-        val firstOccupation = Occupation("Argentina", "Eric", PositiveInt(1))
-        val secondOccupation = Occupation("Uruguay", "Eric", PositiveInt(1))
+        val firstOccupation = PlayerOccupation("Argentina", "Eric", PositiveInt(1))
+        val secondOccupation = PlayerOccupation("Uruguay", "Eric", PositiveInt(1))
 
         assertNotEquals(firstOccupation, secondOccupation)
     }
 
     @Test
     fun `Occupation does not equal another Occupation with different occupier`() {
-        val firstOccupation = Occupation("Argentina", "Eric", PositiveInt(1))
-        val secondOccupation = Occupation("Argentina", "Nico", PositiveInt(1))
+        val firstOccupation = PlayerOccupation("Argentina", "Eric", PositiveInt(1))
+        val secondOccupation = PlayerOccupation("Argentina", "Nico", PositiveInt(1))
 
         assertNotEquals(firstOccupation, secondOccupation)
     }
 
     @Test
     fun `Occupation does not equal another Occupation with different armies`() {
-        val firstOccupation = Occupation("Argentina", "Eric", PositiveInt(1))
-        val secondOccupation = Occupation("Argentina", "Eric", PositiveInt(2))
+        val firstOccupation = PlayerOccupation("Argentina", "Eric", PositiveInt(1))
+        val secondOccupation = PlayerOccupation("Argentina", "Eric", PositiveInt(2))
 
         assertNotEquals(firstOccupation, secondOccupation)
     }

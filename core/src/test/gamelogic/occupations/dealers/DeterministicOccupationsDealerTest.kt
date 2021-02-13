@@ -2,8 +2,9 @@ package gamelogic.occupations.dealers
 
 import Country
 import Player
-import gamelogic.occupations.Occupation
 import PositiveInt
+import gamelogic.occupations.Occupation
+import gamelogic.occupations.PlayerOccupation
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -16,7 +17,7 @@ class DeterministicOccupationsDealerTest {
     private fun buildOccupationsFrom(
         countriesByPlayer: Map<Player, List<Country>>): List<Occupation> {
         return countriesByPlayer.flatMap { (player, countries) ->
-            countries.map { country -> Occupation(country, player, PositiveInt(1)) }
+            countries.map { country -> PlayerOccupation(country, player, PositiveInt(1)) }
         }
     }
 

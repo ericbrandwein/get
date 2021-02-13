@@ -3,6 +3,7 @@ package gamelogic.occupations.dealers
 import Country
 import Player
 import gamelogic.occupations.Occupation
+import gamelogic.occupations.PlayerOccupation
 
 class DeterministicOccupationsDealer(countries: List<Country>) : OccupationsDealer(countries) {
 
@@ -41,5 +42,5 @@ class DeterministicOccupationsDealer(countries: List<Country>) : OccupationsDeal
         countries.map { country -> getStartingOccupation(country, player) }
 
     private fun getStartingOccupation(country: Country, player: Player) =
-        Occupation(country, player, STARTING_OCCUPATION_ARMIES)
+        PlayerOccupation(country, player, STARTING_OCCUPATION_ARMIES)
 }

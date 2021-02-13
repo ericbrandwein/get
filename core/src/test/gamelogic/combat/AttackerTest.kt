@@ -1,23 +1,24 @@
 package gamelogic.combat
 
 import Country
+import gamelogic.CountryReinforcement
 import gamelogic.combat.resolver.FixedCombatResolver
 import gamelogic.map.NonExistentCountryException
 import gamelogic.occupations.CountryOccupations
-import gamelogic.occupations.Occupation
-import gamelogic.occupations.TooManyArmiesRemovedException
+import gamelogic.occupations.EmptyCountryException
+import gamelogic.occupations.NoOccupation
+import gamelogic.occupations.PlayerOccupation
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import PositiveInt as Pos
 
 class AttackerTest {
-
     @Test
     fun `Attacking removes one army from the attacker's occupation when the resolver says so`() {
         val attackTester = AttackTester(1, 0)
 
-        attackTester.attack()
+        attackTester.performAttack()
 
         attackTester.assertRightAmountOfArmiesWasRemoved()
     }
@@ -26,7 +27,7 @@ class AttackerTest {
     fun `Attacking removes many armies from the attacker's occupation when the resolver says so`() {
         val attackTester = AttackTester(3, 0)
 
-        attackTester.attack()
+        attackTester.performAttack()
 
         attackTester.assertRightAmountOfArmiesWasRemoved()
     }
@@ -35,7 +36,7 @@ class AttackerTest {
     fun `Attacking removes one army from the defender's occupation when the resolver says so`() {
         val attackTester = AttackTester(0, 1)
 
-        attackTester.attack()
+        attackTester.performAttack()
 
         attackTester.assertRightAmountOfArmiesWasRemoved()
     }
@@ -44,7 +45,7 @@ class AttackerTest {
     fun `Attacking removes many armies from the defender's occupation when the resolver says so`() {
         val attackTester = AttackTester(0, 2)
 
-        attackTester.attack()
+        attackTester.performAttack()
 
         attackTester.assertRightAmountOfArmiesWasRemoved()
     }
@@ -55,81 +56,101 @@ class AttackerTest {
 
         val nonExistentCountry = "I don't exist"
         val exception = assertFailsWith<NonExistentCountryException> {
-            attackTester.attack(attackingCountry = nonExistentCountry)
+            attackTester.performAttack(attackingCountry = nonExistentCountry)
         }
         assertEquals(nonExistentCountry, exception.country)
     }
 
     @Test
-    fun `Can't attack to a non-existent country`() {
+    fun `Can't attack a non-existent country`() {
         val attackTester = AttackTester(0, 2)
 
         val nonExistentCountry = "I don't exist"
         val exception = assertFailsWith<NonExistentCountryException> {
-            attackTester.attack(defendingCountry = nonExistentCountry)
+            attackTester.performAttack(defendingCountry = nonExistentCountry)
         }
         assertEquals(nonExistentCountry, exception.country)
     }
 
     @Test
-    fun `Removing all armies of the defender asks the conqueror for the amount of armies to move`() {
-        val attackTester = AttackTester(0, AttackTester.INITIAL_DEFENDER_ARMIES.toInt())
+    fun `Performing an attack that removes all armies of the defender leaves the defender with zero armies`() {
+        val defenderLostArmies = AttackTester.INITIAL_DEFENDER_ARMIES.toInt()
+        val attackTester = AttackTester(0, defenderLostArmies)
 
-        attackTester.attack(conqueror = object : Conqueror {
-            override fun armiesToMove(remainingAttackingArmies: Pos) =
-                remainingAttackingArmies - Pos(2)
-        })
-
-        attackTester.assertDefendingCountryOccupiedByAttackerWith(
-            AttackTester.INITIAL_ATTACKER_ARMIES - Pos(2))
+        attackTester.performAttack()
+        attackTester.assertRightAmountOfArmiesWasRemoved()
     }
 
     @Test
-    fun `Occupying a country removes lost armies for the attacker as well as the occupying army`() {
-        val attackTester = AttackTester(2, AttackTester.INITIAL_DEFENDER_ARMIES.toInt())
+    fun `Can't attack from a non occupied country`() {
+        val nonOccupiedCountry = "Argentina"
+        val occupiedCountry = "Brasil"
+        val occupations = listOf(
+            NoOccupation(nonOccupiedCountry),
+            PlayerOccupation(occupiedCountry, "Nico", Pos(2))
+        )
+        val countryOccupations = CountryOccupations(occupations)
+        val combatResolver = FixedCombatResolver.createEmpty()
+        val attacker = Attacker(countryOccupations, combatResolver)
 
-        attackTester.attack(conqueror = SingleArmyConqueror())
-
-        attackTester.assertDefendingCountryOccupiedByAttackerWith(Pos(1))
-    }
-
-    @Test
-    fun `The conqueror can't move more armies than the remaining ones minus one`() {
-        val attackTester = AttackTester(2, AttackTester.INITIAL_DEFENDER_ARMIES.toInt())
-
-        val exception = assertFailsWith<TooManyArmiesRemovedException> {
-            attackTester.attack(conqueror = object : Conqueror {
-                override fun armiesToMove(remainingAttackingArmies: Pos) =
-                    remainingAttackingArmies
-            })
+        val exception = assertFailsWith<EmptyCountryException> {
+            attacker.attack(nonOccupiedCountry, occupiedCountry)
         }
 
-        assertEquals(AttackTester.INITIAL_ATTACKER_ARMIES - Pos(2), exception.armies)
+        assertEquals(nonOccupiedCountry, exception.country)
+        assertEquals(0, countryOccupations.armiesOf(nonOccupiedCountry))
+        assertEquals(2, countryOccupations.armiesOf(occupiedCountry))
+
     }
 
     @Test
-    fun `The conqueror can't move more than 3 armies`() {
-        val attackTester = AttackTester(0, AttackTester.INITIAL_DEFENDER_ARMIES.toInt())
+    fun `Can't attack to a non occupied country`() {
+        val nonOccupiedCountry = "Argentina"
+        val occupiedCountry = "Brasil"
+        val occupations = listOf(
+            NoOccupation(nonOccupiedCountry),
+            PlayerOccupation(occupiedCountry, "Nico", Pos(2))
+        )
+        val countryOccupations = CountryOccupations(occupations)
+        val combatResolver = FixedCombatResolver.createEmpty()
+        val attacker = Attacker(countryOccupations, combatResolver)
 
-        val armiesMoved = Pos(4)
-        val exception = assertFailsWith<TooManyArmiesMovedException> {
-            attackTester.attack(conqueror = object : Conqueror {
-                override fun armiesToMove(remainingAttackingArmies: Pos) = armiesMoved
-            })
+        val exception = assertFailsWith<EmptyCountryException> {
+            attacker.attack(occupiedCountry, nonOccupiedCountry)
         }
 
-        assertEquals(armiesMoved, exception.armies)
+        assertEquals(nonOccupiedCountry, exception.country)
+        assertEquals(0, countryOccupations.armiesOf(nonOccupiedCountry))
+        assertEquals(2, countryOccupations.armiesOf(occupiedCountry))
     }
 
     @Test
-    fun `Attacking returns the results of combat`() {
-        val attackerLostArmies = 0
-        val defenderLostArmies = 2
-        val attackTester = AttackTester(attackerLostArmies, defenderLostArmies)
+    fun `Attacking returns the combat results`() {
+        val tester = AttackTester(1, 0)
 
-        val results = attackTester.attack()
+        val combatResults = tester.performAttack()
 
-        assertEquals(attackTester.combatResults, results)
+        assertEquals(tester.combatResults, combatResults)
+    }
+
+    @Test
+    fun `Cannot attack a country you own`() {
+        val countries = listOf("Argentina", "Brasil")
+        val occupations = countries.map { country ->
+            PlayerOccupation(country, "Eric", Pos(2))
+        }
+        val countryOccupations = CountryOccupations(occupations)
+        val combatResolver = FixedCombatResolver.createEmpty()
+        val attacker = Attacker(countryOccupations, combatResolver)
+
+        val exception = assertFailsWith<CannotAttackOwnCountryException> {
+            attacker.attack(countries[0], countries[1])
+        }
+
+        assertEquals(countries[0], exception.from)
+        assertEquals(countries[1], exception.to)
+        assertEquals(2, countryOccupations.armiesOf(countries[0]))
+        assertEquals(2, countryOccupations.armiesOf(countries[1]))
     }
 }
 
@@ -156,36 +177,26 @@ class AttackTester(attackerLostArmies: Int, defenderLostArmies: Int) {
     }
 
     private fun createAttackingOccupation() =
-        Occupation(ATTACKING_COUNTRY, ATTACKING_PLAYER, INITIAL_ATTACKER_ARMIES)
+        PlayerOccupation(ATTACKING_COUNTRY, ATTACKING_PLAYER, INITIAL_ATTACKER_ARMIES)
 
     private fun createDefendingOccupation() =
-        Occupation(DEFENDING_COUNTRY, DEFENDING_PLAYER, INITIAL_DEFENDER_ARMIES)
+        PlayerOccupation(DEFENDING_COUNTRY, DEFENDING_PLAYER, INITIAL_DEFENDER_ARMIES)
 
     private fun combatResultsWithLostArmies(lostArmies: Pair<Int, Int>) =
         CombatResults(lostArmies, Pair(listOf(1, 3, 4), listOf(2, 6)))
 
-    fun attack(
+    fun performAttack(
         attackingCountry: Country = ATTACKING_COUNTRY,
-        defendingCountry: Country = DEFENDING_COUNTRY,
-        conqueror: Conqueror = SingleArmyConqueror()
-    ): CombatResults = attacker.attack(attackingCountry, defendingCountry, conqueror)
+        defendingCountry: Country = DEFENDING_COUNTRY
+    ): CombatResults = attacker.attack(attackingCountry, defendingCountry)
 
     fun assertRightAmountOfArmiesWasRemoved() {
         assertArmiesOfCountryAre(expectedAttackerArmies, ATTACKING_COUNTRY)
         assertArmiesOfCountryAre(expectedDefenderArmies, DEFENDING_COUNTRY)
     }
 
-    fun assertDefendingCountryOccupiedByAttackerWith(armies: Pos) {
-        assertArmiesOfCountryAre(
-            expectedAttackerArmies - armies.toInt(), ATTACKING_COUNTRY)
-        assertEquals(ATTACKING_PLAYER, countryOccupations.occupierOf(DEFENDING_COUNTRY))
-        assertArmiesOfCountryAre(armies.toInt(), DEFENDING_COUNTRY)
-    }
-
     private fun assertArmiesOfCountryAre(expected: Int, country: Country) =
-        assertEquals(Pos(expected), armiesOf(country))
-
-    private fun armiesOf(country: Country) = countryOccupations.armiesOf(country)
+        assertEquals(expected, countryOccupations.armiesOf(country))
 
     companion object {
         const val ATTACKING_COUNTRY = "Argentina"

@@ -4,7 +4,7 @@ class NonPositiveNumberException(val number: Number) : PositiveIntException(
     "Can't create a PositiveInt from non-positive number $number.")
 
 class TooBigToSubtractException(
-    val minuend: PositiveInt, val subtrahend: PositiveInt
+    val minuend: PositiveInt, val subtrahend: Int
 ) : PositiveIntException(
     "Can't do $minuend - $subtrahend, it would result in a non-positive number.")
 

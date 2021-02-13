@@ -130,6 +130,19 @@ class PositiveIntTest {
     }
 
     @Test
+    fun `Can add an Int if the result is positive`() {
+        assertEquals(PositiveInt(1), PositiveInt(2) + (-1))
+    }
+
+    @Test
+    fun `Can't add an Int if the result is not positive`() {
+        val exception = assertFailsWith<NonPositiveNumberException> {
+            PositiveInt(2) + (-2)
+        }
+        assertEquals(0, exception.number)
+    }
+
+    @Test
     fun `Subtracting a PositiveInt from another PositiveInt returns the difference`() {
         val first = PositiveInt(34)
         val second = PositiveInt(1)
@@ -148,7 +161,14 @@ class PositiveIntTest {
         }
 
         assertEquals(first, exception.minuend)
-        assertEquals(second, exception.subtrahend)
+        assertEquals(second.toInt(), exception.subtrahend)
+    }
+
+    @Test
+    fun `Can subtract an Int smaller than the PositiveInt`() {
+        val result = PositiveInt(2) - (-5)
+
+        assertEquals(PositiveInt(7), result)
     }
 
     @Test

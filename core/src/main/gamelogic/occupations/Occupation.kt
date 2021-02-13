@@ -5,16 +5,30 @@ import Player
 import PositiveInt
 import TooBigToSubtractException
 
-class Occupation(val country: Country, val occupier: Player, armies: PositiveInt) {
+interface Occupation {
+    val isEmpty: Boolean
+    val country: Country
+    val occupier: Player
+    val armies: Int
 
+    fun addArmies(added: PositiveInt)
+
+    fun removeArmies(removed: PositiveInt)
+}
+
+class PlayerOccupation(
+    override val country: Country, override val occupier: Player, armies: PositiveInt
+) : Occupation {
+
+    override val isEmpty = false
     private var mutableArmies: PositiveInt = armies
-    val armies get() = mutableArmies
+    override val armies get() = mutableArmies.toInt()
 
-    fun addArmies(added: PositiveInt) {
+    override fun addArmies(added: PositiveInt) {
         mutableArmies += added
     }
 
-    fun removeArmies(removed: PositiveInt) {
+    override fun removeArmies(removed: PositiveInt) {
         try {
             mutableArmies -= removed
         } catch (e: TooBigToSubtractException) {
@@ -23,7 +37,7 @@ class Occupation(val country: Country, val occupier: Player, armies: PositiveInt
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Occupation &&
+        return other is PlayerOccupation &&
             other.country == country &&
             other.occupier == occupier &&
             other.armies == armies
@@ -39,5 +53,14 @@ class Occupation(val country: Country, val occupier: Player, armies: PositiveInt
     override fun toString(): String {
         return "Occupation on $country by $occupier with $armies armies"
     }
+}
 
+class NoOccupation(override val country: Country) : Occupation {
+    override val isEmpty = true
+    override val occupier: Player
+        get() = throw EmptyCountryException(country)
+    override val armies = 0
+
+    override fun addArmies(added: PositiveInt) = throw EmptyCountryException(country)
+    override fun removeArmies(removed: PositiveInt) = throw EmptyCountryException(country)
 }

@@ -1,15 +1,13 @@
 package gamelogic
 
 import PositiveInt
-import gamelogic.*
+import gamelogic.combat.AttackingCountryWinsAttackerFactory
+import gamelogic.combat.CannotAttackOwnCountryException
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
-import gamelogic.occupations.Occupation
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import gamelogic.occupations.PlayerOccupation
+import kotlin.test.*
 
 class RefereeTest {
 
@@ -47,37 +45,57 @@ class RefereeTest {
     private val goalNico = Goal(listOf(OccupyContinent(sudamerica)))
     private val goalEric = Goal(listOf(OccupyContinent(asia)))
 
-    private val occupationsSample = listOf(
-        Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)),
-        Occupation(bra, eric, PositiveInt(1)), Occupation(jap, eric, PositiveInt(1))
+    private val players = mutableListOf(
+        PlayerInfo(nico, Color.Blue, goalNico),
+        PlayerInfo(eric, Color.Brown, goalEric)
     )
 
-    private val sampleReferee = Referee(mutableListOf<PlayerInfo>(PlayerInfo(nico, Color.Blue,goalNico), PlayerInfo(eric, Color.Brown, goalEric)),
-        politicalMap,
-        CountryOccupations(occupationsSample)
+    private val occupationsSample = listOf(
+        PlayerOccupation(arg, nico, PositiveInt(1)),
+        PlayerOccupation(kam, nico, PositiveInt(1)),
+        PlayerOccupation(bra, eric, PositiveInt(1)),
+        PlayerOccupation(jap, eric, PositiveInt(1))
     )
+
+    private val occupationsSampleLarge = listOf(
+        PlayerOccupation(arg, nico, PositiveInt(1)),
+        PlayerOccupation(kam, nico, PositiveInt(1)),
+        PlayerOccupation(chi, nico, PositiveInt(1)),
+        PlayerOccupation(bra, eric, PositiveInt(1)),
+        PlayerOccupation(jap, eric, PositiveInt(1)),
+        PlayerOccupation(vie, eric, PositiveInt(1))
+    )
+
+    private val countryOccupations = CountryOccupations(occupationsSample)
+    private val countryOccupationsLarge = CountryOccupations(occupationsSampleLarge)
+
+    private val sampleReferee = Referee(players, politicalMap, countryOccupations)
+    private val sampleRefereeLarge =
+        Referee(players, politicalMapLarge, countryOccupationsLarge)
 
 
     @Test
     fun `Game is not over if nobody achieved goal`() {
         assertFalse(sampleReferee.gameIsOver)
-        assertTrue (sampleReferee.winners.isEmpty())
+        assertTrue(sampleReferee.winners.isEmpty())
     }
 
     @Test
     fun `Nico wins if he plays against eric (and achieves his goal first)`() {
         val occupationsNico = listOf(
-            Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)),
-            Occupation(bra, nico, PositiveInt(1))
+            PlayerOccupation(arg, nico, PositiveInt(1)),
+            PlayerOccupation(kam, nico, PositiveInt(1)),
+            PlayerOccupation(bra, nico, PositiveInt(1))
         )
-        val occupationsEric = listOf(Occupation(jap, eric, PositiveInt(1)))
+        val occupationsEric = listOf(PlayerOccupation(jap, eric, PositiveInt(1)))
 
-        val referee = Referee(mutableListOf<PlayerInfo>(PlayerInfo(nico, Color.Blue,goalNico), PlayerInfo(eric, Color.Brown, goalEric)),
+        val referee = Referee(
+            players,
             politicalMap,
             CountryOccupations(occupationsEric.union(occupationsNico))
         )
         assertTrue(referee.gameIsOver)
-        assertTrue (referee.winners.contains(nico) and !referee.winners.contains(eric))
+        assertTrue(referee.winners.contains(nico) and !referee.winners.contains(eric))
     }
 
     @Test
@@ -88,11 +106,12 @@ class RefereeTest {
     @Test
     fun `AddArmies adds armies and changes referee's state`() {
         val armiesToAdd = PositiveInt(1)
-        val reinforcements = listOf(CountryReinforcement(arg,armiesToAdd))
+        val reinforcements = listOf(CountryReinforcement(arg, armiesToAdd))
         val armiesBefore = sampleReferee.occupations.armiesOf(arg)
         sampleReferee.addArmies(reinforcements)
         assertEquals(sampleReferee.currentState, Referee.State.Attack)
-        assertEquals(sampleReferee.occupations.armiesOf(arg), armiesBefore + armiesToAdd)
+        assertEquals(
+            sampleReferee.occupations.armiesOf(arg), (armiesToAdd + armiesBefore).toInt())
     }
 
     @Test
@@ -106,14 +125,8 @@ class RefereeTest {
     @Test
     fun `Regroup moves the armies and changes turn`() {
 
-        val occupationsSampleLarge = listOf(
-            Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)), Occupation(chi,nico,
-            PositiveInt(1)),
-            Occupation(bra, eric, PositiveInt(1)), Occupation(jap, eric, PositiveInt(1)), Occupation(vie,eric,
-            PositiveInt(1))
-        )
-
-        val referee = Referee(mutableListOf<PlayerInfo>(PlayerInfo(nico, Color.Blue,goalNico), PlayerInfo(eric, Color.Brown, goalEric)),
+        val referee = Referee(
+            players,
             politicalMapLarge,
             CountryOccupations(occupationsSampleLarge)
         )
@@ -121,44 +134,143 @@ class RefereeTest {
         referee.addArmies(reinforcements)
         referee.endAttack()
         referee.regroup(listOf(Regrouping(arg, chi, PositiveInt(2))))
-        assertEquals(referee.occupations.armiesOf(chi), PositiveInt(3))
+        assertEquals(referee.occupations.armiesOf(chi), 3)
         assertEquals(referee.currentState, Referee.State.AddArmies)
         assertEquals(referee.currentPlayer, eric)
     }
 
     @Test
-    fun `Attack does not change neutral countries but change non neutral ones`() {
+    fun `Attacking removes correct amount of armies only from the combating countries`() {
 
-        val occupationsSampleLarge = listOf(
-            Occupation(arg, nico, PositiveInt(1)), Occupation(kam, nico, PositiveInt(1)), Occupation(chi,nico,
-            PositiveInt(1)),
-            Occupation(bra, eric, PositiveInt(1)), Occupation(jap, eric, PositiveInt(1)), Occupation(vie,eric,
-            PositiveInt(1))
-        )
-
-        val referee = Referee(mutableListOf<PlayerInfo>(PlayerInfo(nico, Color.Blue,goalNico), PlayerInfo(eric, Color.Brown, goalEric)),
+        val attackerFactory =
+            AttackingCountryWinsAttackerFactory(PositiveInt(4), PositiveInt(1))
+        val referee = Referee(
+            players,
             politicalMapLarge,
-            CountryOccupations(occupationsSampleLarge)
+            CountryOccupations(occupationsSampleLarge),
+            attackerFactory
         )
         val reinforcements = listOf(CountryReinforcement(arg, PositiveInt(3)))
         referee.addArmies(reinforcements)
         referee.makeAttack(arg, bra)
-        //TODO: Use a deterministic Die and (therefore) a deterministic test
-        if (referee.currentAttackState== Referee.AttackState.Occupation) {
-            referee.occupyConqueredCountry(PositiveInt(1))
-            assertEquals(referee.occupations.occupierOf(bra), nico )
-            assertEquals(referee.occupations.armiesOf(bra), PositiveInt(1))
-            assertEquals(referee.occupations.armiesOf(arg), PositiveInt(3))
-        } else {
-            assertEquals(referee.occupations.occupierOf(bra), eric)
-            assertEquals(referee.occupations.armiesOf(bra), PositiveInt(1))
-            assertEquals(referee.occupations.armiesOf(arg), PositiveInt(3))
-        }
+        assertTrue(referee.occupations.isEmpty(bra))
+        assertEquals(referee.occupations.armiesOf(arg), 4)
+
         referee.endAttack()
-        assertEquals(referee.occupations.armiesOf(kam), PositiveInt(1))
-        assertEquals(referee.occupations.armiesOf(chi), PositiveInt(1))
-        assertEquals(referee.occupations.armiesOf(jap), PositiveInt(1))
-        assertEquals(referee.occupations.armiesOf(vie), PositiveInt(1))
+        assertEquals(referee.occupations.armiesOf(kam), 1)
+        assertEquals(referee.occupations.armiesOf(chi), 1)
+        assertEquals(referee.occupations.armiesOf(jap), 1)
+        assertEquals(referee.occupations.armiesOf(vie), 1)
     }
 
+    @Test
+    fun `Cannot conquer when no country has been conquered`() {
+        val occupationsSampleSmall = listOf(
+            PlayerOccupation(arg, eric, PositiveInt(1)),
+            PlayerOccupation(kam, nico, PositiveInt(1))
+        )
+
+        val referee = Referee(
+            players, politicalMapLarge, CountryOccupations(occupationsSampleSmall)
+        )
+
+        assertFails {
+            referee.occupyConqueredCountry(PositiveInt(2))
+        }
+
+        assertEquals(1, referee.occupations.armiesOf(arg))
+        assertEquals(1, referee.occupations.armiesOf(kam))
+    }
+
+    @Test
+    fun `Conquering a country moves the requested armies and changes the occupier`() {
+        val attackerFactory =
+            AttackingCountryWinsAttackerFactory(PositiveInt(4), PositiveInt(1))
+        val referee = Referee(players, politicalMap, countryOccupations, attackerFactory)
+
+        referee.addArmies(listOf(CountryReinforcement(arg, PositiveInt(3))))
+        referee.makeAttack(arg, bra)
+
+        referee.occupyConqueredCountry(PositiveInt(3))
+
+        assertFalse(referee.occupations.isEmpty(bra))
+        assertEquals(nico, referee.occupations.occupierOf(bra))
+        assertEquals(3, referee.occupations.armiesOf(bra))
+        assertFalse(referee.occupations.isEmpty(arg))
+        assertEquals(nico, referee.occupations.occupierOf(arg))
+        assertEquals(1, referee.occupations.armiesOf(arg))
+    }
+
+    @Test
+    fun `Cannot attack when not in attacking state`() {
+        sampleReferee.addArmies(listOf(CountryReinforcement(arg, PositiveInt(2))))
+        sampleReferee.endAttack()
+        assertFails {
+            sampleReferee.makeAttack(arg, bra)
+        }
+    }
+
+    @Test
+    fun `Cannot attack when occupying a country`() {
+        val attackerFactory =
+            AttackingCountryWinsAttackerFactory(PositiveInt(4), PositiveInt(1))
+        val referee = Referee(players, politicalMap, countryOccupations, attackerFactory)
+
+        referee.addArmies(
+            listOf(
+                CountryReinforcement(arg, PositiveInt(3)),
+                CountryReinforcement(kam, PositiveInt(2))
+            ))
+        referee.makeAttack(arg, bra)
+
+        assertFails {
+            referee.makeAttack(kam, jap)
+        }
+
+        assertEquals(4, referee.occupations.armiesOf(arg))
+        assertEquals(3, referee.occupations.armiesOf(kam))
+        assertEquals(0, referee.occupations.armiesOf(bra))
+        assertEquals(1, referee.occupations.armiesOf(jap))
+    }
+
+    @Test
+    fun `Cannot attack if current player doesn't occupy attacking country`() {
+        sampleReferee.addArmies(listOf(CountryReinforcement(arg, PositiveInt(2))))
+        sampleReferee.endAttack()
+        sampleReferee.regroup(emptyList())
+        sampleReferee.addArmies(emptyList())
+
+        assertFails {
+            sampleReferee.makeAttack(arg, bra)
+        }
+    }
+
+    @Test
+    fun `Cannot attack if the countries are not bordering`() {
+        sampleReferee.addArmies(listOf(CountryReinforcement(arg, PositiveInt(2))))
+
+        val exception = assertFailsWith<CountriesAreNotBorderingException> {
+            sampleReferee.makeAttack(arg, jap)
+        }
+
+        assertEquals(arg, exception.from)
+        assertEquals(jap, exception.to)
+        assertEquals(3, sampleReferee.occupations.armiesOf(arg))
+        assertEquals(1, sampleReferee.occupations.armiesOf(jap))
+    }
+
+    @Test
+    fun `Cannot regroup if the countries are not bordering`() {
+        sampleReferee.addArmies(listOf(CountryReinforcement(arg, PositiveInt(2))))
+        sampleReferee.endAttack()
+
+        val exception = assertFailsWith<CountriesAreNotBorderingException> {
+            sampleReferee.regroup(listOf(Regrouping(arg, kam, PositiveInt(2))))
+        }
+
+        assertEquals(arg, exception.from)
+        assertEquals(kam, exception.to)
+        assertEquals(3, sampleReferee.occupations.armiesOf(arg))
+        assertEquals(1, sampleReferee.occupations.armiesOf(kam))
+    }
 }

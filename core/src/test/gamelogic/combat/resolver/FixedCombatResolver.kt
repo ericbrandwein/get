@@ -27,4 +27,11 @@ class FixedCombatResolver(
         return attackingArmies == expectedAttackingArmies &&
             defendingArmies == expectedDefendingArmies
     }
+
+    companion object {
+        fun createEmpty(): FixedCombatResolver {
+            val combatResults = CombatResults(Pair(1, 0), Pair(listOf(1), listOf(1)))
+            return FixedCombatResolver(PositiveInt(1), PositiveInt(1), combatResults)
+        }
+    }
 }

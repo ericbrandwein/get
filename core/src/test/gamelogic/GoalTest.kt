@@ -1,11 +1,10 @@
 package gamelogic
 
-import Player
 import PositiveInt
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
-import gamelogic.occupations.Occupation
+import gamelogic.occupations.PlayerOccupation
 import org.junit.Test
 import kotlin.test.assertFails
 import kotlin.test.assertFalse
@@ -16,7 +15,7 @@ private val SINGLE_COUNTRY_CONTINENT = Continent("América", setOf(A_COUNTRY))
 private val SINGLE_COUNTRY_POLITICAL_MAP =
     PoliticalMap.Builder().addContinent(SINGLE_COUNTRY_CONTINENT).build()
 private val SINGLE_COUNTRY_OCCUPATIONS =
-    CountryOccupations(listOf(Occupation(A_COUNTRY, "Nico", PositiveInt(1))))
+    CountryOccupations(listOf(PlayerOccupation(A_COUNTRY, "Nico", PositiveInt(1))))
 
 private fun twoPlayersWithGoals(firstGoal: Goal, secondGoal: Goal) =
     mutableListOf(
@@ -99,8 +98,8 @@ class OccupySubContinentTest {
         val players = twoPlayersWithGoals(goal, goal)
         val occupations = CountryOccupations(
             listOf(
-                Occupation(firstCountry, players[0].name, PositiveInt(1)),
-                Occupation(secondCountry, players[1].name, PositiveInt(1))
+                PlayerOccupation(firstCountry, players[0].name, PositiveInt(1)),
+                PlayerOccupation(secondCountry, players[1].name, PositiveInt(1))
             ))
         val gameInfo = createGameInfo(players, politicalMap, occupations)
 
