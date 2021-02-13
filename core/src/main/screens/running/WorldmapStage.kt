@@ -14,21 +14,35 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.utils.viewport.Viewport
+import gamelogic.occupations.CountryOccupations
 import screens.running.countryImage.CountryImage
 import screens.running.countryImage.findCountryRectangles
 
 class WorldmapStage(
-    assetManager: AssetManager, worldmapTexture: Texture, viewport: Viewport
+    viewport: Viewport,
+    assetManager: AssetManager,
+    worldmapTexture: Texture,
+    countryColors: CountryColors,
+    private val occupations: CountryOccupations
 ) : Stage(viewport) {
     private val countryLabel = Label("", Label.LabelStyle(BitmapFont(), Color.WHITE))
     private var currentCountry: String? = null
         set(value) {
-            countryLabel.setText(value ?: "")
+            if (value != null) {
+                countryLabel.setText("""
+                    $value
+                    Occupied by ${
+                        occupations.occupierOf(value)
+                    } with ${occupations.armiesOf(value)} armies.                    
+                """.trimIndent())
+            } else {
+                countryLabel.setText("")
+            }
             field = value
         }
+    var countrySelectionListener: CountrySelectionListener = NoCountrySelectionListener()
 
     init {
-        val (countryColors, politicalMap) = parseMapInfoFromJsonFile(MAP_INFO_JSON_FILE)
         setupWorldmapImage(worldmapTexture)
         setupCountryImages(assetManager, countryColors)
         setupCountryLabel()
@@ -69,6 +83,14 @@ class WorldmapStage(
         val image = CountryImage.fromPixmapRectangle(
             countryColorsPixmap, rectangle, countryColor)
         image.addListener(object : InputListener() {
+            override fun touchDown(
+                event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int
+            ) = true
+
+            override fun touchUp(
+                event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int
+            ) = countrySelectionListener.onCountrySelected(country)
+
             override fun mouseMoved(event: InputEvent?, x: Float, y: Float): Boolean {
                 image.highlight()
                 currentCountry = country
@@ -78,8 +100,10 @@ class WorldmapStage(
             override fun exit(
                 event: InputEvent?, x: Float, y: Float, pointer: Int, toActor: Actor?
             ) {
-                image.removeHighlight()
-                currentCountry = null
+                if (image.hit(x, y, false) == null) {
+                    image.removeHighlight()
+                    currentCountry = null
+                }
                 super.exit(event, x, y, pointer, toActor)
             }
         })
@@ -88,12 +112,11 @@ class WorldmapStage(
 
     private fun setupCountryLabel() {
         countryLabel.setFontScale(4F)
-        countryLabel.setPosition(8F, 20F)
+        countryLabel.setPosition(8F, 70F)
         addActor(countryLabel)
     }
 
     companion object {
-        private const val MAP_INFO_JSON_FILE = "mapa.json"
         private const val COUNTRY_COLORS_FILE = "colores-paises.png"
     }
 }
