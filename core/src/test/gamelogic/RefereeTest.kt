@@ -335,4 +335,11 @@ class RefereeTest {
         assertEquals(4, referee.occupations.armiesOf(arg))
         assertEquals(0, referee.occupations.armiesOf(bra))
     }
+
+    @Test
+    fun `Cannot end attack if not attacking`() {
+        assertFailsWith<NotInAttackingStateException> {
+            sampleReferee.endAttack()
+        }
+    }
 }

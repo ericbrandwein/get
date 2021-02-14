@@ -15,7 +15,7 @@ abstract class GameState {
     open fun occupyConqueredCountry(armies: PositiveInt): Unit =
         throw NotInAttackingStateException()
 
-    open fun endAttack(): Unit = throw Exception("Cannot end attack if not attacking")
+    open fun endAttack(): Unit = throw NotInAttackingStateException()
 
     open fun regroup(regroupings: List<Regrouping>): Unit =
         throw Exception("Cannot regroup if not regrouping")
