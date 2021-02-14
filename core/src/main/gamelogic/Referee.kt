@@ -62,9 +62,8 @@ class Referee(
     attackerFactory: AttackerFactory = DiceRollingAttackerFactory()
 ) {
 
-
     private val gameInfo = GameInfo(
-        NoState, attackerFactory,
+        attackerFactory,
         players, politicalMap,
         PlayerDestructions(), occupationsDealer
     )

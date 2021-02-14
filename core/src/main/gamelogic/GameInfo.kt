@@ -2,17 +2,18 @@ package gamelogic
 
 import gamelogic.combat.AttackerFactory
 import gamelogic.gameState.GameState
+import gamelogic.gameState.NoState
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
 import gamelogic.occupations.dealers.OccupationsDealer
 
 class GameInfo(
-    var state: GameState,
     val attackerFactory: AttackerFactory,
     val players: MutableList<PlayerInfo>,
     val politicalMap: PoliticalMap,
     val destroyedPlayers: PlayerDestructions,
-    occupationsDealer: OccupationsDealer
+    occupationsDealer: OccupationsDealer,
+    var state: GameState = NoState
 ) {
 
     val playerIterator = players.loopingIterator()
