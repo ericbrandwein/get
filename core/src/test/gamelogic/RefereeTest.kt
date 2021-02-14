@@ -3,6 +3,7 @@ package gamelogic
 import PositiveInt
 import gamelogic.combat.AttackingCountryWinsAttackerFactory
 import gamelogic.gameState.CannotEndAttackWhenOccupyingException
+import gamelogic.gameState.NotInAttackingStateException
 import gamelogic.gameState.NotInReinforcingStateException
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
@@ -217,9 +218,12 @@ class RefereeTest {
     fun `Cannot attack when not in attacking state`() {
         sampleReferee.addArmies(listOf(CountryReinforcement(arg, PositiveInt(2))))
         sampleReferee.endAttack()
-        assertFails {
+        assertFailsWith<NotInAttackingStateException> {
             sampleReferee.makeAttack(arg, bra)
         }
+
+        assertEquals(3, sampleReferee.occupations.armiesOf(arg))
+        assertEquals(1, sampleReferee.occupations.armiesOf(bra))
     }
 
     @Test

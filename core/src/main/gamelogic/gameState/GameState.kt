@@ -10,10 +10,10 @@ abstract class GameState {
         throw NotInReinforcingStateException()
 
     open fun makeAttack(from: Country, to: Country): Unit =
-        throw Exception("Cannot attack when not in attacking state")
+        throw NotInAttackingStateException()
 
     open fun occupyConqueredCountry(armies: PositiveInt): Unit =
-        throw Exception("Cannot occupy when not in attacking state")
+        throw NotInAttackingStateException()
 
     open fun endAttack(): Unit = throw Exception("Cannot end attack if not attacking")
 
@@ -24,3 +24,4 @@ abstract class GameState {
 object NoState : GameState()
 
 class NotInReinforcingStateException : Exception("Cannot add armies right now.")
+class NotInAttackingStateException : Exception("Cannot attack or occupy right now.")
