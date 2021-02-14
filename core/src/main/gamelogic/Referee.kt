@@ -5,7 +5,9 @@ import Player
 import PositiveInt
 import gamelogic.combat.AttackerFactory
 import gamelogic.combat.DiceRollingAttackerFactory
-import gamelogic.combat.Occupier
+import gamelogic.gameState.GameState
+import gamelogic.gameState.NoState
+import gamelogic.gameState.ReinforceState
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
 import gamelogic.occupations.dealers.OccupationsDealer

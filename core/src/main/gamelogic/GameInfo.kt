@@ -1,6 +1,7 @@
 package gamelogic
 
 import gamelogic.combat.AttackerFactory
+import gamelogic.gameState.GameState
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
 

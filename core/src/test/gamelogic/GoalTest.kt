@@ -2,6 +2,7 @@ package gamelogic
 
 import PositiveInt
 import gamelogic.combat.DiceRollingAttackerFactory
+import gamelogic.gameState.NoState
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations

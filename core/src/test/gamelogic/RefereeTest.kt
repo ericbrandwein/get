@@ -2,6 +2,8 @@ package gamelogic
 
 import PositiveInt
 import gamelogic.combat.AttackingCountryWinsAttackerFactory
+import gamelogic.gameState.CannotEndAttackWhenOccupyingException
+import gamelogic.gameState.NotInReinforcingStageException
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.PlayerOccupation
