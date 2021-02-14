@@ -33,46 +33,56 @@ class ReinforceState(private val gameInfo: GameInfo) : GameState() {
 }
 
 class AttackState(private val gameInfo: GameInfo) : GameState() {
-    enum class AttackState { Fight, Occupation }
-    private var attackState = AttackState.Fight
-    private val occupier = Occupier(gameInfo.occupations)
-    private var occupyingFrom: Country? = null
-    private var occupyingTo: Country? = null
+    private var state: State = FightState()
 
+    override fun makeAttack(from: Country, to: Country) = state.makeAttack(from, to)
 
-    override fun makeAttack(from: Country, to: Country) {
-        if (attackState != AttackState.Fight) {
-            throw Exception("Cannot attack if not fighting")
-        }
-        val occupations = gameInfo.occupations
-        val currentPlayerName = gameInfo.currentPlayer.name
-        if (occupations.occupierOf(from) != currentPlayerName) {
-            throw Exception("Player $currentPlayerName does not occupy $from")
-        }
-        val politicalMap = gameInfo.politicalMap
-        CountriesAreNotBorderingException(from, to).assertAreBorderingIn(politicalMap)
-        val attacker = gameInfo.attackerFactory.create(
-            occupations, ClassicCombatDiceAmountCalculator()
-        )
-        attacker.attack(from, to)
-        if (occupations.isEmpty(to)) {
-            attackState = AttackState.Occupation
-            occupyingFrom = from
-            occupyingTo = to
-        }
-    }
-
-    override fun occupyConqueredCountry(armies: PositiveInt) {
-        if (attackState != AttackState.Occupation) {
-            throw Exception("Not the moment to occupy conquered country")
-        }
-
-        occupier.occupy(occupyingFrom!!, occupyingTo!!, armies)
-        attackState = AttackState.Fight
-    }
+    override fun occupyConqueredCountry(armies: PositiveInt) =
+        state.occupyConqueredCountry(armies)
 
     override fun endAttack() {
         gameInfo.state = RegroupState(gameInfo)
+    }
+
+    private abstract class State {
+        abstract fun makeAttack(from: Country, to: Country)
+        abstract fun occupyConqueredCountry(armies: PositiveInt)
+    }
+
+    private inner class FightState : State() {
+        override fun makeAttack(from: Country, to: Country) {
+            val occupations = gameInfo.occupations
+            val currentPlayerName = gameInfo.currentPlayer.name
+            if (occupations.occupierOf(from) != currentPlayerName) {
+                throw Exception("Player $currentPlayerName does not occupy $from")
+            }
+            val politicalMap = gameInfo.politicalMap
+            CountriesAreNotBorderingException(from, to).assertAreBorderingIn(politicalMap)
+            val attacker = gameInfo.attackerFactory.create(
+                occupations, ClassicCombatDiceAmountCalculator()
+            )
+            attacker.attack(from, to)
+            if (occupations.isEmpty(to)) {
+                state = OccupyingState(from, to)
+            }
+        }
+
+        override fun occupyConqueredCountry(armies: PositiveInt) =
+            throw Exception("Not the moment to occupy conquered country")
+    }
+
+    private inner class OccupyingState(
+        private val from: Country, private val to: Country
+    ) : State() {
+        private val occupier = Occupier(gameInfo.occupations)
+
+        override fun makeAttack(from: Country, to: Country) =
+            throw Exception("Cannot attack if not fighting")
+
+        override fun occupyConqueredCountry(armies: PositiveInt) {
+            occupier.occupy(from, to, armies)
+            state = FightState()
+        }
     }
 }
 
@@ -91,7 +101,7 @@ class RegroupState(private val gameInfo: GameInfo) : GameState() {
         if (
             regroupings.any {
                 occupations.occupierOf(it.from) != playerName ||
-                occupations.occupierOf(it.to) != playerName
+                    occupations.occupierOf(it.to) != playerName
             }
         ) {
             throw Exception("player must occupy both countries to regroup")
