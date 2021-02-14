@@ -3,7 +3,7 @@ package gamelogic
 import PositiveInt
 import gamelogic.combat.AttackingCountryWinsAttackerFactory
 import gamelogic.gameState.CannotEndAttackWhenOccupyingException
-import gamelogic.gameState.NotInReinforcingStageException
+import gamelogic.gameState.NotInReinforcingStateException
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.PlayerOccupation
@@ -304,7 +304,7 @@ class RefereeTest {
     fun `Cannot reinforce when not in reinforcing state`() {
         sampleReferee.addArmies(listOf())
 
-        assertFailsWith<NotInReinforcingStageException> {
+        assertFailsWith<NotInReinforcingStateException> {
             sampleReferee.addArmies(listOf())
         }
 

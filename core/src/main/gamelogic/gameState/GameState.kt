@@ -7,7 +7,7 @@ import gamelogic.Regrouping
 
 abstract class GameState {
     open fun addArmies(reinforcements: Collection<CountryReinforcement>): Unit =
-        throw NotInReinforcingStageException()
+        throw NotInReinforcingStateException()
 
     open fun makeAttack(from: Country, to: Country): Unit =
         throw Exception("Cannot attack when not in attacking state")
@@ -23,4 +23,4 @@ abstract class GameState {
 
 object NoState : GameState()
 
-class NotInReinforcingStageException : Exception("Cannot add armies right now.")
+class NotInReinforcingStateException : Exception("Cannot add armies right now.")
