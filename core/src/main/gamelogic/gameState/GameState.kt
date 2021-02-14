@@ -18,10 +18,11 @@ abstract class GameState {
     open fun endAttack(): Unit = throw NotInAttackingStateException()
 
     open fun regroup(regroupings: List<Regrouping>): Unit =
-        throw Exception("Cannot regroup if not regrouping")
+        throw NotInRegroupingStateException()
 }
 
 object NoState : GameState()
 
 class NotInReinforcingStateException : Exception("Cannot add armies right now.")
 class NotInAttackingStateException : Exception("Cannot attack or occupy right now.")
+class NotInRegroupingStateException : Exception("Cannot regroup right now.")

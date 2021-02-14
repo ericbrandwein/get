@@ -4,6 +4,7 @@ import PositiveInt
 import gamelogic.combat.AttackingCountryWinsAttackerFactory
 import gamelogic.gameState.CannotEndAttackWhenOccupyingException
 import gamelogic.gameState.NotInAttackingStateException
+import gamelogic.gameState.NotInRegroupingStateException
 import gamelogic.gameState.NotInReinforcingStateException
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
@@ -340,6 +341,13 @@ class RefereeTest {
     fun `Cannot end attack if not attacking`() {
         assertFailsWith<NotInAttackingStateException> {
             sampleReferee.endAttack()
+        }
+    }
+
+    @Test
+    fun `Cannot regroup if not regrouping`() {
+        assertFailsWith<NotInRegroupingStateException> {
+            sampleReferee.regroup(listOf())
         }
     }
 }
