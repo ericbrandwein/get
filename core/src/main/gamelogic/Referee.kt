@@ -67,7 +67,7 @@ class Referee(
 
     private val gameInfo = GameInfo(
         NoState, attackerFactory,
-        players, players.loopingIterator(), politicalMap, occupations,
+        players, politicalMap, occupations,
         PlayerDestructions()
     )
 

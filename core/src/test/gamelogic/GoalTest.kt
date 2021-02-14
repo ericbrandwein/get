@@ -38,7 +38,7 @@ private fun createGameInfo(
     destroyed: PlayerDestructions = PlayerDestructions()
 ) = GameInfo(
     NoState, DiceRollingAttackerFactory(),
-    players, players.loopingIterator(),
+    players,
     politicalMap, occupations, destroyed
 )
 

@@ -8,12 +8,14 @@ import gamelogic.occupations.CountryOccupations
 data class GameInfo(
     var state: GameState,
     val attackerFactory: AttackerFactory,
-    val players: List<PlayerInfo>,
-    val playerIterator: LoopingIterator<PlayerInfo>,
+    val players: MutableList<PlayerInfo>,
     val politicalMap: PoliticalMap,
     val occupations: CountryOccupations,
     val destroyedPlayers: PlayerDestructions
 ) {
+
+    val playerIterator = players.loopingIterator()
+
     val currentPlayer
         get() = playerIterator.current
 
