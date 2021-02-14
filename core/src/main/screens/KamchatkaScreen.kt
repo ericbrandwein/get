@@ -23,7 +23,7 @@ abstract class KamchatkaScreen(
 
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
-        viewport.update(width, height)
+        viewport.update(width, height, true)
     }
 }
 
