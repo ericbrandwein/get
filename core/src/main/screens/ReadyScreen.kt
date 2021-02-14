@@ -41,7 +41,10 @@ class ReadyScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
     override fun render(delta: Float) {
         super.render(delta)
         game.batch.begin()
-        message.draw(game.batch, "Press s to start, q to quit", 1F, 1F)
+        message.draw(
+            game.batch, "Press s to start, q to quit",
+            viewport.worldWidth / 2, viewport.worldHeight / 2
+        )
         game.batch.end()
     }
 

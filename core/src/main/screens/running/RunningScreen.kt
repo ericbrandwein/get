@@ -47,16 +47,16 @@ class RunningScreen(
         inputProcessor.addProcessor(stage)
     }
 
-    fun switchToReadyScreen() {
+    private fun switchToReadyScreen() {
         game.setKamchatkaScreen(ReadyScreen(game))
     }
+
     override fun onCountrySelected(country: Country) {
         println("Country $country was selected")
     }
 
     override fun render(delta: Float) {
         super.render(delta)
-
         stage.act(delta)
         stage.draw()
     }
@@ -65,6 +65,7 @@ class RunningScreen(
     override fun dispose() {
         super.dispose()
         assetManager.dispose()
+        stage.dispose()
     }
 
     companion object {
