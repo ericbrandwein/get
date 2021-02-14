@@ -40,16 +40,15 @@ class AttackState(private val gameInfo: GameInfo) : GameState() {
     override fun occupyConqueredCountry(armies: PositiveInt) =
         state.occupyConqueredCountry(armies)
 
-    override fun endAttack() {
-        gameInfo.state = RegroupState(gameInfo)
+    override fun endAttack() = state.endAttack()
+
+    private interface State {
+        fun makeAttack(from: Country, to: Country)
+        fun occupyConqueredCountry(armies: PositiveInt)
+        fun endAttack()
     }
 
-    private abstract class State {
-        abstract fun makeAttack(from: Country, to: Country)
-        abstract fun occupyConqueredCountry(armies: PositiveInt)
-    }
-
-    private inner class FightState : State() {
+    private inner class FightState : State {
         override fun makeAttack(from: Country, to: Country) {
             val occupations = gameInfo.occupations
             val currentPlayerName = gameInfo.currentPlayer.name
@@ -69,11 +68,15 @@ class AttackState(private val gameInfo: GameInfo) : GameState() {
 
         override fun occupyConqueredCountry(armies: PositiveInt) =
             throw Exception("Not the moment to occupy conquered country")
+
+        override fun endAttack() {
+            gameInfo.state = RegroupState(gameInfo)
+        }
     }
 
     private inner class OccupyingState(
         private val from: Country, private val to: Country
-    ) : State() {
+    ) : State {
         private val occupier = Occupier(gameInfo.occupations)
 
         override fun makeAttack(from: Country, to: Country) =
@@ -83,8 +86,14 @@ class AttackState(private val gameInfo: GameInfo) : GameState() {
             occupier.occupy(from, to, armies)
             state = FightState()
         }
+
+        override fun endAttack() = throw CannotEndAttackWhenOccupyingException()
     }
 }
+
+class CannotEndAttackWhenOccupyingException : Exception(
+    "Cannot end attack when there is a country that must be occupied."
+)
 
 class RegroupState(private val gameInfo: GameInfo) : GameState() {
     override fun regroup(regroupings: List<Regrouping>) {

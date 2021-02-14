@@ -157,10 +157,9 @@ class RefereeTest {
         val reinforcements = listOf(CountryReinforcement(arg, PositiveInt(3)))
         referee.addArmies(reinforcements)
         referee.makeAttack(arg, bra)
+
         assertTrue(referee.occupations.isEmpty(bra))
         assertEquals(referee.occupations.armiesOf(arg), 4)
-
-        referee.endAttack()
         assertEquals(referee.occupations.armiesOf(kam), 1)
         assertEquals(referee.occupations.armiesOf(chi), 1)
         assertEquals(referee.occupations.armiesOf(jap), 1)
@@ -310,5 +309,24 @@ class RefereeTest {
         politicalMap.countries.forEach { country ->
             assertEquals(1, sampleReferee.occupations.armiesOf(country))
         }
+    }
+
+    @Test
+    fun `Cannot end attack when occupying`() {
+        val referee = Referee(
+            players,
+            politicalMap,
+            FixedOccupationsDealer(occupationsSample, playerNames),
+            AttackingCountryWinsAttackerFactory(PositiveInt(4), PositiveInt(1))
+        )
+        referee.addArmies(listOf(CountryReinforcement(arg, PositiveInt(3))))
+        referee.makeAttack(arg, bra)
+
+        assertFailsWith<CannotEndAttackWhenOccupyingException> {
+            referee.endAttack()
+        }
+
+        assertEquals(4, referee.occupations.armiesOf(arg))
+        assertEquals(0, referee.occupations.armiesOf(bra))
     }
 }
