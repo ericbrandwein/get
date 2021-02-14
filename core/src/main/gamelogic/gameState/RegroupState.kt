@@ -29,14 +29,14 @@ class RegroupState(private val gameInfo: GameInfo) : GameState() {
 
     private fun assertPlayerOccupiesCountry(country: Country) {
         CountryIsNotOccupiedByPlayerException(country, gameInfo.currentPlayer.name)
-            .assertPlayerOccupiesCountry(gameInfo.occupations)
+            .assertPlayerOccupiesCountryIn(gameInfo.occupations)
     }
 }
 
 class CountryIsNotOccupiedByPlayerException(val country: Country, val player: Player) :
     Exception("Country $country is not occupied by $player.")
 {
-    fun assertPlayerOccupiesCountry(occupations: CountryOccupations) {
+    fun assertPlayerOccupiesCountryIn(occupations: CountryOccupations) {
         if (occupations.occupierOf(country) != player) {
             throw this
         }

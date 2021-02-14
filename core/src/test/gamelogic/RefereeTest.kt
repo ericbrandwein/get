@@ -259,9 +259,14 @@ class RefereeTest {
         sampleReferee.regroup(emptyList())
         sampleReferee.addArmies(emptyList())
 
-        assertFails {
+        val exception = assertFailsWith<CountryIsNotOccupiedByPlayerException> {
             sampleReferee.makeAttack(arg, bra)
         }
+
+        assertEquals(arg, exception.country)
+        assertEquals(eric, exception.player)
+        assertEquals(3, sampleReferee.occupations.armiesOf(arg))
+        assertEquals(1, sampleReferee.occupations.armiesOf(bra))
     }
 
     @Test

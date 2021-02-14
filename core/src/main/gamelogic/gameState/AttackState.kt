@@ -26,12 +26,10 @@ class AttackState(private val gameInfo: GameInfo) : GameState() {
     private inner class FightState : State {
         override fun makeAttack(from: Country, to: Country) {
             val occupations = gameInfo.occupations
-            val currentPlayerName = gameInfo.currentPlayer.name
-            if (occupations.occupierOf(from) != currentPlayerName) {
-                throw Exception("Player $currentPlayerName does not occupy $from")
-            }
-            val politicalMap = gameInfo.politicalMap
-            CountriesAreNotBorderingException(from, to).assertAreBorderingIn(politicalMap)
+            CountryIsNotOccupiedByPlayerException(from, gameInfo.currentPlayer.name)
+                .assertPlayerOccupiesCountryIn(occupations)
+            CountriesAreNotBorderingException(from, to)
+                .assertAreBorderingIn(gameInfo.politicalMap)
             val attacker = gameInfo.attackerFactory.create(
                 occupations, ClassicCombatDiceAmountCalculator()
             )
