@@ -103,3 +103,5 @@ class RegroupState(private val gameInfo: GameInfo) : GameState() {
         }
     }
 }
+
+class NotInReinforcingStageException : Exception("Cannot add armies right now.")

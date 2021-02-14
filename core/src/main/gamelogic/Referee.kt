@@ -110,4 +110,3 @@ class CountriesAreNotBorderingException(val from: Country, val to: Country) :
     }
 }
 
-class NotInReinforcingStageException : Exception("Cannot add armies right now.")
