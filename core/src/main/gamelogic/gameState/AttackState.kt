@@ -3,6 +3,7 @@ package gamelogic.gameState
 import Country
 import PositiveInt
 import gamelogic.CountriesAreNotBorderingException
+import gamelogic.CountryIsNotOccupiedByPlayerException
 import gamelogic.GameInfo
 import gamelogic.combat.Occupier
 import gamelogic.situations.classicCombat.ClassicCombatDiceAmountCalculator

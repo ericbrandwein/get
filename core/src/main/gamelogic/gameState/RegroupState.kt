@@ -1,10 +1,9 @@
 package gamelogic.gameState
 
 import Country
-import Player
+import gamelogic.CountryIsNotOccupiedByPlayerException
 import gamelogic.GameInfo
 import gamelogic.Regrouping
-import gamelogic.occupations.CountryOccupations
 
 class RegroupState(private val gameInfo: GameInfo) : GameState() {
     override fun regroup(regroupings: List<Regrouping>) {
@@ -30,15 +29,5 @@ class RegroupState(private val gameInfo: GameInfo) : GameState() {
     private fun assertPlayerOccupiesCountry(country: Country) {
         CountryIsNotOccupiedByPlayerException(country, gameInfo.currentPlayer.name)
             .assertPlayerOccupiesCountryIn(gameInfo.occupations)
-    }
-}
-
-class CountryIsNotOccupiedByPlayerException(val country: Country, val player: Player) :
-    Exception("Country $country is not occupied by $player.")
-{
-    fun assertPlayerOccupiesCountryIn(occupations: CountryOccupations) {
-        if (occupations.occupierOf(country) != player) {
-            throw this
-        }
     }
 }
