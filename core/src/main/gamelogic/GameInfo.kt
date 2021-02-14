@@ -7,6 +7,12 @@ import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
 import gamelogic.occupations.dealers.OccupationsDealer
 
+/**
+ * Maintains the current game context, including its state, its current player,
+ * its occupations, etc.
+ *
+ * [GameState] objects manipulate this to advance the game.
+ */
 class GameInfo(
     val players: MutableList<PlayerInfo>,
     val politicalMap: PoliticalMap,
