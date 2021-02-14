@@ -1,6 +1,7 @@
 package gamelogic
 
 import PositiveInt
+import gamelogic.combat.DiceRollingAttackerFactory
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
@@ -34,7 +35,11 @@ private fun createGameInfo(
     politicalMap: PoliticalMap,
     occupations: CountryOccupations,
     destroyed: PlayerDestructions = PlayerDestructions()
-) = GameInfo(players, players.loopingIterator(), politicalMap, occupations, destroyed)
+) = GameInfo(
+    NoState, DiceRollingAttackerFactory(),
+    players, players.loopingIterator(),
+    politicalMap, occupations, destroyed
+)
 
 class OccupyContinentTest {
     private val goal: Goal = Goal(listOf(OccupyContinent(SINGLE_COUNTRY_CONTINENT)))

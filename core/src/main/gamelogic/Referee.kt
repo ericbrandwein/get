@@ -10,7 +10,6 @@ import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
 import gamelogic.occupations.dealers.OccupationsDealer
 import gamelogic.occupations.dealers.RandomOccupationsDealer
-import gamelogic.situations.classicCombat.ClassicCombatDiceAmountCalculator
 
 class CountryReinforcement(val country:Country, val armies: PositiveInt) {
     fun apply(player: Player, occupations: CountryOccupations) {
@@ -58,106 +57,47 @@ class Referee(
     private val politicalMap: PoliticalMap,
     occupationsDealer: OccupationsDealer =
         RandomOccupationsDealer(politicalMap.countries.toList()),
-    private val attackerFactory: AttackerFactory = DiceRollingAttackerFactory()
+    attackerFactory: AttackerFactory = DiceRollingAttackerFactory()
 ) {
-    enum class AttackState { Fight, Occupation }
 
     val occupations =
         CountryOccupations(occupationsDealer.dealTo(players.map { it.name }))
-    private var playerIterator = players.loopingIterator()
-    private var state = GameState.AddArmies
-    private var attackState = AttackState.Fight
-    private val occupier = Occupier(occupations)
-    private var occupyingFrom: Country? = null
-    private var occupyingTo: Country? = null
 
-
-    private val gameInfo
-        get() = GameInfo(
-            players, playerIterator, politicalMap, occupations, PlayerDestructions())
-
-    val currentState: GameState
-        get() = state
-
-    val currentAttackState: AttackState
-        get() = attackState
+    private val gameInfo = GameInfo(
+        NoState, attackerFactory,
+        players, players.loopingIterator(), politicalMap, occupations,
+        PlayerDestructions()
+    )
 
     val currentPlayer
-        get() = playerIterator.current.name
+        get() = gameInfo.currentPlayer.name
 
-    val gameIsOver : Boolean
+    private var state: GameState
+        get() = gameInfo.state
+        set(value) {
+            gameInfo.state = value
+        }
+
+    val gameIsOver: Boolean
         get() = players.any { it.reachedTheGoal(gameInfo) }
 
-    val winners : List<Player>
+    val winners: List<Player>
         get() = players.filter { it.reachedTheGoal(gameInfo) }.map { it.name }
 
-    private fun toNextState() {
-        state = state.next(gameInfo)
+    init {
+        state = ReinforceState(gameInfo)
     }
 
-    fun addArmies(reinforcements: List<CountryReinforcement>) {
-        if (state != GameState.AddArmies) {
-            throw NotInReinforcingStageException()
-        }
-        reinforcements.forEach { it.apply(currentPlayer, occupations) }
-        toNextState()
-    }
+    fun addArmies(reinforcements: List<CountryReinforcement>) =
+        state.addArmies(reinforcements)
 
-    fun makeAttack(from:Country, to:Country) {
-        if (state != GameState.Attack) {
+    fun makeAttack(from: Country, to: Country) = state.makeAttack(from, to)
 
-            throw Exception("Cannot attack when not in attacking state")
-        } else if (attackState != AttackState.Fight) {
-            throw Exception("Cannot attack if not fighting")
-        }
-        if (occupations.occupierOf(from) != currentPlayer) {
-            throw Exception("Player $currentPlayer does not occupy $from")
-        }
-        CountriesAreNotBorderingException(from, to).assertAreBorderingIn(politicalMap)
-        val attacker = attackerFactory.create(
-            occupations, ClassicCombatDiceAmountCalculator()
-        )
-        attacker.attack(from, to)
-        if (occupations.isEmpty(to)) {
-            attackState = AttackState.Occupation
-            occupyingFrom = from
-            occupyingTo = to
-        }
-    }
+    fun occupyConqueredCountry(armies: PositiveInt) = state.occupyConqueredCountry(armies)
 
-    fun occupyConqueredCountry(armies: PositiveInt) {
-        if (state != GameState.Attack || attackState != AttackState.Occupation) {
-           throw Exception("Not the moment to occupy conquered country")
-        }
+    fun endAttack() = state.endAttack()
 
-        occupier.occupy(occupyingFrom!!, occupyingTo!!, armies)
-        attackState = AttackState.Fight
-    }
-
-    fun endAttack() {
-        if (state != GameState.Attack) {
-            throw Exception("Cannot end attack if not attacking")
-        }
-        toNextState()
-    }
-
-    fun validateRegroupings(regroupings: List<Regrouping>) {
-        regroupings.forEach { it.validate(gameInfo) }
-        if(regroupings.any{ occupations.occupierOf(it.from) != currentPlayer || occupations.occupierOf(it.to) != currentPlayer }) {
-            throw Exception("player must occupy both countries to regroup")
-        }
-
-        if (regroupings.distinctBy { it.from }.count() != regroupings.count()) {
-            throw Exception("Only one regroup per country per turn is allowed (to facilitate validation)")
-        }
-    }
-
-    fun regroup(regroupings: List<Regrouping>){
-        if (state != GameState.Regroup) { throw Exception("Cannot regroup if not regrouping") }
-        validateRegroupings(regroupings)
-        regroupings.map { it.apply(occupations) }
-        toNextState()
-    }
+    fun regroup(regroupings: List<Regrouping>) = state.regroup(regroupings)
 }
 
 class CountriesAreNotBorderingException(val from: Country, val to: Country) :
