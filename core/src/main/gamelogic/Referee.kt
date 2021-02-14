@@ -6,40 +6,10 @@ import PositiveInt
 import gamelogic.combat.AttackerFactory
 import gamelogic.combat.DiceRollingAttackerFactory
 import gamelogic.gameState.GameState
-import gamelogic.gameState.ReinforceState
 import gamelogic.map.PoliticalMap
-import gamelogic.occupations.CountryOccupations
 import gamelogic.occupations.dealers.OccupationsDealer
 import gamelogic.occupations.dealers.RandomOccupationsDealer
 
-class CountryReinforcement(val country:Country, val armies: PositiveInt) {
-    fun apply(player: Player, occupations: CountryOccupations) {
-        CountryIsNotOccupiedByPlayerException(country, player)
-            .assertPlayerOccupiesCountryIn(occupations)
-        occupations.addArmies(country, armies)
-    }
-}
-
-/**
- * preconditions (checked in [Referee.validateRegroupings] method):
- *      1. `regroupings.distinctBy { it.from }.count() == regroupings.count()`
- *      2. occupier of from and to is the same as the currentPlayer
- */
-class Regrouping(val from: Country, val to: Country, val armies: PositiveInt) {
-    fun validate(gameInfo: GameInfo) {
-        if (gameInfo.occupations.armiesOf(from) <= armies.toInt()) {
-            throw Exception(
-                "Cannot move ${armies.toInt()} armies if they are not available in country")
-        }
-        CountriesAreNotBorderingException(from, to)
-            .assertAreBorderingIn(gameInfo.politicalMap)
-    }
-
-    fun apply(occupations: CountryOccupations) {
-        occupations.removeArmies(from, armies)
-        occupations.addArmies(to, armies)
-    }
-}
 /**
  * The Referee of the game
  *
