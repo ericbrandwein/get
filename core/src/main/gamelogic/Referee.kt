@@ -14,9 +14,8 @@ import gamelogic.occupations.dealers.RandomOccupationsDealer
 
 class CountryReinforcement(val country:Country, val armies: PositiveInt) {
     fun apply(player: Player, occupations: CountryOccupations) {
-        if (occupations.occupierOf(country) != player) {
-            throw Exception("Player $player cannot add army to country")
-        }
+        CountryIsNotOccupiedByPlayerException(country, player)
+            .assertPlayerOccupiesCountryIn(occupations)
         occupations.addArmies(country, armies)
     }
 }

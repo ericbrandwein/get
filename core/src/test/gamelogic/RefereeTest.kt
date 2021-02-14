@@ -300,10 +300,12 @@ class RefereeTest {
 
     @Test
     fun `Cannot add armies to a country not occupied by the current player`() {
-        assertFails {
+        val exception = assertFailsWith<CountryIsNotOccupiedByPlayerException> {
             sampleReferee.addArmies(listOf(CountryReinforcement(bra, PositiveInt(1))))
         }
 
+        assertEquals(bra, exception.country)
+        assertEquals(nico, exception.player)
         assertEquals(1, sampleReferee.occupations.armiesOf(bra))
     }
 
