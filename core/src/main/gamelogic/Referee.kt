@@ -15,7 +15,7 @@ import gamelogic.situations.classicCombat.ClassicCombatDiceAmountCalculator
 class CountryReinforcement(val country:Country, val armies: PositiveInt) {
     fun apply(player: Player, occupations: CountryOccupations) {
         if (occupations.occupierOf(country) != player) {
-            throw Exception("Player ${player} cannot add army to country")
+            throw Exception("Player $player cannot add army to country")
         }
         occupations.addArmies(country, armies)
     }
@@ -60,29 +60,12 @@ class Referee(
         RandomOccupationsDealer(politicalMap.countries.toList()),
     private val attackerFactory: AttackerFactory = DiceRollingAttackerFactory()
 ) {
-    enum class State {
-        AddArmies {
-            override fun next(referee: Referee): State = Attack
-        },
-        Attack {
-            override fun next(referee: Referee): State = Regroup
-        },
-        Regroup {
-            override fun next(referee: Referee): State {
-                referee.changeTurn();
-                return AddArmies
-            }
-        };
-
-        abstract fun next(referee: Referee): State
-    }
-
     enum class AttackState { Fight, Occupation }
 
     val occupations =
         CountryOccupations(occupationsDealer.dealTo(players.map { it.name }))
     private var playerIterator = players.loopingIterator()
-    private var state = State.AddArmies
+    private var state = GameState.AddArmies
     private var attackState = AttackState.Fight
     private val occupier = Occupier(occupations)
     private var occupyingFrom: Country? = null
@@ -93,7 +76,7 @@ class Referee(
         get() = GameInfo(
             players, playerIterator, politicalMap, occupations, PlayerDestructions())
 
-    val currentState: State
+    val currentState: GameState
         get() = state
 
     val currentAttackState: AttackState
@@ -109,18 +92,20 @@ class Referee(
         get() = players.filter { it.reachedTheGoal(gameInfo) }.map { it.name }
 
     private fun toNextState() {
-        state = state.next(this)
+        state = state.next(gameInfo)
     }
 
-    private fun changeTurn() = playerIterator.next()
-
     fun addArmies(reinforcements: List<CountryReinforcement>) {
+        if (state != GameState.AddArmies) {
+            throw NotInReinforcingStageException()
+        }
         reinforcements.forEach { it.apply(currentPlayer, occupations) }
         toNextState()
     }
 
     fun makeAttack(from:Country, to:Country) {
-        if (state != State.Attack) {
+        if (state != GameState.Attack) {
+
             throw Exception("Cannot attack when not in attacking state")
         } else if (attackState != AttackState.Fight) {
             throw Exception("Cannot attack if not fighting")
@@ -141,7 +126,7 @@ class Referee(
     }
 
     fun occupyConqueredCountry(armies: PositiveInt) {
-        if (state != State.Attack || attackState != AttackState.Occupation) {
+        if (state != GameState.Attack || attackState != AttackState.Occupation) {
            throw Exception("Not the moment to occupy conquered country")
         }
 
@@ -150,7 +135,7 @@ class Referee(
     }
 
     fun endAttack() {
-        if (state != State.Attack) {
+        if (state != GameState.Attack) {
             throw Exception("Cannot end attack if not attacking")
         }
         toNextState()
@@ -168,7 +153,7 @@ class Referee(
     }
 
     fun regroup(regroupings: List<Regrouping>){
-        if (state != State.Regroup) { throw Exception("Cannot regroup if not regrouping") }
+        if (state != GameState.Regroup) { throw Exception("Cannot regroup if not regrouping") }
         validateRegroupings(regroupings)
         regroupings.map { it.apply(occupations) }
         toNextState()
@@ -184,3 +169,5 @@ class CountriesAreNotBorderingException(val from: Country, val to: Country) :
         }
     }
 }
+
+class NotInReinforcingStageException : Exception("Cannot add armies right now.")

@@ -123,7 +123,7 @@ class RefereeTest {
         val reinforcements = listOf(CountryReinforcement(arg, armiesToAdd))
         val armiesBefore = sampleReferee.occupations.armiesOf(arg)
         sampleReferee.addArmies(reinforcements)
-        assertEquals(sampleReferee.currentState, Referee.State.Attack)
+        assertEquals(sampleReferee.currentState, GameState.Attack)
         assertEquals(
             sampleReferee.occupations.armiesOf(arg), (armiesToAdd + armiesBefore).toInt())
     }
@@ -133,7 +133,7 @@ class RefereeTest {
         val reinforcements = listOf(CountryReinforcement(arg, PositiveInt(1)))
         sampleReferee.addArmies(reinforcements)
         sampleReferee.endAttack()
-        assertEquals(sampleReferee.currentState, Referee.State.Regroup)
+        assertEquals(sampleReferee.currentState, GameState.Regroup)
     }
 
     @Test
@@ -149,7 +149,7 @@ class RefereeTest {
         referee.endAttack()
         referee.regroup(listOf(Regrouping(arg, chi, PositiveInt(2))))
         assertEquals(referee.occupations.armiesOf(chi), 3)
-        assertEquals(referee.currentState, Referee.State.AddArmies)
+        assertEquals(referee.currentState, GameState.AddArmies)
         assertEquals(referee.currentPlayer, eric)
     }
 
@@ -298,5 +298,27 @@ class RefereeTest {
         assertEquals(kam, exception.to)
         assertEquals(3, sampleReferee.occupations.armiesOf(arg))
         assertEquals(1, sampleReferee.occupations.armiesOf(kam))
+    }
+
+    @Test
+    fun `Cannot add armies to a country not occupied by the current player`() {
+        assertFails {
+            sampleReferee.addArmies(listOf(CountryReinforcement(bra, PositiveInt(1))))
+        }
+
+        assertEquals(1, sampleReferee.occupations.armiesOf(bra))
+    }
+
+    @Test
+    fun `Cannot reinforce when not in reinforcing state`() {
+        sampleReferee.addArmies(listOf())
+
+        assertFailsWith<NotInReinforcingStageException> {
+            sampleReferee.addArmies(listOf())
+        }
+
+        politicalMap.countries.forEach { country ->
+            assertEquals(1, sampleReferee.occupations.armiesOf(country))
+        }
     }
 }
