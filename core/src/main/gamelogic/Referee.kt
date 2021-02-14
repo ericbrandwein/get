@@ -6,7 +6,6 @@ import PositiveInt
 import gamelogic.combat.AttackerFactory
 import gamelogic.combat.DiceRollingAttackerFactory
 import gamelogic.gameState.GameState
-import gamelogic.gameState.NoState
 import gamelogic.gameState.ReinforceState
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
@@ -63,7 +62,7 @@ class Referee(
 ) {
 
     private val gameInfo = GameInfo(
-        attackerFactory, players, politicalMap, occupationsDealer
+        players, politicalMap, occupationsDealer, attackerFactory
     )
 
     val occupations
@@ -72,21 +71,14 @@ class Referee(
     val currentPlayer
         get() = gameInfo.currentPlayer.name
 
-    private var state: GameState
+    private val state: GameState
         get() = gameInfo.state
-        set(value) {
-            gameInfo.state = value
-        }
 
     val gameIsOver: Boolean
         get() = players.any { it.reachedTheGoal(gameInfo) }
 
     val winners: List<Player>
         get() = players.filter { it.reachedTheGoal(gameInfo) }.map { it.name }
-
-    init {
-        state = ReinforceState(gameInfo)
-    }
 
     fun addArmies(reinforcements: List<CountryReinforcement>) =
         state.addArmies(reinforcements)

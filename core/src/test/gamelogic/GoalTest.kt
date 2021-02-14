@@ -37,10 +37,10 @@ private fun createGameInfo(
     occupations: Collection<Occupation>,
     destroyed: PlayerDestructions = PlayerDestructions()
 ) = GameInfo(
-    DiceRollingAttackerFactory(),
     players,
     politicalMap,
     FixedOccupationsDealer(occupations, players.map { it.name }),
+    DiceRollingAttackerFactory(),
     destroyed
 )
 

@@ -21,8 +21,6 @@ abstract class GameState {
         throw NotInRegroupingStateException()
 }
 
-object NoState : GameState()
-
 class NotInReinforcingStateException : Exception("Cannot add armies right now.")
 class NotInAttackingStateException : Exception("Cannot attack or occupy right now.")
 class NotInRegroupingStateException : Exception("Cannot regroup right now.")
