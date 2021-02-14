@@ -2,10 +2,7 @@ package gamelogic
 
 import PositiveInt
 import gamelogic.combat.AttackingCountryWinsAttackerFactory
-import gamelogic.gameState.CannotEndAttackWhenOccupyingException
-import gamelogic.gameState.NotInAttackingStateException
-import gamelogic.gameState.NotInRegroupingStateException
-import gamelogic.gameState.NotInReinforcingStateException
+import gamelogic.gameState.*
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.PlayerOccupation
@@ -349,5 +346,36 @@ class RefereeTest {
         assertFailsWith<NotInRegroupingStateException> {
             sampleReferee.regroup(listOf())
         }
+    }
+
+    @Test
+    fun `Cannot regroup to a country that does not belong to the current player`() {
+        sampleRefereeLarge.addArmies(listOf(CountryReinforcement(arg, PositiveInt(1))))
+        sampleRefereeLarge.endAttack()
+        val exception = assertFailsWith<CountryIsNotOccupiedByPlayerException> {
+            sampleRefereeLarge.regroup(listOf(Regrouping(arg, bra, PositiveInt(1))))
+        }
+
+        assertEquals(bra, exception.country)
+        assertEquals(nico, exception.player)
+        assertEquals(2, sampleRefereeLarge.occupations.armiesOf(arg))
+        assertEquals(1, sampleRefereeLarge.occupations.armiesOf(bra))
+    }
+
+    @Test
+    fun `Cannot regroup from a country that does not belong to the current player`() {
+        sampleRefereeLarge.addArmies(listOf(CountryReinforcement(arg, PositiveInt(1))))
+        sampleRefereeLarge.endAttack()
+        sampleRefereeLarge.regroup(listOf())
+        sampleRefereeLarge.addArmies(listOf())
+        sampleRefereeLarge.endAttack()
+        val exception = assertFailsWith<CountryIsNotOccupiedByPlayerException> {
+            sampleRefereeLarge.regroup(listOf(Regrouping(arg, bra, PositiveInt(1))))
+        }
+
+        assertEquals(arg, exception.country)
+        assertEquals(eric, exception.player)
+        assertEquals(2, sampleRefereeLarge.occupations.armiesOf(arg))
+        assertEquals(1, sampleRefereeLarge.occupations.armiesOf(bra))
     }
 }

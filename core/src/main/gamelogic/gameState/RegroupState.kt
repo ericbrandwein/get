@@ -1,5 +1,7 @@
 package gamelogic.gameState
 
+import Country
+import Player
 import gamelogic.GameInfo
 import gamelogic.Regrouping
 
@@ -12,16 +14,10 @@ class RegroupState(private val gameInfo: GameInfo) : GameState() {
     }
 
     private fun validateRegroupings(regroupings: List<Regrouping>) {
-        regroupings.forEach { it.validate(gameInfo) }
-        val occupations = gameInfo.occupations
-        val playerName = gameInfo.currentPlayer.name
-        if (
-            regroupings.any {
-                occupations.occupierOf(it.from) != playerName ||
-                    occupations.occupierOf(it.to) != playerName
-            }
-        ) {
-            throw Exception("player must occupy both countries to regroup")
+        regroupings.forEach {
+            it.validate(gameInfo)
+            assertPlayerOccupiesCountry(it.from)
+            assertPlayerOccupiesCountry(it.to)
         }
 
         if (regroupings.distinctBy { it.from }.count() != regroupings.count()) {
@@ -29,4 +25,15 @@ class RegroupState(private val gameInfo: GameInfo) : GameState() {
                 "Only one regroup per country per turn is allowed (to facilitate validation)")
         }
     }
+
+    private fun assertPlayerOccupiesCountry(country: Country) {
+        val occupations = gameInfo.occupations
+        val playerName = gameInfo.currentPlayer.name
+        if (occupations.occupierOf(country) != playerName) {
+            throw CountryIsNotOccupiedByPlayerException(country, playerName)
+        }
+    }
 }
+
+class CountryIsNotOccupiedByPlayerException(val country: Country, val player: Player) :
+    Exception("Country $country is not occupied by $player.")
