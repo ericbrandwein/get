@@ -2,7 +2,6 @@ package gamelogic
 
 import PositiveInt
 import gamelogic.combat.DiceRollingAttackerFactory
-import gamelogic.gameState.NoState
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.Occupation
@@ -40,8 +39,9 @@ private fun createGameInfo(
 ) = GameInfo(
     DiceRollingAttackerFactory(),
     players,
-    politicalMap, destroyed,
-    FixedOccupationsDealer(occupations, players.map { it.name })
+    politicalMap,
+    FixedOccupationsDealer(occupations, players.map { it.name }),
+    destroyed
 )
 
 class OccupyContinentTest {

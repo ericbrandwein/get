@@ -11,8 +11,8 @@ class GameInfo(
     val attackerFactory: AttackerFactory,
     val players: MutableList<PlayerInfo>,
     val politicalMap: PoliticalMap,
-    val destroyedPlayers: PlayerDestructions,
     occupationsDealer: OccupationsDealer,
+    val destroyedPlayers: PlayerDestructions = PlayerDestructions(),
     var state: GameState = NoState
 ) {
 
