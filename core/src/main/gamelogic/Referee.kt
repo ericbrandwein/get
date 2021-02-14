@@ -62,14 +62,15 @@ class Referee(
     attackerFactory: AttackerFactory = DiceRollingAttackerFactory()
 ) {
 
-    val occupations =
-        CountryOccupations(occupationsDealer.dealTo(players.map { it.name }))
 
     private val gameInfo = GameInfo(
         NoState, attackerFactory,
-        players, politicalMap, occupations,
-        PlayerDestructions()
+        players, politicalMap,
+        PlayerDestructions(), occupationsDealer
     )
+
+    val occupations
+        get() = gameInfo.occupations
 
     val currentPlayer
         get() = gameInfo.currentPlayer.name
