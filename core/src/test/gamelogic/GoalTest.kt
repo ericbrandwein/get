@@ -1,10 +1,12 @@
 package gamelogic
 
 import PositiveInt
+import gamelogic.combat.DiceRollingAttackerFactory
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
-import gamelogic.occupations.CountryOccupations
+import gamelogic.occupations.Occupation
 import gamelogic.occupations.PlayerOccupation
+import gamelogic.occupations.dealers.FixedOccupationsDealer
 import org.junit.Test
 import kotlin.test.assertFails
 import kotlin.test.assertFalse
@@ -15,7 +17,7 @@ private val SINGLE_COUNTRY_CONTINENT = Continent("América", setOf(A_COUNTRY))
 private val SINGLE_COUNTRY_POLITICAL_MAP =
     PoliticalMap.Builder().addContinent(SINGLE_COUNTRY_CONTINENT).build()
 private val SINGLE_COUNTRY_OCCUPATIONS =
-    CountryOccupations(listOf(PlayerOccupation(A_COUNTRY, "Nico", PositiveInt(1))))
+    listOf(PlayerOccupation(A_COUNTRY, "Nico", PositiveInt(1)))
 
 private fun twoPlayersWithGoals(firstGoal: Goal, secondGoal: Goal) =
     mutableListOf(
@@ -32,9 +34,15 @@ private fun createSingleCountryGameInfo(
 private fun createGameInfo(
     players: MutableList<PlayerInfo>,
     politicalMap: PoliticalMap,
-    occupations: CountryOccupations,
+    occupations: Collection<Occupation>,
     destroyed: PlayerDestructions = PlayerDestructions()
-) = GameInfo(players, players.loopingIterator(), politicalMap, occupations, destroyed)
+) = GameInfo(
+    players,
+    politicalMap,
+    FixedOccupationsDealer(occupations, players.map { it.name }),
+    DiceRollingAttackerFactory(),
+    destroyed
+)
 
 class OccupyContinentTest {
     private val goal: Goal = Goal(listOf(OccupyContinent(SINGLE_COUNTRY_CONTINENT)))
@@ -96,11 +104,11 @@ class OccupySubContinentTest {
         val politicalMap = PoliticalMap.Builder().addContinent(continent).build()
         val goal = Goal(listOf(OccupySubContinent(continent, 1)))
         val players = twoPlayersWithGoals(goal, goal)
-        val occupations = CountryOccupations(
+        val occupations =
             listOf(
                 PlayerOccupation(firstCountry, players[0].name, PositiveInt(1)),
                 PlayerOccupation(secondCountry, players[1].name, PositiveInt(1))
-            ))
+            )
         val gameInfo = createGameInfo(players, politicalMap, occupations)
 
         assertTrue(goal.achieved(players[0], gameInfo))

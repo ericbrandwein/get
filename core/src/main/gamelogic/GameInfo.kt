@@ -1,12 +1,32 @@
 package gamelogic
 
+import gamelogic.combat.AttackerFactory
+import gamelogic.gameState.GameState
+import gamelogic.gameState.ReinforceState
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
+import gamelogic.occupations.dealers.OccupationsDealer
 
-data class GameInfo(
-    val players: List<PlayerInfo>,
-    val playerIterator: LoopingIterator<PlayerInfo>,
+/**
+ * Maintains the current game context, including its state, its current player,
+ * its occupations, etc.
+ *
+ * [GameState] objects manipulate this to advance the game.
+ */
+class GameInfo(
+    val players: MutableList<PlayerInfo>,
     val politicalMap: PoliticalMap,
-    val occupations: CountryOccupations,
-    val destroyedPlayers: PlayerDestructions
-)
+    occupationsDealer: OccupationsDealer,
+    val attackerFactory: AttackerFactory,
+    val destroyedPlayers: PlayerDestructions = PlayerDestructions()
+) {
+
+    var state: GameState = ReinforceState(this)
+    val playerIterator = players.loopingIterator()
+    val occupations = CountryOccupations(occupationsDealer.dealTo(players.map { it.name }))
+
+    val currentPlayer
+        get() = playerIterator.current
+
+    fun nextTurn() = playerIterator.next()
+}
