@@ -80,7 +80,9 @@ class RefereeTest {
     @Test
     fun `Starting a game deals the countries to the players`() {
         val countries = politicalMap.countries.toList()
-        val referee = Referee.forGame(players, politicalMap)
+        val playerColors = mapOf(nico to Color.Black, eric to Color.White)
+        val referee =
+            Referee.forGame(playerColors, politicalMap, listOf(goalNico, goalEric))
 
         countries.forEach {
             assertTrue(referee.occupations.occupierOf(it) in playerNames)
@@ -379,5 +381,17 @@ class RefereeTest {
         assertEquals(eric, exception.player)
         assertEquals(2, sampleRefereeLarge.occupations.armiesOf(arg))
         assertEquals(1, sampleRefereeLarge.occupations.armiesOf(bra))
+    }
+
+    @Test
+    fun `forGame distributes the goals to the players`() {
+        val players = mapOf(nico to Color.Black, eric to Color.White)
+        val goals = listOf(goalNico, goalEric)
+
+        val referee = Referee.forGame(players, politicalMap, goals)
+
+        assertTrue(referee.goalOf(nico) in goals)
+        assertTrue(referee.goalOf(eric) in goals)
+        assertNotEquals(referee.goalOf(nico), referee.goalOf(eric))
     }
 }

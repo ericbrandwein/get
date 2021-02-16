@@ -45,6 +45,8 @@ class Referee(
     val winners: List<Player>
         get() = players.filter { it.reachedTheGoal(gameInfo) }.map { it.name }
 
+    fun goalOf(player: Player) = players.first { it.name == player }.goal
+
     fun addArmies(reinforcements: List<CountryReinforcement>) =
         state.addArmies(reinforcements)
 
@@ -58,13 +60,19 @@ class Referee(
 
     companion object {
         fun forGame(
-            players: MutableList<PlayerInfo>, politicalMap: PoliticalMap
+            playerColors: Map<Player, Color>,
+            politicalMap: PoliticalMap,
+            goals: Collection<Goal>
         ): Referee {
-            val playerNames = players.map { it.name }
+            val playerNames = playerColors.keys
             val occupations = RandomOccupationsDealer(politicalMap.countries.toList())
-                    .dealTo(playerNames)
+                .dealTo(playerNames)
+            val playerInfos = playerColors.entries
+                .zip(goals.shuffled())
+                .map { (entry, goal) -> PlayerInfo(entry.key, entry.value, goal) }
+                .toMutableList()
             return Referee(
-                players, politicalMap,
+                playerInfos, politicalMap,
                 CountryOccupations(occupations),
                 DiceRollingAttackerFactory()
             )
