@@ -30,11 +30,8 @@ class ReadyScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
             parseMapInfoFromJsonFile(MAP_INFO_FILE_NAME)
         val goal =
             Goal(listOf(OccupyContinent(politicalMap.continents.first())))
-        val players = mutableListOf(
-            PlayerInfo("Eric", Color.White, goal),
-            PlayerInfo("Nico", Color.Black, goal)
-        )
-        val referee = Referee(players, politicalMap)
+        val players = mapOf("Eric" to Color.White, "Nico" to Color.Black)
+        val referee = Referee.forGame(players, politicalMap, listOf(goal, goal))
         game.setKamchatkaScreen(RunningScreen(game, referee, countryColors))
     }
 

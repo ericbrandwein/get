@@ -7,7 +7,7 @@ import gamelogic.combat.AttackerFactory
 import gamelogic.combat.DiceRollingAttackerFactory
 import gamelogic.gameState.GameState
 import gamelogic.map.PoliticalMap
-import gamelogic.occupations.dealers.OccupationsDealer
+import gamelogic.occupations.CountryOccupations
 import gamelogic.occupations.dealers.RandomOccupationsDealer
 
 /**
@@ -25,17 +25,17 @@ import gamelogic.occupations.dealers.RandomOccupationsDealer
 class Referee(
     private val players: MutableList<PlayerInfo>,
     private val politicalMap: PoliticalMap,
-    occupationsDealer: OccupationsDealer =
-        RandomOccupationsDealer(politicalMap.countries.toList()),
+    val occupations: CountryOccupations,
     attackerFactory: AttackerFactory = DiceRollingAttackerFactory()
 ) {
 
-    private val gameInfo = GameInfo(
-        players, politicalMap, occupationsDealer, attackerFactory
-    )
+    init {
+        PlayersSharingColorException.assertNoPlayersShareColor(players)
+    }
 
-    val occupations
-        get() = gameInfo.occupations
+    private val gameInfo = GameInfo(
+        players, politicalMap, occupations, attackerFactory
+    )
 
     val currentPlayer
         get() = gameInfo.currentPlayer.name
@@ -49,6 +49,8 @@ class Referee(
     val winners: List<Player>
         get() = players.filter { it.reachedTheGoal(gameInfo) }.map { it.name }
 
+    fun goalOf(player: Player) = players.first { it.name == player }.goal
+
     fun addArmies(reinforcements: List<CountryReinforcement>) =
         state.addArmies(reinforcements)
 
@@ -59,4 +61,61 @@ class Referee(
     fun endAttack() = state.endAttack()
 
     fun regroup(regroupings: List<Regrouping>) = state.regroup(regroupings)
+
+    companion object {
+        fun forGame(
+            playerColors: Map<Player, Color>,
+            politicalMap: PoliticalMap,
+            goals: Collection<Goal>
+        ): Referee {
+            val playerNames = playerColors.keys
+            val occupations = RandomOccupationsDealer(politicalMap.countries.toList())
+                .dealTo(playerNames)
+            val playerInfos = dealGoals(playerColors, goals)
+            return Referee(
+                playerInfos, politicalMap,
+                CountryOccupations(occupations),
+                DiceRollingAttackerFactory()
+            )
+        }
+
+        private fun dealGoals(
+            playerColors: Map<Player, Color>, goals: Collection<Goal>
+        ): MutableList<PlayerInfo> {
+            NotEnoughGoalsToDealException(goals.size, playerColors.size)
+                .assertEnoughGoalsForPlayers()
+            return playerColors.entries
+                .zip(goals.shuffled())
+                .map { (entry, goal) -> PlayerInfo(entry.key, entry.value, goal) }
+                .toMutableList()
+        }
+    }
+}
+
+class PlayersSharingColorException(
+    val players: List<Player>, val color: Color
+) : IllegalArgumentException(
+    "Players ${players[0]} and $players[1]} have the same color $color."
+) {
+    companion object {
+        fun assertNoPlayersShareColor(players: List<PlayerInfo>) {
+            players.groupBy { it.color }.entries
+                .firstOrNull { (_, players) -> players.size > 1 }
+                ?.let { (color, players) ->
+                    throw PlayersSharingColorException(players.map { it.name }, color)
+                }
+        }
+    }
+}
+
+class NotEnoughGoalsToDealException(
+    val goalsAmount: Int, val playersAmount: Int
+) : IllegalArgumentException(
+    "Cannot deal enough goals; there are $goalsAmount goals, but $playersAmount players."
+) {
+    fun assertEnoughGoalsForPlayers() {
+        if (goalsAmount < playersAmount) {
+            throw this
+        }
+    }
 }

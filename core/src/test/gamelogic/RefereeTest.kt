@@ -2,11 +2,15 @@ package gamelogic
 
 import PositiveInt
 import gamelogic.combat.AttackingCountryWinsAttackerFactory
-import gamelogic.gameState.*
+import gamelogic.gameState.CannotEndAttackWhenOccupyingException
+import gamelogic.gameState.NotInAttackingStateException
+import gamelogic.gameState.NotInRegroupingStateException
+import gamelogic.gameState.NotInReinforcingStateException
 import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
+import gamelogic.occupations.CountryOccupations
 import gamelogic.occupations.PlayerOccupation
-import gamelogic.occupations.dealers.FixedOccupationsDealer
+import java.lang.IllegalArgumentException
 import kotlin.test.*
 
 class RefereeTest {
@@ -68,20 +72,18 @@ class RefereeTest {
     )
 
     private val sampleReferee = Referee(
-        players,
-        politicalMap,
-        FixedOccupationsDealer(occupationsSample, playerNames)
+        players, politicalMap, CountryOccupations(occupationsSample)
     )
     private val sampleRefereeLarge = Referee(
-        players,
-        politicalMapLarge,
-        FixedOccupationsDealer(occupationsSampleLarge, playerNames)
+        players, politicalMapLarge, CountryOccupations(occupationsSampleLarge)
     )
 
     @Test
     fun `Starting a game deals the countries to the players`() {
         val countries = politicalMap.countries.toList()
-        val referee = Referee(players, politicalMap)
+        val playerColors = mapOf(nico to Color.Black, eric to Color.White)
+        val referee =
+            Referee.forGame(playerColors, politicalMap, listOf(goalNico, goalEric))
 
         countries.forEach {
             assertTrue(referee.occupations.occupierOf(it) in playerNames)
@@ -107,7 +109,7 @@ class RefereeTest {
         val referee = Referee(
             players,
             politicalMap,
-            FixedOccupationsDealer(occupationsEric.union(occupationsNico), playerNames)
+            CountryOccupations(occupationsEric.union(occupationsNico))
         )
         assertTrue(referee.gameIsOver)
         assertTrue(referee.winners.contains(nico) and !referee.winners.contains(eric))
@@ -132,9 +134,7 @@ class RefereeTest {
     fun `Regroup moves the armies and changes turn`() {
 
         val referee = Referee(
-            players,
-            politicalMapLarge,
-            FixedOccupationsDealer(occupationsSampleLarge, playerNames)
+            players, politicalMapLarge, CountryOccupations(occupationsSampleLarge)
         )
         val reinforcements = listOf(CountryReinforcement(arg, PositiveInt(3)))
         referee.addArmies(reinforcements)
@@ -152,7 +152,7 @@ class RefereeTest {
         val referee = Referee(
             players,
             politicalMapLarge,
-            FixedOccupationsDealer(occupationsSampleLarge, playerNames),
+            CountryOccupations(occupationsSampleLarge),
             attackerFactory
         )
         val reinforcements = listOf(CountryReinforcement(arg, PositiveInt(3)))
@@ -175,9 +175,7 @@ class RefereeTest {
         )
 
         val referee = Referee(
-            players,
-            politicalMapLarge,
-            FixedOccupationsDealer(occupationsSampleSmall, playerNames)
+            players, politicalMapLarge, CountryOccupations(occupationsSampleSmall)
         )
 
         assertFails {
@@ -195,7 +193,7 @@ class RefereeTest {
         val referee = Referee(
             players,
             politicalMap,
-            FixedOccupationsDealer(occupationsSample, playerNames),
+            CountryOccupations(occupationsSample),
             attackerFactory
         )
 
@@ -231,7 +229,7 @@ class RefereeTest {
         val referee = Referee(
             players,
             politicalMap,
-            FixedOccupationsDealer(occupationsSample, playerNames),
+            CountryOccupations(occupationsSample),
             attackerFactory
         )
 
@@ -327,7 +325,7 @@ class RefereeTest {
         val referee = Referee(
             players,
             politicalMap,
-            FixedOccupationsDealer(occupationsSample, playerNames),
+            CountryOccupations(occupationsSample),
             AttackingCountryWinsAttackerFactory(PositiveInt(4), PositiveInt(1))
         )
         referee.addArmies(listOf(CountryReinforcement(arg, PositiveInt(3))))
@@ -384,5 +382,47 @@ class RefereeTest {
         assertEquals(eric, exception.player)
         assertEquals(2, sampleRefereeLarge.occupations.armiesOf(arg))
         assertEquals(1, sampleRefereeLarge.occupations.armiesOf(bra))
+    }
+
+    @Test
+    fun `forGame distributes the goals to the players`() {
+        val players = mapOf(nico to Color.Black, eric to Color.White)
+        val goals = listOf(goalNico, goalEric)
+
+        val referee = Referee.forGame(players, politicalMap, goals)
+
+        assertTrue(referee.goalOf(nico) in goals)
+        assertTrue(referee.goalOf(eric) in goals)
+        assertNotEquals(referee.goalOf(nico), referee.goalOf(eric))
+    }
+
+    @Test
+    fun `Two players cannot have the same color`() {
+        val players = mutableListOf(
+            PlayerInfo(eric, Color.White, goalEric),
+            PlayerInfo(nico, Color.White, goalNico)
+        )
+
+        val exception = assertFailsWith<PlayersSharingColorException> {
+            Referee(players, politicalMap, CountryOccupations(occupationsSample))
+        }
+
+        assertEquals(2, exception.players.size)
+        listOf(eric, nico).forEach {
+            assertTrue(it in exception.players)
+        }
+        assertEquals(Color.White, exception.color)
+    }
+
+    @Test
+    fun `Cannot create a Referee with less goals than players`() {
+        val players = mapOf(nico to Color.White, eric to Color.Black)
+
+        val exception = assertFailsWith<NotEnoughGoalsToDealException> {
+            Referee.forGame(players, politicalMap, listOf())
+        }
+
+        assertEquals(0, exception.goalsAmount)
+        assertEquals(2, exception.playersAmount)
     }
 }

@@ -16,14 +16,13 @@ import gamelogic.occupations.dealers.OccupationsDealer
 class GameInfo(
     val players: MutableList<PlayerInfo>,
     val politicalMap: PoliticalMap,
-    occupationsDealer: OccupationsDealer,
+    val occupations: CountryOccupations,
     val attackerFactory: AttackerFactory,
     val destroyedPlayers: PlayerDestructions = PlayerDestructions()
 ) {
 
     var state: GameState = ReinforceState(this)
     val playerIterator = players.loopingIterator()
-    val occupations = CountryOccupations(occupationsDealer.dealTo(players.map { it.name }))
 
     val currentPlayer
         get() = playerIterator.current
