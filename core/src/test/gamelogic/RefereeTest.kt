@@ -394,4 +394,22 @@ class RefereeTest {
         assertTrue(referee.goalOf(eric) in goals)
         assertNotEquals(referee.goalOf(nico), referee.goalOf(eric))
     }
+
+    @Test
+    fun `Two players cannot have the same color`() {
+        val players = mutableListOf(
+            PlayerInfo(eric, Color.White, goalEric),
+            PlayerInfo(nico, Color.White, goalNico)
+        )
+
+        val exception = assertFailsWith<PlayersSharingColorException> {
+            Referee(players, politicalMap, CountryOccupations(occupationsSample))
+        }
+
+        assertEquals(2, exception.players.size)
+        listOf(eric, nico).forEach {
+            assertTrue(it in exception.players)
+        }
+        assertEquals(Color.White, exception.color)
+    }
 }

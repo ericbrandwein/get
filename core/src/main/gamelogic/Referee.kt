@@ -29,6 +29,10 @@ class Referee(
     attackerFactory: AttackerFactory = DiceRollingAttackerFactory()
 ) {
 
+    init {
+        PlayersSharingColorException.assertNoPlayersShareColor(players)
+    }
+
     private val gameInfo = GameInfo(
         players, politicalMap, occupations, attackerFactory
     )
@@ -76,6 +80,22 @@ class Referee(
                 CountryOccupations(occupations),
                 DiceRollingAttackerFactory()
             )
+        }
+    }
+}
+
+class PlayersSharingColorException(
+    val players: List<Player>, val color: Color
+) : IllegalArgumentException(
+    "Players ${players[0]} and $players[1]} have the same color $color."
+) {
+    companion object {
+        fun assertNoPlayersShareColor(players: List<PlayerInfo>) {
+            players.groupBy { it.color }.entries
+                .firstOrNull { (_, players) -> players.size > 1 }
+                ?.let { (color, players) ->
+                    throw PlayersSharingColorException(players.map { it.name }, color)
+                }
         }
     }
 }
