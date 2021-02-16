@@ -71,15 +71,23 @@ class Referee(
             val playerNames = playerColors.keys
             val occupations = RandomOccupationsDealer(politicalMap.countries.toList())
                 .dealTo(playerNames)
-            val playerInfos = playerColors.entries
-                .zip(goals.shuffled())
-                .map { (entry, goal) -> PlayerInfo(entry.key, entry.value, goal) }
-                .toMutableList()
+            val playerInfos = dealGoals(playerColors, goals)
             return Referee(
                 playerInfos, politicalMap,
                 CountryOccupations(occupations),
                 DiceRollingAttackerFactory()
             )
+        }
+
+        private fun dealGoals(
+            playerColors: Map<Player, Color>, goals: Collection<Goal>
+        ): MutableList<PlayerInfo> {
+            NotEnoughGoalsToDealException(goals.size, playerColors.size)
+                .assertEnoughGoalsForPlayers()
+            return playerColors.entries
+                .zip(goals.shuffled())
+                .map { (entry, goal) -> PlayerInfo(entry.key, entry.value, goal) }
+                .toMutableList()
         }
     }
 }
@@ -96,6 +104,18 @@ class PlayersSharingColorException(
                 ?.let { (color, players) ->
                     throw PlayersSharingColorException(players.map { it.name }, color)
                 }
+        }
+    }
+}
+
+class NotEnoughGoalsToDealException(
+    val goalsAmount: Int, val playersAmount: Int
+) : IllegalArgumentException(
+    "Cannot deal enough goals; there are $goalsAmount goals, but $playersAmount players."
+) {
+    fun assertEnoughGoalsForPlayers() {
+        if (goalsAmount < playersAmount) {
+            throw this
         }
     }
 }

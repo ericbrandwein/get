@@ -10,6 +10,7 @@ import gamelogic.map.Continent
 import gamelogic.map.PoliticalMap
 import gamelogic.occupations.CountryOccupations
 import gamelogic.occupations.PlayerOccupation
+import java.lang.IllegalArgumentException
 import kotlin.test.*
 
 class RefereeTest {
@@ -411,5 +412,17 @@ class RefereeTest {
             assertTrue(it in exception.players)
         }
         assertEquals(Color.White, exception.color)
+    }
+
+    @Test
+    fun `Cannot create a Referee with less goals than players`() {
+        val players = mapOf(nico to Color.White, eric to Color.Black)
+
+        val exception = assertFailsWith<NotEnoughGoalsToDealException> {
+            Referee.forGame(players, politicalMap, listOf())
+        }
+
+        assertEquals(0, exception.goalsAmount)
+        assertEquals(2, exception.playersAmount)
     }
 }
