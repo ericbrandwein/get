@@ -34,7 +34,7 @@ class ReadyScreen(private val game: Kamchatka) : KamchatkaScreen(game) {
             PlayerInfo("Eric", Color.White, goal),
             PlayerInfo("Nico", Color.Black, goal)
         )
-        val referee = Referee(players, politicalMap)
+        val referee = Referee.initialize(players, politicalMap)
         game.setKamchatkaScreen(RunningScreen(game, referee, countryColors))
     }
 

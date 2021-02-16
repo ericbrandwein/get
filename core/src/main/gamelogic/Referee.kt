@@ -7,6 +7,7 @@ import gamelogic.combat.AttackerFactory
 import gamelogic.combat.DiceRollingAttackerFactory
 import gamelogic.gameState.GameState
 import gamelogic.map.PoliticalMap
+import gamelogic.occupations.CountryOccupations
 import gamelogic.occupations.dealers.OccupationsDealer
 import gamelogic.occupations.dealers.RandomOccupationsDealer
 
@@ -25,17 +26,13 @@ import gamelogic.occupations.dealers.RandomOccupationsDealer
 class Referee(
     private val players: MutableList<PlayerInfo>,
     private val politicalMap: PoliticalMap,
-    occupationsDealer: OccupationsDealer =
-        RandomOccupationsDealer(politicalMap.countries.toList()),
-    attackerFactory: AttackerFactory = DiceRollingAttackerFactory()
+    val occupations: CountryOccupations,
+    attackerFactory: AttackerFactory
 ) {
 
     private val gameInfo = GameInfo(
-        players, politicalMap, occupationsDealer, attackerFactory
+        players, politicalMap, occupations, attackerFactory
     )
-
-    val occupations
-        get() = gameInfo.occupations
 
     val currentPlayer
         get() = gameInfo.currentPlayer.name
@@ -59,4 +56,18 @@ class Referee(
     fun endAttack() = state.endAttack()
 
     fun regroup(regroupings: List<Regrouping>) = state.regroup(regroupings)
+
+    companion object {
+        fun initialize(
+            players: MutableList<PlayerInfo>, politicalMap: PoliticalMap,
+            occupationsDealer: OccupationsDealer =
+                RandomOccupationsDealer(politicalMap.countries.toList()),
+            attackerFactory: AttackerFactory = DiceRollingAttackerFactory()
+        ): Referee {
+            val occupations = CountryOccupations(
+                occupationsDealer.dealTo(players.map { it.name })
+            )
+            return Referee(players, politicalMap, occupations, attackerFactory)
+        }
+    }
 }

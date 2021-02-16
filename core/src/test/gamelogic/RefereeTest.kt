@@ -67,12 +67,12 @@ class RefereeTest {
         PlayerOccupation(vie, eric, PositiveInt(1))
     )
 
-    private val sampleReferee = Referee(
+    private val sampleReferee = Referee.initialize(
         players,
         politicalMap,
         FixedOccupationsDealer(occupationsSample, playerNames)
     )
-    private val sampleRefereeLarge = Referee(
+    private val sampleRefereeLarge = Referee.initialize(
         players,
         politicalMapLarge,
         FixedOccupationsDealer(occupationsSampleLarge, playerNames)
@@ -81,7 +81,7 @@ class RefereeTest {
     @Test
     fun `Starting a game deals the countries to the players`() {
         val countries = politicalMap.countries.toList()
-        val referee = Referee(players, politicalMap)
+        val referee = Referee.initialize(players, politicalMap)
 
         countries.forEach {
             assertTrue(referee.occupations.occupierOf(it) in playerNames)
@@ -104,7 +104,7 @@ class RefereeTest {
         )
         val occupationsEric = listOf(PlayerOccupation(jap, eric, PositiveInt(1)))
 
-        val referee = Referee(
+        val referee = Referee.initialize(
             players,
             politicalMap,
             FixedOccupationsDealer(occupationsEric.union(occupationsNico), playerNames)
@@ -131,7 +131,7 @@ class RefereeTest {
     @Test
     fun `Regroup moves the armies and changes turn`() {
 
-        val referee = Referee(
+        val referee = Referee.initialize(
             players,
             politicalMapLarge,
             FixedOccupationsDealer(occupationsSampleLarge, playerNames)
@@ -149,7 +149,7 @@ class RefereeTest {
 
         val attackerFactory =
             AttackingCountryWinsAttackerFactory(PositiveInt(4), PositiveInt(1))
-        val referee = Referee(
+        val referee = Referee.initialize(
             players,
             politicalMapLarge,
             FixedOccupationsDealer(occupationsSampleLarge, playerNames),
@@ -174,7 +174,7 @@ class RefereeTest {
             PlayerOccupation(kam, nico, PositiveInt(1))
         )
 
-        val referee = Referee(
+        val referee = Referee.initialize(
             players,
             politicalMapLarge,
             FixedOccupationsDealer(occupationsSampleSmall, playerNames)
@@ -192,7 +192,7 @@ class RefereeTest {
     fun `Conquering a country moves the requested armies and changes the occupier`() {
         val attackerFactory =
             AttackingCountryWinsAttackerFactory(PositiveInt(4), PositiveInt(1))
-        val referee = Referee(
+        val referee = Referee.initialize(
             players,
             politicalMap,
             FixedOccupationsDealer(occupationsSample, playerNames),
@@ -228,7 +228,7 @@ class RefereeTest {
     fun `Cannot attack when occupying a country`() {
         val attackerFactory =
             AttackingCountryWinsAttackerFactory(PositiveInt(4), PositiveInt(1))
-        val referee = Referee(
+        val referee = Referee.initialize(
             players,
             politicalMap,
             FixedOccupationsDealer(occupationsSample, playerNames),
@@ -324,7 +324,7 @@ class RefereeTest {
 
     @Test
     fun `Cannot end attack when occupying`() {
-        val referee = Referee(
+        val referee = Referee.initialize(
             players,
             politicalMap,
             FixedOccupationsDealer(occupationsSample, playerNames),
