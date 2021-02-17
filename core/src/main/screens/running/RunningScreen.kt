@@ -16,7 +16,7 @@ import screens.ReadyScreen
 
 class RunningScreen(
     private val game: Kamchatka, referee: Referee, countryColors: CountryColors
-) : KamchatkaScreen(game), CountrySelectionListener {
+) : KamchatkaScreen(game){
     private val assetManager = AssetManager()
     override val viewport: Viewport
     private val stage: WorldmapStage
@@ -48,18 +48,6 @@ class RunningScreen(
 
     private fun switchToReadyScreen() {
         game.setKamchatkaScreen(ReadyScreen(game))
-    }
-
-    override fun onCountrySelected(country: Country) {
-        println("Country $country was selected")
-    }
-
-    override fun onCountryMouseOver(country: Country) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onCountryExit(country: Country) {
-        TODO("Not yet implemented")
     }
 
     override fun render(delta: Float) {

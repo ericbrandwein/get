@@ -1,5 +1,6 @@
 package screens.running
 
+import Country
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
@@ -15,7 +16,7 @@ class WorldmapStage(
     worldmapTexture: Texture,
     countryColors: CountryColors,
     private val occupations: CountryOccupations
-) : Stage(viewport) {
+) : Stage(viewport), CountrySelectionListener {
     private val countryLabel = Label("", Label.LabelStyle(BitmapFont(), Color.WHITE))
     private var currentCountry: String? = null
         set(value) {
@@ -36,7 +37,10 @@ class WorldmapStage(
         assetManager.load(COUNTRY_COLORS_FILE, Texture::class.java)
         val countryColorsTexture =
             assetManager.finishLoadingAsset<Texture>(COUNTRY_COLORS_FILE)
-        addActor(WorldmapActor(worldmapTexture, countryColorsTexture, countryColors))
+        val worldmapActor =
+            WorldmapActor(worldmapTexture, countryColorsTexture, countryColors)
+        worldmapActor.countrySelectionListener = this
+        addActor(worldmapActor)
         setupCountryLabel()
     }
 
@@ -44,6 +48,18 @@ class WorldmapStage(
         countryLabel.setFontScale(4F)
         countryLabel.setPosition(8F, 70F)
         addActor(countryLabel)
+    }
+
+    override fun onCountrySelected(country: Country) {
+
+    }
+
+    override fun onCountryMouseOver(country: Country) {
+        currentCountry = country
+    }
+
+    override fun onCountryExit(country: Country) {
+        currentCountry = null
     }
 
     companion object {
