@@ -7,10 +7,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.viewport.Viewport
 import gamelogic.occupations.CountryOccupations
 
@@ -19,9 +19,12 @@ class RunningStage(
     assetManager: AssetManager,
     worldmapTexture: Texture,
     countryColors: CountryColors,
-    private val occupations: CountryOccupations
+    private val occupations: CountryOccupations,
+    private val nextStateListener: ChangeListener
 ) : Stage(viewport), CountrySelectionListener {
+
     private val countryLabel = Label("", Label.LabelStyle(BitmapFont(), Color.WHITE))
+
     private var currentCountry: String? = null
         set(value) {
             if (value != null) {
@@ -57,12 +60,13 @@ class RunningStage(
 
     private fun setupNextStateButton() {
         val skin = Skin(Gdx.files.internal("skin/uiskin.json"))
-        val textButton = TextButton("Next state", skin)
-        textButton.label.setFontScale(2F)
-        textButton.width = 4 * textButton.width
-        textButton.height = 4 * textButton.height
-        textButton.setPosition(width - textButton.width - 8F, 8F)
-        addActor(textButton)
+        val button = TextButton("Next state", skin)
+        button.label.setFontScale(2F)
+        button.width = 4 * button.width
+        button.height = 4 * button.height
+        button.setPosition(width - button.width - 8F, 8F)
+        button.addListener(nextStateListener)
+        addActor(button)
     }
 
     override fun onCountrySelected(country: Country) {

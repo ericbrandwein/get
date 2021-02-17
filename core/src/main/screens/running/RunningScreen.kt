@@ -7,6 +7,8 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import gamelogic.Referee
@@ -40,7 +42,13 @@ class RunningScreen(
             game.camera
         )
         stage = RunningStage(
-            viewport, assetManager, worldmapTexture, countryColors, referee.occupations)
+            viewport, assetManager, worldmapTexture, countryColors, referee.occupations,
+            object: ChangeListener() {
+                override fun changed(event: ChangeEvent?, actor: Actor?) {
+                    println("State changed")
+                }
+            }
+        )
         inputProcessor.addProcessor(keyInputProcessor)
         inputProcessor.addProcessor(stage)
     }
