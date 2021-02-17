@@ -42,7 +42,6 @@ class RunningScreen(
         )
         stage = WorldmapStage(
             viewport, assetManager, worldmapTexture, countryColors, referee.occupations)
-        stage.countrySelectionListener = this
         inputProcessor.addProcessor(keyInputProcessor)
         inputProcessor.addProcessor(stage)
     }
@@ -53,6 +52,14 @@ class RunningScreen(
 
     override fun onCountrySelected(country: Country) {
         println("Country $country was selected")
+    }
+
+    override fun onCountryMouseOver(country: Country) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onCountryExit(country: Country) {
+        TODO("Not yet implemented")
     }
 
     override fun render(delta: Float) {
