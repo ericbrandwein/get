@@ -18,7 +18,7 @@ class RunningScreen(
 ) : KamchatkaScreen(game){
     private val assetManager = AssetManager()
     override val viewport: Viewport
-    private val stage: WorldmapStage
+    private val stage: RunningStage
     override val inputProcessor = InputMultiplexer()
 
     private val keyInputProcessor: InputProcessor = object: InputAdapter() {
@@ -39,7 +39,7 @@ class RunningScreen(
             worldmapTexture.height.toFloat(),
             game.camera
         )
-        stage = WorldmapStage(
+        stage = RunningStage(
             viewport, assetManager, worldmapTexture, countryColors, referee.occupations)
         inputProcessor.addProcessor(keyInputProcessor)
         inputProcessor.addProcessor(stage)

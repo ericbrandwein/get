@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.viewport.Viewport
 import gamelogic.occupations.CountryOccupations
 
-class WorldmapStage(
+class RunningStage(
     viewport: Viewport,
     assetManager: AssetManager,
     worldmapTexture: Texture,
