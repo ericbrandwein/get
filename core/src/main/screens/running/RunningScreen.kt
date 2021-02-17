@@ -1,11 +1,10 @@
 package screens.running
 
-import Country
 import Kamchatka
-import com.badlogic.gdx.InputProcessor
-import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.viewport.FitViewport
@@ -20,7 +19,7 @@ class RunningScreen(
     private val assetManager = AssetManager()
     override val viewport: Viewport
     private val stage: WorldmapStage
-    override val  inputProcessor = InputMultiplexer()
+    override val inputProcessor = InputMultiplexer()
 
     private val keyInputProcessor: InputProcessor = object: InputAdapter() {
         override fun keyDown(keycode: Int): Boolean {
