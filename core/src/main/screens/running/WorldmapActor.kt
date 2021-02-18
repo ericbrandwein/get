@@ -2,50 +2,26 @@ package screens.running
 
 import Country
 import IntRectangle
-import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
-import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
-import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.utils.viewport.Viewport
-import gamelogic.occupations.CountryOccupations
 import screens.running.countryImage.CountryImage
 import screens.running.countryImage.findCountryRectangles
 
-class WorldmapStage(
-    viewport: Viewport,
-    assetManager: AssetManager,
-    worldmapTexture: Texture,
-    countryColors: CountryColors,
-    private val occupations: CountryOccupations
-) : Stage(viewport) {
-    private val countryLabel = Label("", Label.LabelStyle(BitmapFont(), Color.WHITE))
-    private var currentCountry: String? = null
-        set(value) {
-            if (value != null) {
-                countryLabel.setText("""
-                    $value
-                    Occupied by ${
-                        occupations.occupierOf(value)
-                    } with ${occupations.armiesOf(value)} armies.                    
-                """.trimIndent())
-            } else {
-                countryLabel.setText("")
-            }
-            field = value
-        }
-    var countrySelectionListener: CountrySelectionListener = NoCountrySelectionListener()
+class WorldmapActor(
+    worldmapTexture: Texture, countryColorsTexture: Texture, countryColors: CountryColors
+) : Group() {
+
+    var countrySelectionListener: CountrySelectionListener? = null
 
     init {
         setupWorldmapImage(worldmapTexture)
-        setupCountryImages(assetManager, countryColors)
-        setupCountryLabel()
+        setupCountryImages(countryColorsTexture, countryColors)
     }
 
     private fun setupWorldmapImage(worldmapTexture: Texture) {
@@ -55,9 +31,9 @@ class WorldmapStage(
     }
 
     private fun setupCountryImages(
-        assetManager: AssetManager, countryColors: CountryColors
+        countryColorsTexture: Texture, countryColors: CountryColors
     ) {
-        val countryColorsPixmap = loadCountryColorsPixmap(assetManager)
+        val countryColorsPixmap = loadCountryColorsPixmap(countryColorsTexture)
         val rectangles = findCountryRectangles(countryColorsPixmap, countryColors)
         rectangles.forEach { (country, rectangle) ->
             val countryColor = countryColors.getValue(country)
@@ -65,10 +41,7 @@ class WorldmapStage(
         }
     }
 
-    private fun loadCountryColorsPixmap(assetManager: AssetManager): Pixmap {
-        assetManager.load(COUNTRY_COLORS_FILE, Texture::class.java)
-        val countryColorsTexture =
-            assetManager.finishLoadingAsset<Texture>(COUNTRY_COLORS_FILE)
+    private fun loadCountryColorsPixmap(countryColorsTexture: Texture): Pixmap {
         val textureData = countryColorsTexture.textureData
         if (!textureData.isPrepared) {
             textureData.prepare()
@@ -89,11 +62,13 @@ class WorldmapStage(
 
             override fun touchUp(
                 event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int
-            ) = countrySelectionListener.onCountrySelected(country)
+            ) {
+                countrySelectionListener?.onCountrySelected(country)
+            }
 
             override fun mouseMoved(event: InputEvent?, x: Float, y: Float): Boolean {
                 image.highlight()
-                currentCountry = country
+                countrySelectionListener?.onCountryMouseOver(country)
                 return false
             }
 
@@ -102,21 +77,11 @@ class WorldmapStage(
             ) {
                 if (image.hit(x, y, false) == null) {
                     image.removeHighlight()
-                    currentCountry = null
+                    countrySelectionListener?.onCountryExit(country)
                 }
                 super.exit(event, x, y, pointer, toActor)
             }
         })
         addActor(image)
-    }
-
-    private fun setupCountryLabel() {
-        countryLabel.setFontScale(4F)
-        countryLabel.setPosition(8F, 70F)
-        addActor(countryLabel)
-    }
-
-    companion object {
-        private const val COUNTRY_COLORS_FILE = "colores-paises.png"
     }
 }

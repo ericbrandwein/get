@@ -1,13 +1,14 @@
 package screens.running
 
-import Country
 import Kamchatka
-import com.badlogic.gdx.InputProcessor
-import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import gamelogic.Referee
@@ -16,11 +17,11 @@ import screens.ReadyScreen
 
 class RunningScreen(
     private val game: Kamchatka, referee: Referee, countryColors: CountryColors
-) : KamchatkaScreen(game), CountrySelectionListener {
+) : KamchatkaScreen(game){
     private val assetManager = AssetManager()
     override val viewport: Viewport
-    private val stage: WorldmapStage
-    override val  inputProcessor = InputMultiplexer()
+    private val stage: RunningStage
+    override val inputProcessor = InputMultiplexer()
 
     private val keyInputProcessor: InputProcessor = object: InputAdapter() {
         override fun keyDown(keycode: Int): Boolean {
@@ -40,19 +41,20 @@ class RunningScreen(
             worldmapTexture.height.toFloat(),
             game.camera
         )
-        stage = WorldmapStage(
-            viewport, assetManager, worldmapTexture, countryColors, referee.occupations)
-        stage.countrySelectionListener = this
+        stage = RunningStage(
+            viewport, assetManager, worldmapTexture, countryColors, referee.occupations,
+            object: ChangeListener() {
+                override fun changed(event: ChangeEvent?, actor: Actor?) {
+                    println("State changed")
+                }
+            }
+        )
         inputProcessor.addProcessor(keyInputProcessor)
         inputProcessor.addProcessor(stage)
     }
 
     private fun switchToReadyScreen() {
         game.setKamchatkaScreen(ReadyScreen(game))
-    }
-
-    override fun onCountrySelected(country: Country) {
-        println("Country $country was selected")
     }
 
     override fun render(delta: Float) {
